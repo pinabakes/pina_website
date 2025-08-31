@@ -20,6 +20,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Organization Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "PiNa Bakes",
+    "url": "https://pinabakes.github.io/pina_website/",
+    "logo": "https://pinabakes.github.io/pina_website/assets/logo/pina-bakes-logo.png",
+    "sameAs": ["https://instagram.com/PiNaBakes"]
+  }
+  </script>
+
   <style>
     :root{--brand:#2f6a3a;--brand-2:#6b4226;--bg:#fffdf7;--ink:#202020;--muted:#565c64;--card:#ffffff;--ring:rgba(0,0,0,.08);--radius:16px}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -83,6 +96,11 @@
     footer{text-align:center;color:var(--muted);margin:2.2rem 0 1.6rem}
     .fssai{display:inline-flex;align-items:center;gap:.4rem;vertical-align:middle;color:var(--brand)}
     .fssai img{width:45px;height:26px;object-fit:contain}
+
+    /* Product gallery thumbs (detail page) */
+    .thumbs{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}
+    .thumbs button{border:1px solid var(--ring);padding:0;background:#fff;border-radius:10px;cursor:pointer}
+    .thumbs img{display:block;width:78px;height:78px;object-fit:cover;border-radius:10px}
   </style>
 </head>
 <body>
@@ -134,6 +152,7 @@
       <div class="flex2" style="margin-top:1rem">
         <div>
           <img id="product-image" alt="" class="thumb" style="border-radius:var(--radius)">
+          <div id="product-thumbs" class="thumbs" aria-label="More photos"></div>
         </div>
         <div>
           <h2 id="product-title">Product</h2>
@@ -156,6 +175,20 @@
           <h3>Notes</h3>
           <p id="product-notes">Add tasting notes, storage tips, and allergy info here.</p>
         </div>
+      </div>
+      <hr class="divider">
+      <div class="section">
+        <h3>Nutrition (per 100g)</h3>
+        <table aria-label="Nutrition facts per 100 grams" id="nutrition-table" style="width:100%;border-collapse:collapse;border:1px solid var(--ring);border-radius:12px;overflow:hidden">
+          <thead>
+            <tr style="background:#fafafa">
+              <th style="padding:.65rem .75rem;text-align:left">Nutrient</th>
+              <th style="padding:.65rem .75rem;text-align:left">Amount</th>
+            </tr>
+          </thead>
+          <tbody id="product-nutrition"></tbody>
+        </table>
+        <p style="color:#565c64;margin:.5rem 0 0">Replace “—” with tested values when you have them.</p>
       </div>
     </section>
 
@@ -228,16 +261,87 @@
     window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawer() })
     document.getElementById('year').textContent = new Date().getFullYear()
 
-    // Products with slugs and details
+    // Products with slugs, details & image galleries
     const products = [
-      { slug:'nutty-coco', name:'Nutty-Coco', price:199, tagline:'Real coconut & millet', img:'assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg', bullets:['Crisp edges, soft center','Made with real coconut flakes'], ingredients:['Jowar (sorghum) flour','Oats flour','Coconut','Butter','Jaggery','Baking powder','Vanilla'] },
-      { slug:'jowar-peanut-butter', name:'Jowar-Peanut Butter', price:209, tagline:'Jowar with peanut butter', img:'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg', bullets:['Protein-packed','No maida'], ingredients:['Jowar flour','Peanut butter','Jaggery','Butter','Baking powder'] },
-      { slug:'lemon-blueberry', name:'Lemon-Blueberry', price:289, tagline:'Tangy & fruity millet cookies', img:'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg', bullets:['Real lemon zest','Blueberry bits'], ingredients:['Bajra flour','Oats flour','Blueberries','Butter','Sugar','Lemon zest'] },
-      { slug:'quinoa-walnut', name:'Quinoa-Walnut', price:279, tagline:'Quinoa & walnut', img:'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg', bullets:['Nutty crunch','Quinoa goodness'], ingredients:['Quinoa flour','Jowar flour','Walnuts','Butter','Jaggery'] },
-      { slug:'richie-pistachio', name:'Richie-Pistachio', price:349, tagline:'Richie pistachio cookies', img:'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg', bullets:['Loaded with pistachios','Premium treat'], ingredients:['Pistachio','Bajra flour','Butter','Sugar'] },
-      { slug:'foxtail-true-chocolate', name:'Foxtail True-Chocolate', price:349, tagline:'Pure chocolate with foxtail millet', img:'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg', bullets:['Deep cocoa','Foxtail millet base'], ingredients:['Foxtail millet flour','Cocoa','Butter','Sugar','Baking powder'] },
-      { slug:'ragi-millet', name:'Ragi Millet', price:229, tagline:'Wholesome ragi cookies', img:'assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg', bullets:['Calcium-rich ragi','Tea-time friendly'], ingredients:['Ragi flour','Oats flour','Butter','Jaggery'] },
-      { slug:'bajra-almond', name:'Bajra Millet with Almond', price:199, tagline:'Bajra base, almond enriched', img:'assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg', bullets:['Almond bits','Hearty bajra'], ingredients:['Bajra flour','Almonds','Butter','Sugar'] }
+      { slug:'nutty-coco', name:'Nutty-Coco', price:199, tagline:'Real coconut & millet',
+        img:'assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg',
+        images:[
+          'assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg',
+          'assets/products/nutty-coco/pina-bakes-nutty-coco-2.jpg',
+          'assets/products/nutty-coco/pina-bakes-nutty-coco-3.jpg'
+        ],
+        bullets:['Crisp edges, soft center','Made with real coconut flakes'],
+        ingredients:['Jowar (sorghum) flour','Oats flour','Coconut','Butter','Jaggery','Baking powder','Vanilla'] },
+
+      { slug:'jowar-peanut-butter', name:'Jowar-Peanut Butter', price:209, tagline:'Jowar with peanut butter',
+        img:'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg',
+        images:[
+          'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg',
+          'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-2.jpg',
+          'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-3.jpg'
+        ],
+        bullets:['Protein-packed','No maida'],
+        ingredients:['Jowar flour','Peanut butter','Jaggery','Butter','Baking powder'] },
+
+      { slug:'lemon-blueberry', name:'Lemon-Blueberry', price:289, tagline:'Tangy & fruity millet cookies',
+        img:'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg',
+        images:[
+          'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg',
+          'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-2.jpg',
+          'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-3.jpg'
+        ],
+        bullets:['Real lemon zest','Blueberry bits'],
+        ingredients:['Bajra flour','Oats flour','Blueberries','Butter','Sugar','Lemon zest'] },
+
+      { slug:'quinoa-walnut', name:'Quinoa-Walnut', price:279, tagline:'Quinoa & walnut',
+        img:'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg',
+        images:[
+          'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg',
+          'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-2.jpg',
+          'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-3.jpg'
+        ],
+        bullets:['Nutty crunch','Quinoa goodness'],
+        ingredients:['Quinoa flour','Jowar flour','Walnuts','Butter','Jaggery'] },
+
+      { slug:'richie-pistachio', name:'Richie-Pistachio', price:349, tagline:'Richie pistachio cookies',
+        img:'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg',
+        images:[
+          'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg',
+          'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-2.jpg',
+          'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-3.jpg'
+        ],
+        bullets:['Loaded with pistachios','Premium treat'],
+        ingredients:['Pistachio','Bajra flour','Butter','Sugar'] },
+
+      { slug:'foxtail-true-chocolate', name:'Foxtail True-Chocolate', price:349, tagline:'Pure chocolate with foxtail millet',
+        img:'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg',
+        images:[
+          'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg',
+          'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-2.jpg',
+          'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-3.jpg'
+        ],
+        bullets:['Deep cocoa','Foxtail millet base'],
+        ingredients:['Foxtail millet flour','Cocoa','Butter','Sugar','Baking powder'] },
+
+      { slug:'ragi-millet', name:'Ragi Millet', price:229, tagline:'Wholesome ragi cookies',
+        img:'assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg',
+        images:[
+          'assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg',
+          'assets/products/ragi-millet/pina-bakes-ragi-millet-2.jpg',
+          'assets/products/ragi-millet/pina-bakes-ragi-millet-3.jpg'
+        ],
+        bullets:['Calcium-rich ragi','Tea-time friendly'],
+        ingredients:['Ragi flour','Oats flour','Butter','Jaggery'] },
+
+      { slug:'bajra-almond', name:'Bajra Millet with Almond', price:199, tagline:'Bajra base, almond enriched',
+        img:'assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg',
+        images:[
+          'assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg',
+          'assets/products/bajra-almond/pina-bakes-bajra-almond-2.jpg',
+          'assets/products/bajra-almond/pina-bakes-bajra-almond-3.jpg'
+        ],
+        bullets:['Almond bits','Hearty bajra'],
+        ingredients:['Bajra flour','Almonds','Butter','Sugar'] }
     ]
 
     // Render product grid
@@ -245,22 +349,47 @@
     grid.innerHTML = products.map(p=>{
       const wa = `https://wa.me/917678506669?text=Hi%20PiNa%20Bakes!%20I%20want%20to%20order%20${encodeURIComponent(p.name)}%20(%3Fqty%3D1)`
       const href = `#/product/${p.slug}`
+      const cover = (p.images && p.images[0]) || p.img
       return `
-        <article class=\"card\">
-          <a href=\"${href}\" aria-label=\"View ${p.name}\">
-            <img class=\"thumb\" loading=\"lazy\" src=\"${p.img}\" alt=\"PiNa Bakes ${p.name} cookies\">
+        <article class="card">
+          <a href="${href}" aria-label="View ${p.name}">
+            <img class="thumb" loading="lazy" src="${cover}" alt="PiNa Bakes ${p.name} cookies">
           </a>
-          <div class=\"card-body\">
-            <div class=\"title\">${p.name}</div>
-            <div class=\"price\">₹${p.price}</div>
-            <div class=\"tagline\">${p.tagline}</div>
-            <div style=\"display:flex;gap:.5rem;flex-wrap:wrap\">
-              <a class=\"btn\" href=\"${href}\">View details</a>
-              <a class=\"btn secondary\" href=\"${wa}\" target=\"_blank\" rel=\"noopener\">Order on WhatsApp</a>
+          <div class="card-body">
+            <div class="title">${p.name}</div>
+            <div class="price">₹${p.price}</div>
+            <div class="tagline">${p.tagline}</div>
+            <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+              <a class="btn" href="${href}">View details</a>
+              <a class="btn secondary" href="${wa}" target="_blank" rel="noopener">Order on WhatsApp</a>
             </div>
           </div>
         </article>`
     }).join('')
+
+    // Inject JSON-LD Product schemas (Google can understand your catalog)
+    try{
+      const productSchemas = products.map(p => ({
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: p.name,
+        image: (p.images && p.images.length ? p.images : [p.img]).map(path => `https://pinabakes.github.io/pina_website/${path}`),
+        description: p.tagline,
+        brand: {"@type":"Brand","name":"PiNa Bakes"},
+        sku: p.slug,
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "INR",
+          price: String(p.price),
+          availability: "https://schema.org/InStock",
+          url: `https://pinabakes.github.io/pina_website/#/product/${p.slug}`
+        }
+      }));
+      const ld = document.createElement('script');
+      ld.type = 'application/ld+json';
+      ld.textContent = JSON.stringify(productSchemas);
+      document.head.appendChild(ld);
+    }catch(e){ console.warn('LD-JSON not added', e); }
 
     // Simple hash router for product pages
     function renderRoute(){
@@ -273,13 +402,37 @@
         const slug = hash.split('/')[2]
         const p = products.find(x=>x.slug===slug)
         if(p){
-          document.getElementById('product-image').src = p.img
-          document.getElementById('product-image').alt = `${p.name} cookies`
+          const imgs = (p.images && p.images.length) ? p.images : [p.img]
+          const main = document.getElementById('product-image')
+          main.src = imgs[0]
+          main.alt = `${p.name} cookies`
+
+          const thumbs = document.getElementById('product-thumbs')
+          thumbs.innerHTML = imgs.map((src,i)=>`
+            <button aria-label="View image ${i+1}">
+              <img loading="lazy" src="${src}" alt="">
+            </button>`).join('')
+          Array.from(thumbs.querySelectorAll('button')).forEach((btn,i)=>btn.addEventListener('click', ()=>{ main.src = imgs[i] }))
+
           document.getElementById('product-title').textContent = p.name
           document.getElementById('product-price').textContent = `₹${p.price}`
           document.getElementById('product-tagline').textContent = p.tagline
           document.getElementById('product-bullets').innerHTML = p.bullets? `<ul>${p.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''
           document.getElementById('product-ingredients').innerHTML = (p.ingredients||[]).map(i=>`<li>${i}</li>`).join('')
+
+          // Build nutrition (placeholder if not provided)
+          const nut = p.nutrition || { energy:'— kcal', protein:'— g', fat:'— g', carbs:'— g', sugar:'— g', fibre:'— g', sodium:'— mg' };
+          const rows = [
+            ['Energy', nut.energy||'— kcal'],
+            ['Protein', nut.protein||'— g'],
+            ['Total Fat', nut.fat||'— g'],
+            ['Carbohydrates', nut.carbs||'— g'],
+            ['Added Sugar', nut.sugar||'— g'],
+            ['Dietary Fibre', nut.fibre||'— g'],
+            ['Sodium', nut.sodium||'— mg']
+          ].map(([k,v])=>`<tr><td style="padding:.65rem .75rem;border-bottom:1px solid var(--ring)">${k}</td><td style="padding:.65rem .75rem;border-bottom:1px solid var(--ring)">${v}</td></tr>`).join('');
+          document.getElementById('product-nutrition').innerHTML = rows
+
           const wa = `https://wa.me/917678506669?text=Hi%20PiNa%20Bakes!%20I%20want%20to%20order%20${encodeURIComponent(p.name)}%20(%3Fqty%3D1)`
           const waBtn = document.getElementById('product-wa'); waBtn.href = wa; waBtn.textContent = `Order ${p.name} on WhatsApp`
           productPage.hidden = false; productsSection.hidden = true; hero.hidden = true

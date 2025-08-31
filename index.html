@@ -5,319 +5,298 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PiNa Bakes – Millet Cookies</title>
   <meta name="description" content="PiNa Bakes: gourmet millet-based cookies from Delhi. Healthy, tasty & wholesome." />
-  <!-- 2) absolute og:image -->
+  <link rel="canonical" href="https://pinabakes.github.io/pina_website/" />
+  <meta name="theme-color" content="#2f6a3a" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="PiNa Bakes – Millet Cookies" />
+  <meta property="og:description" content="Gourmet millet-based cookies from Delhi. Healthy, tasty & wholesome." />
   <meta property="og:image" content="https://pinabakes.github.io/pina_website/assets/hero.jpg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <meta property="og:url" content="https://pinabakes.github.io/pina_website/" />
+  <meta property="og:site_name" content="PiNa Bakes" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="assets/logo/pina-bakes-logo.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="assets/logo/pina-bakes-logo.png" />
+  <link rel="manifest" href="assets/site.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-  <!-- 1) favicon -->
-  <link rel="icon" href="assets/logo/pina-bakes-logo.png">
   <style>
-    :root{
-      --brand:#2f6a3a;
-      --brand-2:#6b4226;
-      --bg:#fffdf7;
-      --ink:#202020;
-      --muted:#787878;
-      --card:#ffffff;
-      --ring:rgba(0,0,0,.08);
-      --radius:16px;
-    }
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif}
+    :root{--brand:#2f6a3a;--brand-2:#6b4226;--bg:#fffdf7;--ink:#202020;--muted:#565c64;--card:#ffffff;--ring:rgba(0,0,0,.08);--radius:16px}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
     a{color:var(--brand);text-decoration:none}
     img{max-width:100%;border-radius:10px}
-
-    /* Topbar/Nav */
-    .topbar{
-      position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:.8rem;
-      background:var(--card);border-bottom:1px solid var(--ring);
-      padding:.8rem 1.1rem;
-      justify-content:space-between;
-    }
-    .brand{font-weight:800;font-size:1.1rem;letter-spacing:.2px;color:var(--brand);}
-    .navlinks{display:flex;gap:1.25rem;}
+    *{box-sizing:border-box}
+    .skip-link{position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip-link:focus{left:1rem;top:1rem;width:auto;height:auto;background:#fff;padding:.5rem .75rem;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+    header.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:.8rem;background:var(--card);border-bottom:1px solid var(--ring);padding:.8rem 1.1rem;justify-content:space-between}
+    .brand{font-weight:800;font-size:1.1rem;letter-spacing:.2px;color:var(--brand)}
+    .navlinks{display:flex;gap:1.25rem}
     .navlink{font-size:1rem;font-weight:600;position:relative;transition:.2s}
-    .navlink:hover{color:var(--brand-2);}
-    @media(max-width:640px){
-      .navlinks{display:none;}
-      .burger{display:block;}
-    }
-    .burger{display:none;cursor:pointer;}
-    .burger span,
-    .burger::before,
-    .burger::after{
-      content:"";display:block;width:24px;height:2.9px;background:var(--ink);
-      border-radius:2px;transition:.25s;
-    }
-    .burger::before{transform:translateY(-7px);}
-    .burger::after{transform:translateY(5px);}
-    .burger.open span{background:transparent;}
-    .burger.open::before{transform:rotate(45deg);}
-    .burger.open::after{transform:rotate(-45deg);}
-    /* Drawer */
-    .drawer{display:none;}
-    .drawer.open{
-      display:flex;flex-direction:column;position:fixed;z-index:60;top:0;left:0;
-      width:78vw;max-width:320px;height:100vh;background:var(--card);box-shadow:2px 0 24px rgba(0,0,0,.13);
-      padding:2rem 1.4rem;animation:fromLeft .31s;
-    }
-    .drawer a{margin:.8rem 0;font-size:1.22rem;color:var(--ink);font-weight:700;padding-bottom:5px;}
-    .drawer a:hover{color:var(--brand);}
-    .drawer-backdrop{display:none;}
-    .drawer-backdrop.active{
-      display:block;position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:59;
-    }
-    @keyframes fromLeft{from{transform:translateX(-100%);}to{transform:translateX(0);}}
-    
-    /* Hero */
-    .hero{background:url('assets/hero.jpg') center/cover no-repeat;min-height:370px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3.5rem 1rem 2.5rem;}
-    .hero .title{font-size:2.5rem;font-weight:800;margin:0.6rem 0 0;}
-    .hero .desc{font-size:1.2rem;font-weight:400;max-width:500px;margin:.8rem auto 1.6rem;}
-    .pill{background:#e6f3e9;color:var(--brand);font-weight:700;border-radius:999px;padding:.55rem 1.5rem;margin:0.4rem 0;}
-
-    /* Section */
-    .section{padding:2.3rem 1rem 1.2rem;max-width:1100px;margin:auto;}
-    .section h2{margin-top:0;font-size:2rem;color:var(--brand);}
-    .section .desc{color:var(--muted);font-size:1.1rem;margin-bottom:2.1rem;}
-    .divider{margin:2.4rem 0;border:1px solid var(--ring);}
-    /* Products Grid */
-    .grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
-    .card{background:var(--card);border:1px solid var(--ring);border-radius:var(--radius);overflow:hidden;transition:box-shadow .18s;}
-    .card:hover{box-shadow:0 8px 24px rgba(47,106,58,.12);}
-    .card .thumb{aspect-ratio:1/1;object-fit:cover;}
-    .card-body{padding:1.1rem .9rem .9rem;}
-    .title{font-weight:700;font-size:1.25rem;}
-    .price{color:var(--brand-2);font-weight:800;margin:.41rem 0;}
-    .tagline{color:var(--muted);font-size:1rem;margin-bottom:.7rem;}
-    .btn{
-      background:var(--brand);color:#fff;padding:.62rem 1.1rem;border:none;cursor:pointer;font-weight:700;
-      border-radius:8px;text-align:center;margin-top:.9rem;box-shadow:0 2px 14px 0 rgba(47,106,58,.12);transition:.16s;
-      display:inline-block;
-    }
-    .btn.secondary{background:var(--brand-2);}
-    .btn:hover{background:var(--brand-2);}
-
-    /* Video Gallery */
+    .navlink:hover{color:var(--brand-2)}
+    @media(max-width:640px){.navlinks{display:none}.burger{display:block}}
+    .burger{display:none;cursor:pointer;background:none;border:0}
+    .burger span,.burger::before,.burger::after{content:"";display:block;width:24px;height:3px;background:var(--ink);border-radius:2px;transition:.25s}
+    .burger::before{transform:translateY(-7px)}
+    .burger::after{transform:translateY(5px)}
+    .burger[aria-expanded="true"] span{background:transparent}
+    .burger[aria-expanded="true"]::before{transform:rotate(45deg)}
+    .burger[aria-expanded="true"]::after{transform:rotate(-45deg)}
+    .drawer{display:none}
+    .drawer.open{display:flex;flex-direction:column;position:fixed;z-index:60;top:0;left:0;width:78vw;max-width:320px;height:100vh;background:var(--card);box-shadow:2px 0 24px rgba(0,0,0,.13);padding:2rem 1.4rem;animation:fromLeft .31s}
+    .drawer a{margin:.8rem 0;font-size:1.22rem;color:var(--ink);font-weight:700;padding-bottom:5px}
+    .drawer a:hover{color:var(--brand)}
+    .drawer-backdrop{display:none}
+    .drawer-backdrop.active{display:block;position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:59}
+    @keyframes fromLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+    @media (prefers-reduced-motion: reduce){.drawer.open{animation:none}}
+    .hero{position:relative;min-height:420px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3.5rem 1rem 2.5rem;isolation:isolate}
+    .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.45));z-index:0}
+    .hero-inner{position:relative;z-index:1}
+    .hero .title{font-size:2.5rem;font-weight:800;margin:.6rem 0 0}
+    .hero .desc{font-size:1.2rem;font-weight:400;max-width:540px;margin:.8rem auto 1.6rem}
+    .pill{background:#e6f3e9;color:var(--brand);font-weight:700;border-radius:999px;padding:.55rem 1.2rem;margin:.4rem 0;display:inline-block}
+    main .section{padding:2.3rem 1rem 1.2rem;max-width:1100px;margin:auto}
+    .section h2{margin-top:0;font-size:2rem;color:var(--brand)}
+    .section .desc{color:var(--muted);font-size:1.05rem;margin-bottom:2rem}
+    .divider{margin:2.4rem 0;border:1px solid var(--ring)}
+    .grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+    .card{background:var(--card);border:1px solid var(--ring);border-radius:var(--radius);overflow:hidden;transition:box-shadow .18s}
+    .card:hover{box-shadow:0 8px 24px rgba(47,106,58,.12)}
+    .card .thumb{aspect-ratio:1/1;object-fit:cover}
+    .card-body{padding:1.1rem .9rem .9rem}
+    .title{font-weight:700;font-size:1.25rem}
+    .price{color:var(--brand-2);font-weight:800;margin:.41rem 0}
+    .tagline{color:var(--muted);font-size:1rem;margin-bottom:.7rem}
+    .btn{background:var(--brand);color:#fff;padding:.62rem 1.1rem;border:none;cursor:pointer;font-weight:700;border-radius:8px;text-align:center;margin-top:.9rem;box-shadow:0 2px 14px 0 rgba(47,106,58,.12);transition:.16s;display:inline-block}
+    .btn.secondary{background:var(--brand-2)}
+    .btn:hover{background:var(--brand-2)}
     .video-gallery{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-    .video-wrap{background:var(--card);padding:1rem;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.04);}
-    .video-wrap video,.video-wrap iframe{width:100%;border-radius:12px;max-height:350px;}
-    .video-wrap .desc{font-size:.99rem;color:var(--brand-2);margin:.6rem 0 .2rem;}
-    @media(max-width:500px){
-      .video-gallery{grid-template-columns:1fr}
-    }
-    /* Instagram */
+    .video-wrap{background:var(--card);padding:1rem;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+    .video-wrap video,.video-wrap iframe{width:100%;border-radius:12px;max-height:350px}
+    .video-wrap .desc{font-size:.99rem;color:var(--brand-2);margin:.6rem 0 .2rem}
+    @media(max-width:500px){.video-gallery{grid-template-columns:1fr}}
     .insta-embed{margin:2.3rem 0 0;padding:1rem 0;border-radius:var(--radius);background:#fafafb}
-    .insta-embed h3{font-size:1.13rem;font-weight:700;margin-bottom:.6rem; color:var(--brand);}
-    /* About, Contact */
-    .flex2{display:flex;gap:2rem;flex-wrap:wrap;}
-    .flex2 > div{flex:1 1 340px;}
-    .contact strong{color:var(--ink);}
-    /* Footer */
-    footer{text-align:center;color:var(--muted);margin:2.2rem 0 1.6rem;}
-    .fssai{display:inline-flex;align-items:center;gap:.4rem;vertical-align:middle;color:var(--brand);}
-    .fssai img{width:45px;height:26px;object-fit:contain;}
+    .insta-embed h3{font-size:1.13rem;font-weight:700;margin-bottom:.6rem;color:var(--brand)}
+    .flex2{display:flex;gap:2rem;flex-wrap:wrap}
+    .flex2>div{flex:1 1 340px}
+    .contact strong{color:var(--ink)}
+    footer{text-align:center;color:var(--muted);margin:2.2rem 0 1.6rem}
+    .fssai{display:inline-flex;align-items:center;gap:.4rem;vertical-align:middle;color:var(--brand)}
+    .fssai img{width:45px;height:26px;object-fit:contain}
   </style>
 </head>
 <body>
-  <!-- Top Navigation -->
-  <div class="topbar">
-    <div style="display:flex;align-items:center;gap:.5rem;">
-      <!-- 3) header logo explicit size -->
-      <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:34px;width:34px;border-radius:50%;object-fit:cover;">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar" role="banner">
+    <a href="#home" style="display:flex;align-items:center;gap:.5rem;text-decoration:none" aria-label="PiNa Bakes Home">
+      <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:34px;width:34px;border-radius:50%;object-fit:cover" loading="eager" fetchpriority="high">
       <span class="brand">PiNa Bakes</span>
-    </div>
-    <nav class="navlinks">
+    </a>
+    <nav class="navlinks" aria-label="Primary">
+      <a href="#home" class="navlink">Home</a>
       <a href="#products" class="navlink">Products</a>
       <a href="#videos" class="navlink">Videos</a>
       <a href="#about" class="navlink">About</a>
       <a href="#contact" class="navlink">Contact</a>
     </nav>
-    <button class="burger" aria-controls="drawer" onclick="toggleDrawer()"><span></span></button>
-  </div>
-  <div class="drawer-backdrop" onclick="closeDrawer()" id="backdrop"></div>
-  <nav class="drawer" id="drawer">
+    <button class="burger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" onclick="toggleDrawer()"><span></span></button>
+  </header>
+  <div class="drawer-backdrop" onclick="closeDrawer()" id="backdrop" hidden></div>
+  <nav class="drawer" id="drawer" aria-label="Mobile">
+    <a href="#home" onclick="closeDrawer()">Home</a>
     <a href="#products" onclick="closeDrawer()">Products</a>
     <a href="#videos" onclick="closeDrawer()">Videos</a>
     <a href="#about" onclick="closeDrawer()">About</a>
     <a href="#contact" onclick="closeDrawer()">Contact</a>
   </nav>
-
-  <!-- Hero -->
-  <section class="hero">
-    <span class="pill">Healthy • Tasty • Wholesome</span>
-    <div class="title">Millet Cookies, Made the Right Way</div>
-    <p class="desc">Crafted in Delhi with premium ingredients.<br>Gourmet gluten-friendly indulgence you can feel great about!</p>
-    <a href="#products" class="btn">Shop Our Cookies</a>
-  </section>
-
-  <!-- Products -->
-  <section id="products" class="section">
-    <h2>Our Flavors</h2>
-    <div class="desc">Premium millet-based cookies, delivered fresh to your door. <b>Safe cardboard packaging.</b> Amazon & Shiprocket ready.</div>
-    <div class="grid">
-      <!-- Product Cards will be rendered here -->
+  <section class="hero" id="home" aria-labelledby="hero-title">
+    <picture aria-hidden="true" style="position:absolute;inset:0;z-index:-1">
+      <img src="assets/hero.jpg" alt="" style="width:100%;height:100%;object-fit:cover" loading="eager" fetchpriority="high">
+    </picture>
+    <div class="hero-inner">
+      <span class="pill">Healthy • Tasty • Wholesome</span>
+      <h1 id="hero-title" class="title">Millet Cookies, Made the Right Way</h1>
+      <p class="desc">Crafted in Delhi with premium ingredients.<br>Gourmet gluten-friendly indulgence you can feel great about!</p>
+      <a href="#products" class="btn">Shop Our Cookies</a>
     </div>
   </section>
+  <main id="main">
+    <section id="products" class="section" aria-labelledby="products-title">
+      <h2 id="products-title">Our Flavors</h2>
+      <div class="desc">Premium millet-based cookies, delivered fresh to your door. <b>Safe cardboard packaging.</b> Amazon & Shiprocket ready.</div>
+      <div class="grid" id="product-grid" aria-live="polite"></div>
+      <noscript><p>Please enable JavaScript to see product cards.</p></noscript>
+    </section>
 
-  <!-- Videos -->
-  <section id="videos" class="section">
-    <h2>Our UnMatched Purity makes us master of Baking!</h2>
-    <div class="desc">See the magic and being enjoyed!</div>
-    <div class="video-gallery">
-      <!-- Add your local videos or YouTube embeds below (replace src as needed) -->
-      <div class="video-wrap">
-        <video controls poster="assets/videos/cookie-thumb.jpg">
-          <source src="assets/videos/cookies-baking.mp4" type="video/mp4">
-          Your browser does not support this video.
-        </video>
-        <div class="desc">Our fresh Nutty-Coco batch, straight from the oven!</div>
+    <!-- Product Detail Page (hash-based SPA) -->
+    <section id="product-page" class="section" aria-labelledby="product-title" hidden>
+      <a href="#products" class="navlink" id="back-to-products">← Back to products</a>
+      <div class="flex2" style="margin-top:1rem">
+        <div>
+          <img id="product-image" alt="" class="thumb" style="border-radius:var(--radius)">
+        </div>
+        <div>
+          <h2 id="product-title">Product</h2>
+          <div id="product-price" class="price"></div>
+          <p id="product-tagline" class="tagline"></p>
+          <div id="product-bullets"></div>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <a id="product-wa" class="btn" target="_blank" rel="noopener">Order on WhatsApp</a>
+            <a href="#products" class="btn secondary">Back</a>
+          </div>
+        </div>
       </div>
-      <div class="video-wrap">
-        <iframe src="https://www.instagram.com/reel/DNrufS8ZD1b/" allowfullscreen title="PiNa Bakes baking process"></iframe>
-        <div class="desc">Behind the scenes: cookie making at PiNa Bakes</div>
+      <hr class="divider">
+      <div class="flex2">
+        <div>
+          <h3>Ingredients</h3>
+          <ul id="product-ingredients"></ul>
+        </div>
+        <div>
+          <h3>Notes</h3>
+          <p id="product-notes">Add tasting notes, storage tips, and allergy info here.</p>
+        </div>
       </div>
-      <!-- Add more video blocks as needed -->
-    </div>
+    </section>
 
-    <!-- Instagram section for showing feed -->
-    <div class="insta-embed">
-      <h3>See More on Instagram <a href="https://instagram.com/PiNaBakes" target="_blank">@PiNaBakes</a></h3>
-      <!-- Replace below with an actual Instagram embed, or use a widget provider for more functionality -->
-      <iframe src="https://www.instagram.com/PiNaBakes/embed" width="400" height="480" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
-    </div>
-  </section>
+    <section id="videos" class="section" aria-labelledby="videos-title">
+      <h2 id="videos-title">Cookie Gallery: Watch Us Bake!</h2>
+      <div class="desc">See the magic—our cookies in-the-making and being enjoyed!</div>
+      <div class="video-gallery">
+        <div class="video-wrap">
+          <video controls poster="assets/videos/cookie-thumb.jpg" preload="metadata">
+            <source src="assets/videos/cookies-baking.mp4" type="video/mp4">
+            Your browser does not support this video.
+          </video>
+          <div class="desc">Our fresh Nutty-Coco batch, straight from the oven!</div>
+        </div>
+        <div class="video-wrap">
+          <iframe src="https://www.youtube.com/embed/2rQrxFsgbeE" allowfullscreen title="PiNa Bakes baking process" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <div class="desc">Behind the scenes: cookie making at PiNa Bakes</div>
+        </div>
+      </div>
+      <div class="insta-embed">
+        <h3>See More on Instagram <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></h3>
+        <p>Follow us on Instagram for daily bakes and behind‑the‑scenes!</p>
+      </div>
+    </section>
 
-  <!-- About -->
-  <section id="about" class="section flex2">
-    <div>
-      <h2>About PiNa Bakes</h2>
-      <p>
-        <b>PiNa Bakes</b> brings wholesome, millet-based gourmet cookies to Delhi and pan-India.
-        Simple ingredients, balanced nutrition, and honest flavors—crafted with passion and expertise.<br>
-        <br>
-        <b>Packaging:</b> Eco-friendly cardboard, safe for shipping.
-        <br>
-        <b>Compliance:</b> FSSAI certified. Ready for Amazon and Shiprocket.
-      </p>
-    </div>
-    <div>
-      <h2>Why Choose Us?</h2>
-      <ul>
-        <li>100% premium-quality millet blends</li>
-        <li>Rich, honest flavors—no compromise</li>
-        <li>Gluten-friendly, wholesome indulgence</li>
-        <li>Pan-India delivery, safe packaging</li>
-        <li>Manufactured & Marketed by <b>PiNa Bakes</b></li>
-      </ul>
-    </div>
-  </section>
+    <section id="about" class="section flex2" aria-labelledby="about-title">
+      <div>
+        <h2 id="about-title">About PiNa Bakes</h2>
+        <p><b>PiNa Bakes</b> brings wholesome, millet-based gourmet cookies to Delhi and pan-India. Simple ingredients, balanced nutrition, and honest flavors—crafted with passion and expertise.</p>
+        <p><b>Packaging:</b> Eco-friendly cardboard, safe for shipping.<br><b>Compliance:</b> FSSAI certified. Ready for Amazon and Shiprocket.</p>
+      </div>
+      <div>
+        <h2>Why Choose Us?</h2>
+        <ul>
+          <li>100% premium-quality millet blends</li>
+          <li>Rich, honest flavors—no compromise</li>
+          <li>Gluten-friendly, wholesome indulgence</li>
+          <li>Pan-India delivery, safe packaging</li>
+          <li>Manufactured &amp; Marketed by <b>PiNa Bakes</b></li>
+        </ul>
+      </div>
+    </section>
 
-  <!-- Contact -->
-  <section id="contact" class="section">
-    <h2>Contact</h2>
-    <div class="contact">
-      <div><strong>Address:</strong> 3684, DaribaPan, Paharganj, New Delhi – 110055</div>
-      <div><strong>Call/WhatsApp:</strong> <a href="https://wa.me/917678506669">+91 7678506669</a></div>
-      <div><strong>Email:</strong> <a href="mailto:Pinabakes@gmail.com">Pinabakes@gmail.com</a></div>
-      <div><strong>Instagram:</strong> <a href="https://instagram.com/PiNaBakes">@PiNaBakes</a></div>
-    </div>
-    <div style="margin-top:.7rem;" class="fssai">
-      <img src="assets/fssai-logo.png" alt="FSSAI Logo"> FSSAI License: abcd1234
-    </div>
-  </section>
-
+    <section id="contact" class="section" aria-labelledby="contact-title">
+      <h2 id="contact-title">Contact</h2>
+      <address class="contact">
+        <div><strong>Address:</strong> 3684, DaribaPan, Paharganj, New Delhi – 110055</div>
+        <div><strong>Call/WhatsApp:</strong> <a href="https://wa.me/917678506669" target="_blank" rel="noopener">+91 7678506669</a></div>
+        <div><strong>Email:</strong> <a href="mailto:Pinabakes@gmail.com?subject=PiNa%20Bakes%20Enquiry">Pinabakes@gmail.com</a></div>
+        <div><strong>Instagram:</strong> <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></div>
+      </address>
+      <div style="margin-top:.7rem" class="fssai" aria-label="FSSAI License">
+        <img src="assets/fssai-logo.png" alt="FSSAI Logo"> <span id="fssai-text">FSSAI License: abcd1234</span>
+      </div>
+    </section>
+  </main>
   <footer>
-    <!-- 3) footer logo explicit size -->
-    <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:38px;width:38px;margin-bottom:.4rem;border-radius:50%;object-fit:cover;"><br>
-    © <span id="year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!
-    <br>
-    <span class="fssai"><img src="assets/fssai-logo.png" alt="FSSAI Logo"> abcd1234</span>
+    <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:38px;width:38px;margin-bottom:.4rem;border-radius:50%;object-fit:cover" loading="lazy"><br>
+    © <span id="year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!<br>
+    <span class="fssai"><img src="assets/fssai-logo.png" alt="FSSAI Logo"> <span id="fssai-text-footer">abcd1234</span></span>
   </footer>
-
-
-  <!-- Scripts -->
   <script>
-    // Responsive drawer logic
-    function toggleDrawer(){
-      document.getElementById('drawer').classList.toggle('open');
-      document.getElementById('backdrop').classList.toggle('active');
-      document.querySelector('.burger').classList.toggle('open');
-    }
-    function closeDrawer(){
-      document.getElementById('drawer').classList.remove('open');
-      document.getElementById('backdrop').classList.remove('active');
-      document.querySelector('.burger').classList.remove('open');
-    }
+    // Drawer
+    const drawer = document.getElementById('drawer');
+    const backdrop = document.getElementById('backdrop');
+    const burger = document.querySelector('.burger');
+    function openDrawer(){drawer.classList.add('open');backdrop.classList.add('active');backdrop.hidden=false;burger.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'}
+    function closeDrawer(){drawer.classList.remove('open');backdrop.classList.remove('active');backdrop.hidden=true;burger.setAttribute('aria-expanded','false');document.body.style.overflow=''}
+    function toggleDrawer(){drawer.classList.contains('open')?closeDrawer():openDrawer()}
+    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawer() })
+    document.getElementById('year').textContent = new Date().getFullYear()
 
-    // Year footer
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    // Product card data & rendering
+    // Products with slugs and details
     const products = [
-      {
-        name: "Nutty-Coco",
-        price: 199,
-        tagline: "Real coconut & millet",
-        img: "assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg"
-      },
-      {
-        name: "Jowar-Peanut Butter",
-        price: 209,
-        tagline: "Jowar with peanut butter",
-        img: "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg"
-      },
-      {
-        name: "Lemon-Blueberry",
-        price: 289,
-        tagline: "Tangy & fruity millet cookies",
-        img: "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg"
-      },
-      {
-        name: "Quinoa-Walnut",
-        price: 279,
-        tagline: "Quinoa & walnut",
-        img: "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg"
-      },
-      {
-        name: "Richie-Pistachio",
-        price: 349,
-        tagline: "Richie pistachio cookies",
-        img: "assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg"
-      },
-      {
-        name: "Foxtail True-Chocolate",
-        price: 349,
-        tagline: "Pure chocolate with foxtail millet",
-        img: "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg"
-      },
-      {
-        name: "Ragi Millet",
-        price: 229,
-        tagline: "Wholesome ragi cookies",
-        img: "assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg"
-      },
-      {
-        name: "Bajra Millet with Almond",
-        price: 199,
-        tagline: "Bajra base, almond enriched",
-        img: "assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg"
-      }
-    ];
+      { slug:'nutty-coco', name:'Nutty-Coco', price:199, tagline:'Real coconut & millet', img:'assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg', bullets:['Crisp edges, soft center','Made with real coconut flakes'], ingredients:['Jowar (sorghum) flour','Oats flour','Coconut','Butter','Jaggery','Baking powder','Vanilla'] },
+      { slug:'jowar-peanut-butter', name:'Jowar-Peanut Butter', price:209, tagline:'Jowar with peanut butter', img:'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg', bullets:['Protein-packed','No maida'], ingredients:['Jowar flour','Peanut butter','Jaggery','Butter','Baking powder'] },
+      { slug:'lemon-blueberry', name:'Lemon-Blueberry', price:289, tagline:'Tangy & fruity millet cookies', img:'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg', bullets:['Real lemon zest','Blueberry bits'], ingredients:['Bajra flour','Oats flour','Blueberries','Butter','Sugar','Lemon zest'] },
+      { slug:'quinoa-walnut', name:'Quinoa-Walnut', price:279, tagline:'Quinoa & walnut', img:'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg', bullets:['Nutty crunch','Quinoa goodness'], ingredients:['Quinoa flour','Jowar flour','Walnuts','Butter','Jaggery'] },
+      { slug:'richie-pistachio', name:'Richie-Pistachio', price:349, tagline:'Richie pistachio cookies', img:'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg', bullets:['Loaded with pistachios','Premium treat'], ingredients:['Pistachio','Bajra flour','Butter','Sugar'] },
+      { slug:'foxtail-true-chocolate', name:'Foxtail True-Chocolate', price:349, tagline:'Pure chocolate with foxtail millet', img:'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg', bullets:['Deep cocoa','Foxtail millet base'], ingredients:['Foxtail millet flour','Cocoa','Butter','Sugar','Baking powder'] },
+      { slug:'ragi-millet', name:'Ragi Millet', price:229, tagline:'Wholesome ragi cookies', img:'assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg', bullets:['Calcium-rich ragi','Tea-time friendly'], ingredients:['Ragi flour','Oats flour','Butter','Jaggery'] },
+      { slug:'bajra-almond', name:'Bajra Millet with Almond', price:199, tagline:'Bajra base, almond enriched', img:'assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg', bullets:['Almond bits','Hearty bajra'], ingredients:['Bajra flour','Almonds','Butter','Sugar'] }
+    ]
 
     // Render product grid
-    document.querySelector('#products .grid').innerHTML =
-      products.map(p=>`
-        <article class="card">
-          <img class="thumb" loading="lazy" src="${p.img}" alt="PiNa Bakes ${p.name} cookies">
-          <div class="card-body">
-            <div class="title">${p.name}</div>
-            <div class="price">₹${p.price}</div>
-            <div class="tagline">${p.tagline}</div>
-            <a class="btn" href="https://wa.me/917678506669?text=Hi%20PiNa%20Bakes!%20I%20want%20to%20order%20${encodeURIComponent(p.name)}" target="_blank" rel="noopener">
-              Order on WhatsApp
-            </a>
+    const grid = document.getElementById('product-grid')
+    grid.innerHTML = products.map(p=>{
+      const wa = `https://wa.me/917678506669?text=Hi%20PiNa%20Bakes!%20I%20want%20to%20order%20${encodeURIComponent(p.name)}%20(%3Fqty%3D1)`
+      const href = `#/product/${p.slug}`
+      return `
+        <article class=\"card\">
+          <a href=\"${href}\" aria-label=\"View ${p.name}\">
+            <img class=\"thumb\" loading=\"lazy\" src=\"${p.img}\" alt=\"PiNa Bakes ${p.name} cookies\">
+          </a>
+          <div class=\"card-body\">
+            <div class=\"title\">${p.name}</div>
+            <div class=\"price\">₹${p.price}</div>
+            <div class=\"tagline\">${p.tagline}</div>
+            <div style=\"display:flex;gap:.5rem;flex-wrap:wrap\">
+              <a class=\"btn\" href=\"${href}\">View details</a>
+              <a class=\"btn secondary\" href=\"${wa}\" target=\"_blank\" rel=\"noopener\">Order on WhatsApp</a>
+            </div>
           </div>
-        </article>
-      `).join('');
+        </article>`
+    }).join('')
+
+    // Simple hash router for product pages
+    function renderRoute(){
+      const hash = location.hash || '#home'
+      const productPage = document.getElementById('product-page')
+      const productsSection = document.getElementById('products')
+      const hero = document.getElementById('home')
+
+      if(hash.startsWith('#/product/')){
+        const slug = hash.split('/')[2]
+        const p = products.find(x=>x.slug===slug)
+        if(p){
+          document.getElementById('product-image').src = p.img
+          document.getElementById('product-image').alt = `${p.name} cookies`
+          document.getElementById('product-title').textContent = p.name
+          document.getElementById('product-price').textContent = `₹${p.price}`
+          document.getElementById('product-tagline').textContent = p.tagline
+          document.getElementById('product-bullets').innerHTML = p.bullets? `<ul>${p.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''
+          document.getElementById('product-ingredients').innerHTML = (p.ingredients||[]).map(i=>`<li>${i}</li>`).join('')
+          const wa = `https://wa.me/917678506669?text=Hi%20PiNa%20Bakes!%20I%20want%20to%20order%20${encodeURIComponent(p.name)}%20(%3Fqty%3D1)`
+          const waBtn = document.getElementById('product-wa'); waBtn.href = wa; waBtn.textContent = `Order ${p.name} on WhatsApp`
+          productPage.hidden = false; productsSection.hidden = true; hero.hidden = true
+          return
+        }
+      }
+      productPage.hidden = true; productsSection.hidden = false; hero.hidden = false
+    }
+    window.addEventListener('hashchange', renderRoute)
+    window.addEventListener('DOMContentLoaded', renderRoute)
+
+    // FSSAI placeholder message
+    const fssaiVal = 'abcd1234'
+    if(!fssaiVal || fssaiVal==='abcd1234'){
+      document.getElementById('fssai-text').textContent = 'FSSAI application in progress'
+      document.getElementById('fssai-text-footer').textContent = 'Application in progress'
+    }
   </script>
 </body>
 </html>

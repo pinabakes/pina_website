@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PiNa Bakes – Millet Cookies</title>
   <meta name="description" content="PiNa Bakes: gourmet millet-based cookies from Delhi. Healthy, tasty & wholesome." />
-  <meta property="og:image" content="assets/hero.jpg" />
+  <!-- 2) absolute og:image -->
+  <meta property="og:image" content="https://pinabakes.github.io/pina_website/assets/hero.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <!-- 1) favicon -->
+  <link rel="icon" href="assets/logo/pina-bakes-logo.png">
   <style>
     :root{
       --brand:#2f6a3a;
@@ -118,7 +121,8 @@
   <!-- Top Navigation -->
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:.5rem;">
-      <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:34px;width:auto;border-radius:50%;">
+      <!-- 3) header logo explicit size -->
+      <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:34px;width:34px;border-radius:50%;object-fit:cover;">
       <span class="brand">PiNa Bakes</span>
     </div>
     <nav class="navlinks">
@@ -222,7 +226,8 @@
   </section>
 
   <footer>
-    <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:38px;width:auto;margin-bottom:.4rem;border-radius:50%;"><br>
+    <!-- 3) footer logo explicit size -->
+    <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:38px;width:38px;margin-bottom:.4rem;border-radius:50%;object-fit:cover;"><br>
     © <span id="year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!
     <br>
     <span class="fssai"><img src="assets/fssai-logo.png" alt="FSSAI Logo"> abcd1234</span>

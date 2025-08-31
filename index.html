@@ -98,7 +98,7 @@
     .fssai img{width:45px;height:26px;object-fit:contain}
 
     /* Product gallery thumbs (detail page) */
-    .thumbs{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}
+    .thumbs{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
     .thumbs button{border:1px solid var(--ring);padding:0;background:#fff;border-radius:10px;cursor:pointer}
     .thumbs img{display:block;width:78px;height:78px;object-fit:cover;border-radius:10px}
   </style>
@@ -251,7 +251,7 @@
     <span class="fssai"><img src="assets/logo/fssai/logo.png" alt="FSSAI Logo"> <span id="fssai-text-footer">23325005002208</span></span>
   </footer>
   <script>
-    // Drawer
+    // ================= Basic UI =================
     const drawer = document.getElementById('drawer');
     const backdrop = document.getElementById('backdrop');
     const burger = document.querySelector('.burger');
@@ -261,11 +261,43 @@
     window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeDrawer() })
     document.getElementById('year').textContent = new Date().getFullYear()
 
-    // Products with slugs, details & image galleries
+    // ================= Config for auto image discovery =================
+    // Edit these if your repo/org/branch changes
+    const GH_OWNER = 'pinabakes';
+    const GH_REPO  = 'pina_website';
+    // Optional: specify ref/branch, else default branch is used by the API
+    const GH_API_BASE = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents`;
+
+    async function listImagesFromGitHub(slug){
+      // Lists all image files in assets/products/<slug> using GitHub's public API
+      try{
+        const path = `assets/products/${slug}`;
+        const res = await fetch(`${GH_API_BASE}/${path}`);
+        if(!res.ok) throw new Error(`GitHub API ${res.status}`);
+        const files = await res.json();
+        const imgs = files
+          .filter(f => f.type === 'file' && /\.(?:jpe?g|png|webp|gif)$/i.test(f.name))
+          .map(f => `${path}/${f.name}`)
+          .sort((a,b)=>{
+            const num = s => {
+              const m = s.match(/-(\d+)\.(?:jpe?g|png|webp|gif)$/i); 
+              return m? parseInt(m[1],10) : 0;
+            };
+            return num(a)-num(b) || a.localeCompare(b);
+          });
+        return imgs;
+      }catch(e){
+        console.warn('Could not list images via GitHub API:', e);
+        return null; // fall back to static arrays
+      }
+    }
+
+    // ================= Catalog =================
+    // Keep `img` as a fallback cover. `images` optional; if missing, we fetch via API.
     const products = [
       { slug:'nutty-coco', name:'Nutty-Coco', price:199, tagline:'Real coconut & millet',
         img:'assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg',
-        images:[
+        images:[ /* You can leave empty and rely on GitHub API, or keep as manual list */
           'assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg',
           'assets/products/nutty-coco/pina-bakes-nutty-coco-2.jpg',
           'assets/products/nutty-coco/pina-bakes-nutty-coco-3.jpg'
@@ -274,78 +306,43 @@
         ingredients:['Jowar (sorghum) flour','Oats flour','Coconut','Butter','Jaggery','Baking powder','Vanilla'] },
 
       { slug:'jowar-peanut-butter', name:'Jowar-Peanut Butter', price:209, tagline:'Jowar with peanut butter',
-        img:'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg',
-        images:[
-          'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg',
-          'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-2.jpg',
-          'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-3.jpg'
-        ],
+        img:'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg', images:[],
         bullets:['Protein-packed','No maida'],
         ingredients:['Jowar flour','Peanut butter','Jaggery','Butter','Baking powder'] },
 
       { slug:'lemon-blueberry', name:'Lemon-Blueberry', price:289, tagline:'Tangy & fruity millet cookies',
-        img:'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg',
-        images:[
-          'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg',
-          'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-2.jpg',
-          'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-3.jpg'
-        ],
+        img:'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg', images:[],
         bullets:['Real lemon zest','Blueberry bits'],
         ingredients:['Bajra flour','Oats flour','Blueberries','Butter','Sugar','Lemon zest'] },
 
       { slug:'quinoa-walnut', name:'Quinoa-Walnut', price:279, tagline:'Quinoa & walnut',
-        img:'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg',
-        images:[
-          'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg',
-          'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-2.jpg',
-          'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-3.jpg'
-        ],
+        img:'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg', images:[],
         bullets:['Nutty crunch','Quinoa goodness'],
         ingredients:['Quinoa flour','Jowar flour','Walnuts','Butter','Jaggery'] },
 
       { slug:'richie-pistachio', name:'Richie-Pistachio', price:349, tagline:'Richie pistachio cookies',
-        img:'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg',
-        images:[
-          'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg',
-          'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-2.jpg',
-          'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-3.jpg'
-        ],
+        img:'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg', images:[],
         bullets:['Loaded with pistachios','Premium treat'],
         ingredients:['Pistachio','Bajra flour','Butter','Sugar'] },
 
       { slug:'foxtail-true-chocolate', name:'Foxtail True-Chocolate', price:349, tagline:'Pure chocolate with foxtail millet',
-        img:'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg',
-        images:[
-          'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg',
-          'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-2.jpg',
-          'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-3.jpg'
-        ],
+        img:'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg', images:[],
         bullets:['Deep cocoa','Foxtail millet base'],
         ingredients:['Foxtail millet flour','Cocoa','Butter','Sugar','Baking powder'] },
 
       { slug:'ragi-millet', name:'Ragi Millet', price:229, tagline:'Wholesome ragi cookies',
-        img:'assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg',
-        images:[
-          'assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg',
-          'assets/products/ragi-millet/pina-bakes-ragi-millet-2.jpg',
-          'assets/products/ragi-millet/pina-bakes-ragi-millet-3.jpg'
-        ],
+        img:'assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg', images:[],
         bullets:['Calcium-rich ragi','Tea-time friendly'],
         ingredients:['Ragi flour','Oats flour','Butter','Jaggery'] },
 
       { slug:'bajra-almond', name:'Bajra Millet with Almond', price:199, tagline:'Bajra base, almond enriched',
-        img:'assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg',
-        images:[
-          'assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg',
-          'assets/products/bajra-almond/pina-bakes-bajra-almond-2.jpg',
-          'assets/products/bajra-almond/pina-bakes-bajra-almond-3.jpg'
-        ],
+        img:'assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg', images:[],
         bullets:['Almond bits','Hearty bajra'],
         ingredients:['Bajra flour','Almonds','Butter','Sugar'] }
     ]
 
-    // Render product grid
-    const grid = document.getElementById('product-grid')
+    // ================= Grid render =================
+    const grid = document.getElementById('product-grid');
     grid.innerHTML = products.map(p=>{
       const wa = `https://wa.me/917678506669?text=Hi%20PiNa%20Bakes!%20I%20want%20to%20order%20${encodeURIComponent(p.name)}%20(%3Fqty%3D1)`
       const href = `#/product/${p.slug}`
@@ -367,13 +364,14 @@
         </article>`
     }).join('')
 
-    // Inject JSON-LD Product schemas (Google can understand your catalog)
+    // ================= JSON-LD (static; uses manual arrays if present) =================
     try{
       const productSchemas = products.map(p => ({
         "@context": "https://schema.org",
         "@type": "Product",
         name: p.name,
-        image: (p.images && p.images.length ? p.images : [p.img]).map(path => `https://pinabakes.github.io/pina_website/${path}`),
+        image: (p.images && p.images.length ? p.images.slice(0,6) : [p.img])
+          .map(path => `https://pinabakes.github.io/pina_website/${path}`),
         description: p.tagline,
         brand: {"@type":"Brand","name":"PiNa Bakes"},
         sku: p.slug,
@@ -391,8 +389,8 @@
       document.head.appendChild(ld);
     }catch(e){ console.warn('LD-JSON not added', e); }
 
-    // Simple hash router for product pages
-    function renderRoute(){
+    // ================= Router + dynamic gallery =================
+    async function renderRoute(){
       const hash = location.hash || '#home'
       const productPage = document.getElementById('product-page')
       const productsSection = document.getElementById('products')
@@ -402,7 +400,13 @@
         const slug = hash.split('/')[2]
         const p = products.find(x=>x.slug===slug)
         if(p){
-          const imgs = (p.images && p.images.length) ? p.images : [p.img]
+          let imgs = (p.images && p.images.length) ? p.images : [p.img]
+          // Try to auto-discover from GitHub if manual list is empty or very small
+          if(!p.images || p.images.length <= 1){
+            const listed = await listImagesFromGitHub(p.slug)
+            if(listed && listed.length) imgs = listed
+          }
+
           const main = document.getElementById('product-image')
           main.src = imgs[0]
           main.alt = `${p.name} cookies`
@@ -420,7 +424,6 @@
           document.getElementById('product-bullets').innerHTML = p.bullets? `<ul>${p.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : ''
           document.getElementById('product-ingredients').innerHTML = (p.ingredients||[]).map(i=>`<li>${i}</li>`).join('')
 
-          // Build nutrition (placeholder if not provided)
           const nut = p.nutrition || { energy:'— kcal', protein:'— g', fat:'— g', carbs:'— g', sugar:'— g', fibre:'— g', sodium:'— mg' };
           const rows = [
             ['Energy', nut.energy||'— kcal'],
@@ -441,8 +444,8 @@
       }
       productPage.hidden = true; productsSection.hidden = false; hero.hidden = false
     }
-    window.addEventListener('hashchange', renderRoute)
-    window.addEventListener('DOMContentLoaded', renderRoute)
+    window.addEventListener('hashchange', ()=>{ renderRoute() })
+    window.addEventListener('DOMContentLoaded', ()=>{ renderRoute() })
 
   </script>
 </body>

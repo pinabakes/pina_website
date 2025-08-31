@@ -1,90 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PiNa Bakes - Millet Cookies</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PiNa Bakes – Millet Cookies</title>
+  <meta name="description" content="PiNa Bakes: premium millet-based cookies from Delhi. Healthy, tasty & wholesome." />
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    header { background: #6b4226; color: white; padding: 20px; text-align: center; }
-    nav a { color: white; margin: 0 15px; text-decoration: none; }
-    .hero { text-align: center; padding: 50px; background: #f5f5f5; }
-    .products { display: flex; flex-wrap: wrap; justify-content: center; margin: 20px; }
-    .card { border: 1px solid #ddd; border-radius: 8px; width: 220px; margin: 15px; padding: 20px; text-align: center; }
-    form { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
-    input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
-    button { background: #6b4226; color: white; border: none; padding: 12px; cursor: pointer; width: 100%; }
-    button:hover { background: #8c5a37; }
-    footer { text-align: center; background: #eee; padding: 20px; margin-top: 20px; }
+    :root{
+      --brand:#2f6a3a;      /* deep green */
+      --brand-2:#6b4226;    /* cocoa brown */
+      --bg:#fffdf7;         /* warm off-white */
+      --ink:#1f1f1f;
+      --muted:#6b6b6b;
+      --card:#ffffff;
+      --ring:rgba(0,0,0,.08);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    img{max-width:100%;display:block}
+
+    /* HEADER */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      display:flex; align-items:center; gap:.75rem;
+      background:var(--card); border-bottom:1px solid var(--ring);
+      padding:.75rem 1rem;
+    }
+    .burger{width:40px;height:40px;display:grid;place-items:center;border:none;background:transparent;cursor:pointer}
+    .burger span,.burger::before,.burger::after{
+      content:""; width:22px; height:2px; background:var(--ink); display:block; border-radius:2px; transition:.25s;
+    }
+    .burger::before{transform:translateY(-6px)}
+    .burger::after{transform:translateY(6px)}
+    .brand{font-weight:800; letter-spacing:.3px}
+    .tag{font-size:.85rem;color:var(--muted)}
+
+    /* DRAWER (sidebar) */
+    .drawer-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:.25s; z-index:40;
+    }
+    .drawer{
+      position:fixed; inset:0 auto 0 0; width:78%; max-width:320px; background:var(--card);
+      transform:translateX(-100%); transition:.25s; z-index:41; box-shadow:2px 0 24px rgba(0,0,0,.12);
+      display:flex; flex-direction:column; padding:1rem;
+    }
+    .drawer.open{transform:translateX(0)}
+    .drawer-backdrop.show{opacity:1; pointer-events:auto}
+    .drawer a{
+      padding:0.9rem 0.5rem; text-decoration:none; color:var(--ink); border-bottom:1px solid var(--ring);
+      font-weight:600;
+    }
+
+    /* HERO */
+    .hero{padding:1.2rem 1rem 1rem; text-align:center}
+    .hero h1{margin:.25rem 0 .35rem; font-size:1.8rem}
+    .hero p{margin:0 auto; color:var(--muted); max-width:44ch}
+    .pill{
+      display:inline-block; margin:.8rem auto 0; padding:.5rem .9rem; border-radius:999px;
+      background:#e6f3e9; color:var(--brand); font-weight:700; font-size:.9rem;
+    }
+
+    /* PRODUCTS */
+    .section{padding:1rem}
+    .section h2{margin:.25rem 0 1rem; font-size:1.35rem}
+    .grid{
+      display:grid; gap:12px;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    @media(min-width:640px){ .grid{grid-template-columns:repeat(3,minmax(0,1fr)); padding:0 0.25rem}}
+    @media(min-width:960px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+    .card{
+      background:var(--card); border:1px solid var(--ring); border-radius:var(--radius);
+      overflow:hidden; display:flex; flex-direction:column;
+    }
+    .thumb{aspect-ratio:1/1; object-fit:cover; background:#fafafa}
+    .card-body{padding:.7rem .8rem .9rem}
+    .title{font-weight:700; margin:0 0 .15rem}
+    .price{color:var(--brand-2); font-weight:800}
+    .tagline{color:var(--muted); font-size:.9rem; margin:.35rem 0 .6rem}
+    .btn{
+      display:inline-block; text-align:center; text-decoration:none; border:none; cursor:pointer;
+      background:var(--brand); color:#fff; padding:.55rem .7rem; border-radius:10px; font-weight:700;
+      box-shadow:0 6px 16px rgba(47,106,58,.18);
+    }
+
+    /* ORDER FORM */
+    form{background:var(--card); border:1px solid var(--ring); border-radius:var(--radius); padding:1rem; max-width:720px; margin:0 auto}
+    .row{display:grid; gap:.75rem}
+    @media(min-width:640px){ .row{grid-template-columns:1fr 1fr}}
+    label{font-size:.9rem; font-weight:600; margin-bottom:.25rem; display:block}
+    input,select,textarea{
+      width:100%; border:1px solid var(--ring); border-radius:10px; padding:.65rem .7rem; font-size:1rem; background:#fff;
+    }
+    textarea{min-height:100px; resize:vertical}
+    .submit{margin-top:.6rem; width:100%}
+
+    /* FOOTER */
+    footer{margin:1.2rem 0 2rem; text-align:center; color:var(--muted)}
+    .contact{display:grid; gap:.25rem}
+    .contact strong{color:var(--ink)}
+
+    /* UTIL */
+    .container{max-width:1150px; margin:0 auto}
+    .hide{display:none}
   </style>
 </head>
 <body>
+  <!-- Drawer -->
+  <div id="backdrop" class="drawer-backdrop" aria-hidden="true"></div>
+  <aside id="drawer" class="drawer" aria-label="Site navigation" aria-hidden="true">
+    <a href="#products" onclick="closeDrawer()">Products</a>
+    <a href="#about" onclick="closeDrawer()">About Us</a>
+    <a href="#order" onclick="closeDrawer()">Order</a>
+    <a href="#contact" onclick="closeDrawer()">Contact</a>
+  </aside>
 
-  <header>
-    <h1>PiNa Bakes</h1>
-    <p>Premium Millet-Based Cookies</p>
-    <nav>
-      <a href="#products">Flavors</a>
-      <a href="#order">Order</a>
-      <a href="#about">About</a>
-    </nav>
+  <!-- Header -->
+  <header class="topbar">
+    <button class="burger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" onclick="toggleDrawer()">
+      <span></span>
+    </button>
+    <div>
+      <div class="brand">PiNa Bakes</div>
+      <div class="tag">Premium Millet-Based Cookies</div>
+    </div>
   </header>
 
-  <section class="hero">
-    <h2>Healthy, Tasty & Wholesome</h2>
-    <p>Enjoy our millet cookies — gluten-friendly, guilt-free indulgence.</p>
+  <!-- Hero -->
+  <section class="hero container">
+    <span class="pill">Healthy • Tasty • Wholesome</span>
+    <h1>Millet Cookies, Made the Right Way</h1>
+    <p>Crafted in Delhi with premium ingredients. Gluten-friendly indulgence you can feel good about.</p>
   </section>
 
-  <section id="products" class="products">
-    <div class="card"><h3>Nutty-Coco</h3><p>₹219</p></div>
-    <div class="card"><h3>Jowar-Peanut Butter</h3><p>₹229</p></div>
-    <div class="card"><h3>Lemon-Blueberry</h3><p>₹249</p></div>
-    <div class="card"><h3>Quinoa-Walnut</h3><p>₹259</p></div>
-    <div class="card"><h3>Richie-Pistachio</h3><p>₹269</p></div>
-    <div class="card"><h3>Foxtail True-Chocolate</h3><p>₹259</p></div>
-    <div class="card"><h3>Ragi Millet</h3><p>₹219</p></div>
-    <div class="card"><h3>Bajra-Almond</h3><p>₹239</p></div>
+  <!-- Products -->
+  <section id="products" class="section container">
+    <h2>Our Products</h2>
+    <div id="productGrid" class="grid"></div>
   </section>
 
-  <section id="order">
-    <h2 style="text-align:center;">Place an Order</h2>
-    <form onsubmit="saveCustomerInfo(event)">
-      <input type="text" id="name" placeholder="Your Name" required>
-      <input type="email" id="email" placeholder="Email" required>
-      <input type="tel" id="phone" placeholder="Phone" required>
-      <textarea id="address" placeholder="Delivery Address" required></textarea>
-      <select id="flavor" required>
-        <option value="">Choose a Flavor</option>
-        <option>Nutty-Coco</option>
-        <option>Jowar-Peanut Butter</option>
-        <option>Lemon-Blueberry</option>
-        <option>Quinoa-Walnut</option>
-        <option>Richie-Pistachio</option>
-        <option>Foxtail True-Chocolate</option>
-        <option>Ragi Millet</option>
-        <option>Bajra-Almond</option>
-      </select>
-      <button type="submit">Submit</button>
+  <!-- Order -->
+  <section id="order" class="section container">
+    <h2>Place an Order</h2>
+    <form id="orderForm" onsubmit="handleSubmit(event)">
+      <div class="row">
+        <div>
+          <label for="name">Name</label>
+          <input id="name" name="name" autocomplete="name" required />
+        </div>
+        <div>
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" inputmode="numeric" pattern="[0-9]{10}" placeholder="10-digit number" required />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div>
+          <label for="flavor">Select Flavor</label>
+          <select id="flavor" name="flavor" required></select>
+        </div>
+      </div>
+      <div>
+        <label for="address">Delivery Address</label>
+        <textarea id="address" name="address" required></textarea>
+      </div>
+      <button class="btn submit" type="submit">Submit</button>
     </form>
   </section>
 
-  <section id="about" style="padding: 20px; text-align: center;">
+  <!-- About -->
+  <section id="about" class="section container">
     <h2>About Us</h2>
-    <p>PiNa Bakes is dedicated to bringing you wholesome, millet-based gourmet cookies. 
-       Packed with nutrition and crafted with love in Delhi.</p>
+    <p>
+      PiNa Bakes is dedicated to bringing you wholesome, millet-based gourmet cookies. 
+      We keep it simple—quality ingredients, balanced nutrition, and honest flavors.
+    </p>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="section container">
+    <h2>Contact</h2>
+    <div class="contact">
+      <div><strong>Address:</strong> 3684, DaribaPan, Paharganj, New Delhi – 110055</div>
+      <div><strong>Call/WhatsApp:</strong> +91 7678506669</div>
+      <div><strong>Email:</strong> Pinabakes@gmail.com</div>
+    </div>
   </section>
 
   <footer>
-    <p>📍 3684, DaribaPan, Paharganj, New Delhi 110055 | 📞 7678506669 | ✉️ Pinabakes@gmail.com</p>
+    © <span id="year"></span> PiNa Bakes • FSSAI: (to be added)
   </footer>
 
   <script>
-    function saveCustomerInfo(e) {
-      e.preventDefault();
-      alert("Thank you! Your details have been recorded.");
-      // Later: Send form data to backend / database
+    // --- Drawer logic
+    const drawer = document.getElementById('drawer');
+    const backdrop = document.getElementById('backdrop');
+    function openDrawer(){
+      drawer.classList.add('open');
+      backdrop.classList.add('show');
+      drawer.setAttribute('aria-hidden','false');
     }
-  </script>
+    function closeDrawer(){
+      drawer.classList.remove('open');
+      backdrop.classList.remove('show');
+      drawer.setAttribute('aria-hidden','true');
+    }
+    function toggleDrawer(){
+      drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+    }
+    backdrop.addEventListener('click', closeDrawer);
 
+    // --- Product data (edit paths if your filenames differ)
+    const products = [
+      {
+        name: "Nutty-Coco",
+        price: 219,
+        tagline: "Real coconut & millet",
+        img: "assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg"
+      },
+      {
+        name: "Jowar-Peanut Butter",
+        price: 229,
+        tagline: "Jowar flour + peanut butter",
+        img: "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg"
+      },
+      {
+        name: "Lemon-Blueberry",
+        price: 249,
+        tagline: "Zesty & fruity",
+        img: "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg"
+      },
+      {
+        name: "Quinoa-Walnut",
+        price: 259,
+        tagline: "Quinoa flour & walnuts",
+        img: "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg"
+      },
+      {
+        name: "Richie-Pistachio",
+        price: 269,
+        tagline: "Premium pista bites",
+        img: "assets/products/richie-pistachio/pina-bakes-richie-pistachio-1.jpg"
+      },
+      {
+        name: "Foxtail True-Chocolate",
+        price: 259,
+        tagline: "Deep chocolate, foxtail millet",
+        img: "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg"
+      },
+      {
+        name: "Ragi Millet",
+        price: 219,
+        tagline: "Wholesome ragi",
+        img: "assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg"
+      },
+      {
+        name: "Bajra-Almond",
+        price: 239,
+        tagline: "Bajra base, almond enriched",
+        img: "assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg"
+      }
+    ];
+
+    // Render product grid
+    const grid = document.getElementById('productGrid');
+    const flavorSelect = document.getElementById('flavor');
+    products.forEach(p=>{
+      // grid card
+      const card = document.createElement('article');
+      card.className = 'card';
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.src = p.img;
+      img.alt = `PiNa Bakes ${p.name} cookies`;
+      img.className = 'thumb';
+      const body = document.createElement('div');
+      body.className = 'card-body';
+      body.innerHTML = `
+        <h3 class="title">${p.name}</h3>
+        <div class="price">₹${p.price}</div>
+        <div class="tagline">${p.tagline}</div>
+        <a class="btn" href="https://wa.me/917678506669?text=Hi%20PiNa%20Bakes!%20I%20want%20to%20order%20${encodeURIComponent(p.name)}" target="_blank" rel="noopener">Order on WhatsApp</a>
+      `;
+      card.appendChild(img); card.appendChild(body);
+      grid.appendChild(card);
+
+      // select options
+      const opt = document.createElement('option');
+      opt.value = p.name;
+      opt.textContent = `${p.name} (₹${p.price})`;
+      flavorSelect.appendChild(opt);
+    });
+
+    // Order form handler (trial: WhatsApp message; later: DB)
+    function handleSubmit(e){
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const flavor = document.getElementById('flavor').value;
+      const address = document.getElementById('address').value.trim();
+
+      // For trial: open WhatsApp with prefilled message
+      const msg = `Hi PiNa Bakes!%0AName: ${encodeURIComponent(name)}%0APhone: ${encodeURIComponent(phone)}%0AEmail: ${encodeURIComponent(email)}%0AFlavor: ${encodeURIComponent(flavor)}%0AAddress: ${encodeURIComponent(address)}`;
+      window.open(`https://wa.me/917678506669?text=${msg}`, '_blank');
+
+      // TODO (permanent): send to Supabase/Sheets endpoint via fetch()
+      // fetch('YOUR_ENDPOINT_URL',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,phone,email,flavor,address})})
+    }
+
+    // minor nicety
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

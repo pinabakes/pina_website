@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PiNa Bakes - Millet Cookies</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    header { background: #6b4226; color: white; padding: 20px; text-align: center; }
+    nav a { color: white; margin: 0 15px; text-decoration: none; }
+    .hero { text-align: center; padding: 50px; background: #f5f5f5; }
+    .products { display: flex; flex-wrap: wrap; justify-content: center; margin: 20px; }
+    .card { border: 1px solid #ddd; border-radius: 8px; width: 220px; margin: 15px; padding: 20px; text-align: center; }
+    form { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+    input, textarea, select { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; }
+    button { background: #6b4226; color: white; border: none; padding: 12px; cursor: pointer; width: 100%; }
+    button:hover { background: #8c5a37; }
+    footer { text-align: center; background: #eee; padding: 20px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>PiNa Bakes</h1>
+    <p>Premium Millet-Based Cookies</p>
+    <nav>
+      <a href="#products">Flavors</a>
+      <a href="#order">Order</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>Healthy, Tasty & Wholesome</h2>
+    <p>Enjoy our millet cookies — gluten-friendly, guilt-free indulgence.</p>
+  </section>
+
+  <section id="products" class="products">
+    <div class="card"><h3>Nutty-Coco</h3><p>₹219</p></div>
+    <div class="card"><h3>Jowar-Peanut Butter</h3><p>₹229</p></div>
+    <div class="card"><h3>Lemon-Blueberry</h3><p>₹249</p></div>
+    <div class="card"><h3>Quinoa-Walnut</h3><p>₹259</p></div>
+    <div class="card"><h3>Richie-Pistachio</h3><p>₹269</p></div>
+    <div class="card"><h3>Foxtail True-Chocolate</h3><p>₹259</p></div>
+    <div class="card"><h3>Ragi Millet</h3><p>₹219</p></div>
+    <div class="card"><h3>Bajra-Almond</h3><p>₹239</p></div>
+  </section>
+
+  <section id="order">
+    <h2 style="text-align:center;">Place an Order</h2>
+    <form onsubmit="saveCustomerInfo(event)">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="tel" id="phone" placeholder="Phone" required>
+      <textarea id="address" placeholder="Delivery Address" required></textarea>
+      <select id="flavor" required>
+        <option value="">Choose a Flavor</option>
+        <option>Nutty-Coco</option>
+        <option>Jowar-Peanut Butter</option>
+        <option>Lemon-Blueberry</option>
+        <option>Quinoa-Walnut</option>
+        <option>Richie-Pistachio</option>
+        <option>Foxtail True-Chocolate</option>
+        <option>Ragi Millet</option>
+        <option>Bajra-Almond</option>
+      </select>
+      <button type="submit">Submit</button>
+    </form>
+  </section>
+
+  <section id="about" style="padding: 20px; text-align: center;">
+    <h2>About Us</h2>
+    <p>PiNa Bakes is dedicated to bringing you wholesome, millet-based gourmet cookies. 
+       Packed with nutrition and crafted with love in Delhi.</p>
+  </section>
+
+  <footer>
+    <p>📍 3684, DaribaPan, Paharganj, New Delhi 110055 | 📞 7678506669 | ✉️ Pinabakes@gmail.com</p>
+  </footer>
+
+  <script>
+    function saveCustomerInfo(e) {
+      e.preventDefault();
+      alert("Thank you! Your details have been recorded.");
+      // Later: Send form data to backend / database
+    }
+  </script>
+
+</body>
+</html>

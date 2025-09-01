@@ -1,5 +1,208 @@
 [
-  // ... your existing 6 products ...
+  {
+    "slug": "nutty-coco",
+    "name": "Nutty-Coco Delight",
+    "price": 199,
+    "tagline": "Real coconut flakes meet wholesome jowar",
+    "img": "assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg",
+    "images": [
+      "assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg",
+      "assets/products/nutty-coco/pina-bakes-nutty-coco-2.jpg",
+      "assets/products/nutty-coco/pina-bakes-nutty-coco-3.jpg"
+    ],
+    "bullets": [
+      "Crisp edges with soft, chewy center",
+      "Made with authentic coconut flakes",
+      "Rich in dietary fiber from jowar",
+      "No artificial coconut flavoring"
+    ],
+    "ingredients": [
+      "Jowar (sorghum) flour",
+      "Oats flour",
+      "Fresh coconut flakes",
+      "Pure butter",
+      "Natural jaggery",
+      "Baking powder",
+      "Pure vanilla extract"
+    ],
+    "nutrition": {
+      "energy": "445 kcal",
+      "protein": "8.2 g",
+      "fat": "18.5 g",
+      "carbs": "62.3 g",
+      "sugar": "22.1 g",
+      "fibre": "4.8 g",
+      "sodium": "156 mg"
+    },
+    "tags": ["gluten-friendly", "high-fiber", "natural-sweetener"]
+  },
+  {
+    "slug": "jowar-peanut-butter",
+    "name": "Jowar Peanut Butter Cookies",
+    "price": 209,
+    "tagline": "Protein-rich jowar meets creamy peanut butter",
+    "img": "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg",
+    "images": [
+      "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg"
+    ],
+    "bullets": [
+      "High in plant-based protein",
+      "Made with pure peanut butter",
+      "Zero refined flour (maida-free)",
+      "Perfect post-workout snack"
+    ],
+    "ingredients": [
+      "Jowar (sorghum) flour",
+      "Natural peanut butter",
+      "Organic jaggery",
+      "Pure butter",
+      "Aluminum-free baking powder"
+    ],
+    "nutrition": {
+      "energy": "468 kcal",
+      "protein": "12.4 g",
+      "fat": "22.8 g",
+      "carbs": "54.7 g",
+      "sugar": "18.9 g",
+      "fibre": "5.2 g",
+      "sodium": "142 mg"
+    },
+    "tags": ["high-protein", "maida-free", "post-workout"]
+  },
+  {
+    "slug": "lemon-blueberry",
+    "name": "Lemon-Blueberry Burst",
+    "price": 289,
+    "tagline": "Zesty lemon meets antioxidant-rich blueberries",
+    "img": "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg",
+    "images": [
+      "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg"
+    ],
+    "bullets": [
+      "Fresh lemon zest for natural tanginess",
+      "Real blueberry pieces (not artificial)",
+      "Antioxidant-rich superfruit combination",
+      "Refreshing citrus aroma"
+    ],
+    "ingredients": [
+      "Bajra (pearl millet) flour",
+      "Rolled oats flour",
+      "Fresh blueberries",
+      "Pure butter",
+      "Organic sugar",
+      "Fresh lemon zest",
+      "Natural lemon extract"
+    ],
+    "nutrition": {
+      "energy": "421 kcal",
+      "protein": "7.8 g",
+      "fat": "16.2 g",
+      "carbs": "65.4 g",
+      "sugar": "26.8 g",
+      "fibre": "4.1 g",
+      "sodium": "128 mg"
+    },
+    "tags": ["antioxidant-rich", "citrusy", "superfruit"]
+  },
+  {
+    "slug": "quinoa-walnut",
+    "name": "Quinoa-Walnut Crunch",
+    "price": 279,
+    "tagline": "Superfood quinoa with premium walnuts",
+    "img": "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg",
+    "images": [
+      "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg"
+    ],
+    "bullets": [
+      "Quinoa - complete protein superfood",
+      "Premium California walnuts",
+      "Satisfying nutty crunch texture",
+      "Rich in omega-3 fatty acids"
+    ],
+    "ingredients": [
+      "Quinoa flour",
+      "Jowar (sorghum) flour", 
+      "Premium walnut pieces",
+      "Pure butter",
+      "Natural jaggery"
+    ],
+    "nutrition": {
+      "energy": "486 kcal",
+      "protein": "11.6 g",
+      "fat": "26.4 g",
+      "carbs": "52.8 g",
+      "sugar": "19.3 g",
+      "fibre": "6.8 g",
+      "sodium": "98 mg"
+    },
+    "tags": ["superfood", "complete-protein", "omega-3", "premium"]
+  },
+  {
+    "slug": "richie-pistachio",
+    "name": "Richie-Pistachio Premium",
+    "price": 349,
+    "tagline": "Luxuriously loaded with premium pistachios",
+    "img": "assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg",
+    "images": [
+      "assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg"
+    ],
+    "bullets": [
+      "Generously loaded with pistachios",
+      "Premium Iranian pistachios",
+      "Signature PiNa Bakes recipe",
+      "Luxury treat for special occasions"
+    ],
+    "ingredients": [
+      "Premium pistachio kernels",
+      "Bajra (pearl millet) flour",
+      "Pure butter",
+      "Fine sugar",
+      "Natural cardamom"
+    ],
+    "nutrition": {
+      "energy": "524 kcal",
+      "protein": "14.2 g",
+      "fat": "32.6 g",
+      "carbs": "48.1 g",
+      "sugar": "21.4 g",
+      "fibre": "7.2 g",
+      "sodium": "106 mg"
+    },
+    "tags": ["premium", "luxury", "pistachio-loaded", "signature"]
+  },
+  {
+    "slug": "foxtail-true-chocolate",
+    "name": "Foxtail True-Chocolate",
+    "price": 349,
+    "tagline": "Pure Belgian cocoa with ancient foxtail millet",
+    "img": "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg",
+    "images": [
+      "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg"
+    ],
+    "bullets": [
+      "Belgian cocoa for deep chocolate flavor",
+      "Foxtail millet - ancient superfood grain",
+      "Rich, fudgy texture",
+      "No artificial chocolate flavoring"
+    ],
+    "ingredients": [
+      "Foxtail millet flour",
+      "Premium Belgian cocoa powder",
+      "Pure butter",
+      "Organic sugar",
+      "Aluminum-free baking powder"
+    ],
+    "nutrition": {
+      "energy": "456 kcal",
+      "protein": "9.8 g",
+      "fat": "19.4 g",
+      "carbs": "63.2 g",
+      "sugar": "28.6 g",
+      "fibre": "8.4 g",
+      "sodium": "164 mg"
+    },
+    "tags": ["premium", "belgian-cocoa", "ancient-grain", "fudgy"]
+  },
   {
     "slug": "ragi-millet",
     "name": "Ragi Millet Classic",

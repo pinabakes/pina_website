@@ -108,11 +108,11 @@
     .thumbs button:active{transform:scale(.98)}
     .thumbs img{display:block;width:78px;height:78px;object-fit:cover;border-radius:10px}
 
-    /* === NEW: Cart Styles === */
+    /* Cart */
     .cart-btn{position:relative;background:none;border:none;cursor:pointer;padding:.5rem}
     .cart-icon{width:28px;height:28px;stroke:var(--ink);stroke-width:2}
     .cart-count{position:absolute;top:0;right:0;background:var(--brand-2);color:#fff;font-size:.7rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-    .cart-modal{position:fixed;top:0;right:-100%;z-index:100;width:90vw;max-width:400px;height:100%;background:var(--card);box-shadow:-4px 0 24px rgba(0,0,0,.15);transition:right .4s ease-in-out;display:flex;flex-direction:column}
+    .cart-modal{position:fixed;top:0;right:-100%;z-index:100;width:90vw;max-width:420px;height:100%;background:var(--card);box-shadow:-4px 0 24px rgba(0,0,0,.15);transition:right .4s ease-in-out;display:flex;flex-direction:column}
     .cart-modal.open{right:0}
     .cart-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.2rem;border-bottom:1px solid var(--ring)}
     .cart-header h2{font-size:1.4rem;margin:0;color:var(--brand)}
@@ -130,7 +130,19 @@
     .checkout-btn{width:100%;padding:1rem;font-size:1.1rem}
     .empty-cart{text-align:center;padding:3rem 1rem;color:var(--muted)}
 
-    /* === NEW: Slider styles === */
+    /* Checkout form in cart */
+    .checkout-section{margin-top:1rem;border-top:1px dashed var(--ring);padding-top:1rem}
+    .checkout-section h3{margin:.2rem 0 .8rem;font-size:1.05rem;color:var(--brand)}
+    .cart-form{display:grid;grid-template-columns:1fr;gap:.65rem}
+    .cart-form label{font-size:.9rem;font-weight:700}
+    .cart-form input,.cart-form textarea{width:100%;padding:.6rem .7rem;border:1px solid var(--ring);border-radius:10px;background:#fff}
+    .cart-form textarea{min-height:70px;resize:vertical}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+    @media(max-width:420px){.form-row{grid-template-columns:1fr}}
+    .err{color:#b00020;font-size:.85rem;margin-top:.2rem;display:none}
+    .show{display:block}
+
+    /* Slider */
     .slider{position:relative}
     .nav-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.9);border:1px solid var(--ring);width:38px;height:38px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.08)}
     .nav-arrow:hover{filter:brightness(0.95)}
@@ -138,7 +150,7 @@
     .nav-arrow.right{right:8px}
     .nav-arrow span{font-size:22px;line-height:1;color:var(--ink);user-select:none}
 
-    /* === UPDATED: Responsive styles === */
+    /* Responsive fine-tunes */
     @media(max-width:1024px){
       .hero .title{font-size:2.2rem}
       .hero .desc{font-size:1.1rem}
@@ -173,7 +185,6 @@
         <a href="#about" class="navlink">About</a>
         <a href="#contact" class="navlink">Contact</a>
       </nav>
-      <!-- Cart Button -->
       <button class="cart-btn" aria-label="Open cart" onclick="toggleCart()">
         <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -218,7 +229,7 @@
       <a href="#products" class="navlink" id="back-to-products">← Back to products</a>
       <div class="flex2" style="margin-top:1rem">
         <div>
-          <!-- SLIDER WRAPPER -->
+          <!-- SLIDER -->
           <div class="slider">
             <img id="product-image" alt="" class="thumb" style="border-radius:var(--radius)">
             <button class="nav-arrow left" id="prev-btn" aria-label="Previous photo"><span>‹</span></button>
@@ -333,7 +344,47 @@
       <h2 id="cart-title">Your Cart</h2>
       <button class="close-btn" onclick="toggleCart()" aria-label="Close cart">&times;</button>
     </div>
-    <div class="cart-body" id="cart-body"></div>
+    <div class="cart-body">
+      <div id="cart-body"><!-- items inject --></div>
+
+      <!-- Checkout form -->
+      <div class="checkout-section">
+        <h3>Customer details</h3>
+        <form class="cart-form" id="checkout-form" onsubmit="event.preventDefault(); generateWhatsAppCheckout();">
+          <div>
+            <label for="cf-name">Full name</label>
+            <input id="cf-name" name="name" autocomplete="name" placeholder="Your name" required>
+            <div class="err" id="err-name">Please enter your name.</div>
+          </div>
+          <div>
+            <label for="cf-phone">Phone (WhatsApp)</label>
+            <input id="cf-phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="10-digit number" required>
+            <div class="err" id="err-phone">Enter a valid 10-digit Indian number.</div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="cf-pincode">Pincode</label>
+              <input id="cf-pincode" name="pincode" inputmode="numeric" placeholder="6-digit pincode" required>
+              <div class="err" id="err-pincode">Pincode must be 6 digits.</div>
+            </div>
+            <div>
+              <label for="cf-city">City</label>
+              <input id="cf-city" name="city" placeholder="City / District">
+            </div>
+          </div>
+          <div>
+            <label for="cf-address">Address</label>
+            <textarea id="cf-address" name="address" placeholder="House no., street, area" required></textarea>
+            <div class="err" id="err-address">Please enter your address.</div>
+          </div>
+          <div>
+            <label for="cf-notes">Notes (optional)</label>
+            <textarea id="cf-notes" name="notes" placeholder="Landmark, delivery instructions, etc."></textarea>
+          </div>
+          <!-- You can also put the checkout button inside the form; keeping it below for layout -->
+        </form>
+      </div>
+    </div>
     <div class="cart-footer">
       <div class="cart-total">
         <span>Total</span>
@@ -387,6 +438,8 @@
     // ===== Cart =====
     const cartModal = document.getElementById('cart-modal');
     let cart = JSON.parse(localStorage.getItem('pina_cart')) || [];
+    const SAVE_USER_KEY = 'pina_checkout_user';
+
     function openCart(){cartModal.classList.add('open');backdrop.classList.add('active');backdrop.hidden=false;document.body.style.overflow='hidden'}
     function closeCart(){cartModal.classList.remove('open');backdrop.classList.remove('active');backdrop.hidden=true;document.body.style.overflow=''}
     function toggleCart(){cartModal.classList.contains('open')?closeCart():openCart()}
@@ -402,6 +455,7 @@
       if(item){ item.quantity += change; if(item.quantity<=0){ cart = cart.filter(i=>i.slug!==slug); } }
       saveCart(); renderCart();
     }
+
     function renderCart(){
       const cartBody = document.getElementById('cart-body');
       const cartTotalEl = document.getElementById('cart-total');
@@ -430,11 +484,72 @@
       const count = cart.reduce((s,i)=>s+i.quantity,0);
       cartCountEl.textContent = count; cartCountEl.hidden=false;
     }
+
+    function loadUserDetails(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(SAVE_USER_KEY)||'null');
+        if(!saved) return;
+        const ids = ['cf-name','cf-phone','cf-pincode','cf-city','cf-address','cf-notes'];
+        const keys= ['name','phone','pincode','city','address','notes'];
+        ids.forEach((id, idx)=>{ const el = document.getElementById(id); if(el && typeof saved[keys[idx]]!=='undefined') el.value = saved[keys[idx]]; });
+      }catch(e){}
+    }
+
+    function getUserDetails(){
+      const data = {
+        name: document.getElementById('cf-name').value.trim(),
+        phone: document.getElementById('cf-phone').value.trim(),
+        pincode: document.getElementById('cf-pincode').value.trim(),
+        city: document.getElementById('cf-city').value.trim(),
+        address: document.getElementById('cf-address').value.trim(),
+        notes: document.getElementById('cf-notes').value.trim()
+      };
+      return data;
+    }
+
+    function clearErrors(){
+      ['err-name','err-phone','err-pincode','err-address'].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.classList.remove('show');
+      });
+      ['cf-name','cf-phone','cf-pincode','cf-address'].forEach(id=>{
+        const el=document.getElementById(id); if(el) el.style.borderColor='var(--ring)';
+      });
+    }
+
+    function validateUserDetails(user){
+      clearErrors();
+      let ok = true;
+      if(!user.name){ document.getElementById('err-name').classList.add('show'); document.getElementById('cf-name').style.borderColor='#b00020'; ok=false; }
+      // Phone: keep only digits, allow +91, 0 prefix; final must have 10 digits
+      const digits = user.phone.replace(/\D/g,'');
+      if(!(digits.length===10 || (digits.length===12 && digits.startsWith('91')) || (digits.length===11 && digits.startsWith('0')))){
+        document.getElementById('err-phone').classList.add('show'); document.getElementById('cf-phone').style.borderColor='#b00020'; ok=false;
+      }
+      if(!/^\d{6}$/.test(user.pincode)){ document.getElementById('err-pincode').classList.add('show'); document.getElementById('cf-pincode').style.borderColor='#b00020'; ok=false; }
+      if(user.address.length<5){ document.getElementById('err-address').classList.add('show'); document.getElementById('cf-address').style.borderColor='#b00020'; ok=false; }
+      return ok;
+    }
+
     function generateWhatsAppCheckout(){
       if(cart.length===0){ alert("Your cart is empty!"); return; }
+
+      const user = getUserDetails();
+      if(!validateUserDetails(user)) { return; }
+      // Save user for next time
+      localStorage.setItem(SAVE_USER_KEY, JSON.stringify(user));
+
       const total = cart.reduce((s,i)=>s+i.price*i.quantity,0);
       const lines = cart.map(i=>`${i.name} (x${i.quantity}) - ₹${i.price * i.quantity}`).join('\n');
-      const message = `Hi PiNa Bakes! I would like to place an order:\n\n${lines}\n\n*Total: ₹${total}*\n\nThank you!`;
+
+      const userBlock =
+`Customer: ${user.name}
+Phone: ${user.phone}
+City: ${user.city || '-'}
+Pincode: ${user.pincode}
+Address: ${user.address}
+Notes: ${user.notes || '-'}`;
+
+      const message = `Hi PiNa Bakes! I would like to place an order:\n\n${lines}\n\n*Total: ₹${total}*\n\n${userBlock}\n\nThank you!`;
       const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
       window.open(url,'_blank');
     }
@@ -467,7 +582,7 @@
       const ld=document.createElement('script'); ld.type='application/ld+json'; ld.textContent=JSON.stringify(productSchemas); document.head.appendChild(ld);
     }catch(e){console.warn('LD-JSON not added',e);}
 
-    // ===== Slider state (NEW) =====
+    // ===== Slider state =====
     let galleryImgs = [];
     let galleryIndex = 0;
 
@@ -500,7 +615,6 @@
       if(Math.abs(dx) > 40){ dx < 0 ? nextImage() : prevImage(); }
       touchStartX = null;
     }
-    // (We attach these listeners inside renderRoute after image exists)
 
     // ===== Router + dynamic gallery =====
     async function renderRoute(){
@@ -518,22 +632,18 @@
             const listed = await listImagesFromGitHub(p.slug);
             if(listed && listed.length) imgs = listed;
           }
-          galleryImgs = imgs.slice(); // set global gallery
+          galleryImgs = imgs.slice();
           galleryIndex = 0;
 
-          // Main image
           const mainImg = document.getElementById('product-image');
           mainImg.src = galleryImgs[0];
           mainImg.alt = `${p.name} cookies`;
-          // Attach touch listeners (safe to reattach)
           mainImg.addEventListener('touchstart', onTouchStart, {passive:true});
           mainImg.addEventListener('touchend', onTouchEnd, {passive:true});
 
-          // Prev/Next buttons
           document.getElementById('prev-btn').onclick = prevImage;
           document.getElementById('next-btn').onclick = nextImage;
 
-          // Thumbs
           const thumbs = document.getElementById('product-thumbs');
           thumbs.innerHTML = galleryImgs.map((src,i)=>`
             <button aria-label="View image ${i+1}" ${i===0?'class="active"':''}>
@@ -541,7 +651,6 @@
             </button>`).join('');
           Array.from(thumbs.querySelectorAll('button')).forEach((btn,i)=>btn.addEventListener('click', ()=> setMain(i)));
 
-          // Details
           document.getElementById('product-title').textContent = p.name;
           document.getElementById('product-price').textContent = `₹${p.price}`;
           document.getElementById('product-tagline').textContent = p.tagline;
@@ -555,7 +664,6 @@
 
           document.getElementById('detail-add-to-cart-btn').onclick = () => addToCart(p.slug);
 
-          // Show/hide sections
           productPage.hidden = false; mainSections.forEach(sec => sec.hidden = true); hero.hidden = true;
           window.scrollTo(0, 0);
           return;
@@ -565,7 +673,7 @@
     }
 
     window.addEventListener('hashchange', renderRoute);
-    window.addEventListener('DOMContentLoaded', () => { renderRoute(); renderCart(); });
+    window.addEventListener('DOMContentLoaded', () => { renderRoute(); renderCart(); loadUserDetails(); });
   </script>
 </body>
 </html>

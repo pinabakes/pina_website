@@ -21,6 +21,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
+  <!-- Organization Schema -->
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Organization","name":"PiNa Bakes","url":"https://pinabakes.github.io/pina_website/","logo":"https://pinabakes.github.io/pina_website/assets/logo/pina-bakes-logo.png","sameAs":["https://instagram.com/PiNaBakes"]}
   </script>
@@ -33,6 +34,7 @@
     *{box-sizing:border-box}
     .skip-link{position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden}
     .skip-link:focus{left:1rem;top:1rem;width:auto;height:auto;background:#fff;padding:.5rem .75rem;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+
     header.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:.8rem;background:var(--card);border-bottom:1px solid var(--ring);padding:.8rem 1.1rem;justify-content:space-between}
     .brand{font-weight:800;font-size:1.1rem;letter-spacing:.2px;color:var(--brand)}
     .header-controls{display:flex;align-items:center;gap:1.25rem}
@@ -54,12 +56,14 @@
     .drawer-backdrop{display:none}
     .drawer-backdrop.active{display:block;position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:59}
     @keyframes fromLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+
     .hero{position:relative;min-height:420px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3.5rem 1rem 2.5rem;isolation:isolate}
     .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.45));z-index:0}
     .hero-inner{position:relative;z-index:1}
     .hero .title{font-size:2.5rem;font-weight:800;margin:.6rem 0 0}
     .hero .desc{font-size:1.2rem;font-weight:400;max-width:540px;margin:.8rem auto 1.6rem}
     .pill{background:#e6f3e9;color:var(--brand);font-weight:700;border-radius:999px;padding:.55rem 1.2rem;margin:.4rem 0;display:inline-block}
+
     main .section{padding:2.3rem 1rem 1.2rem;max-width:1100px;margin:auto}
     .section h2{margin-top:0;font-size:2rem;color:var(--brand)}
     .section .desc{color:var(--muted);font-size:1.05rem;margin-bottom:2rem}
@@ -78,20 +82,27 @@
     .btn.tertiary{background:#e6f3e9;color:var(--brand)}
     .btn:hover{filter:brightness(1.1)}
     .btn:active{transform:scale(.98)}
+
     .video-gallery{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
     .video-wrap{background:var(--card);padding:1rem;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
     .video-wrap video,.video-wrap iframe{width:100%;border-radius:12px;max-height:350px}
     .insta-embed{margin:2.3rem 0 0;padding:1rem 0;border-radius:var(--radius);background:#fafafb}
     .insta-embed h3{font-size:1.13rem;font-weight:700;margin-bottom:.6rem;color:var(--brand)}
+
     .flex2{display:flex;gap:2rem;flex-wrap:wrap}
     .flex2>div{flex:1 1 340px}
+
     footer{text-align:center;color:var(--muted);margin:2.2rem 0 1.6rem}
     .fssai{display:inline-flex;align-items:center;gap:.4rem;vertical-align:middle;color:var(--brand)}
     .fssai img{width:45px;height:26px;object-fit:contain}
+
+    /* Thumbs */
     .thumbs{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
     .thumbs button{border:1px solid var(--ring);padding:0;background:#fff;border-radius:10px;cursor:pointer;transition:transform .12s}
     .thumbs button.active{outline:2px solid var(--brand)}
     .thumbs img{display:block;width:78px;height:78px;object-fit:cover;border-radius:10px}
+
+    /* Cart */
     .cart-btn{position:relative;background:none;border:none;cursor:pointer;padding:.5rem}
     .cart-icon{width:28px;height:28px;stroke:var(--ink);stroke-width:2}
     .cart-count{position:absolute;top:0;right:0;background:var(--brand-2);color:#fff;font-size:.7rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
@@ -112,6 +123,12 @@
     .cart-total{display:flex;justify-content:space-between;font-size:1.2rem;font-weight:800;margin-bottom:1rem}
     .checkout-btn{width:100%;padding:1rem;font-size:1.1rem}
     .empty-cart{text-align:center;padding:3rem 1rem;color:var(--muted)}
+    /* Keep space for the image before it loads */
+    .img-shell{ position:relative; min-height:320px; background:#eee; }
+    .img-shell.skeleton img{ visibility:hidden; } /* hide image until loaded so shimmer shows */
+    @media (max-width:480px){ .img-shell{ min-height:240px; } }
+
+    /* Checkout form */
     .checkout-section{margin-top:1rem;border-top:1px dashed var(--ring);padding-top:1rem}
     .checkout-section h3{margin:.2rem 0 .8rem;font-size:1.05rem;color:var(--brand)}
     .cart-form{display:grid;grid-template-columns:1fr;gap:.65rem}
@@ -121,28 +138,33 @@
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
     @media(max-width:420px){.form-row{grid-template-columns:1fr}}
     .err{color:#b00020;font-size:.85rem;margin-top:.2rem;display:none}
+
+    /* Slider */
     .slider{position:relative}
     .nav-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.9);border:1px solid var(--ring);width:38px;height:38px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.08)}
     .nav-arrow:hover{filter:brightness(.95)}
     .nav-arrow.left{left:8px}
     .nav-arrow.right{right:8px}
     .nav-arrow span{font-size:22px;line-height:1;user-select:none}
-    
+
     /* Skeleton Loader */
     .skeleton{background:#eee;border-radius:var(--radius);position:relative;overflow:hidden;}
     .skeleton::after{content:'';position:absolute;top:0;left:-150%;width:150%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);animation:shimmer 1.5s infinite;}
     @keyframes shimmer{100%{left:150%;}}
-    
+
     /* Toast Notification */
     .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.8rem 1.5rem;border-radius:999px;z-index:200;font-weight:600;font-size:.95rem;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .3s, visibility .3s, bottom .3s;}
     .toast.show{opacity:1;visibility:visible;bottom:30px;}
-    
-    @media(max-width:768px){main .section{padding:2rem .8rem 1rem}}
+
+    @media(max-width:768px){
+      main .section{padding:2rem .8rem 1rem}
+      .hero .title{font-size:2rem}
+    }
   </style>
 </head>
 <body>
-  <!-- All your HTML body content remains exactly the same -->
   <a class="skip-link" href="#main">Skip to content</a>
+
   <header class="topbar" role="banner">
     <a href="#home" style="display:flex;align-items:center;gap:.5rem;text-decoration:none" aria-label="PiNa Bakes Home">
       <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:50px;width:50px;border-radius:50%;object-fit:cover" loading="eager" fetchpriority="high">
@@ -163,6 +185,7 @@
       <button class="burger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" onclick="App.ui.toggleDrawer()"><span></span></button>
     </div>
   </header>
+
   <div class="drawer-backdrop" onclick="App.ui.closeAll()" id="backdrop" hidden></div>
   <nav class="drawer" id="drawer" aria-label="Mobile">
     <a href="#home" onclick="App.ui.closeAll()">Home</a>
@@ -171,8 +194,14 @@
     <a href="#about" onclick="App.ui.closeAll()">About</a>
     <a href="#contact" onclick="App.ui.closeAll()">Contact</a>
   </nav>
+
+  <!-- Hero -->
   <section class="hero" id="home" aria-labelledby="hero-title">
-    <picture aria-hidden="true" style="position:absolute;inset:0;z-index:-1"><img src="assets/page_images/hero.jpg" alt="" style="width:100%;height:100%;object-fit:cover" loading="eager" fetchpriority="high"></picture>
+    <picture aria-hidden="true" style="position:absolute;inset:0;z-index:-1">
+      <source srcset="assets/page_images/hero.avif" type="image/avif">
+      <source srcset="assets/page_images/hero.webp" type="image/webp">
+      <img src="assets/page_images/hero.jpg" alt="" style="width:100%;height:100%;object-fit:cover" loading="eager" fetchpriority="high" decoding="async">
+    </picture>
     <div class="hero-inner">
       <span class="pill">Healthy • Tasty • Wholesome</span>
       <h1 id="hero-title" class="title">Millet Cookies, Made the Right Way</h1>
@@ -180,18 +209,24 @@
       <a href="#products" class="btn">Shop Our Cookies</a>
     </div>
   </section>
+
   <main id="main">
     <section id="products" class="section" aria-labelledby="products-title">
       <h2 id="products-title">Our Flavors</h2>
       <div class="desc">Premium millet-based cookies, delivered fresh to your door. <b>Safe cardboard packaging.</b></div>
       <div class="grid" id="product-grid" aria-live="polite"></div>
+      <noscript><p>Please enable JavaScript to see product cards.</p></noscript>
     </section>
+
+    <!-- Product Detail Page -->
     <section id="product-page" class="section" aria-labelledby="product-title" hidden>
       <a href="#products" class="navlink" id="back-to-products">← Back to products</a>
       <div class="flex2" style="margin-top:1rem">
         <div>
           <div class="slider">
-            <img id="product-image" alt="" class="thumb skeleton" style="border-radius:var(--radius)">
+            <div class="img-shell skeleton" style="border-radius:var(--radius);overflow:hidden">
+              <img id="product-image" alt="" class="thumb" style="display:block;width:100%;height:auto">
+            </div>
             <button class="nav-arrow left" id="prev-btn" aria-label="Previous photo"><span>‹</span></button>
             <button class="nav-arrow right" id="next-btn" aria-label="Next photo"><span>›</span></button>
           </div>
@@ -209,15 +244,91 @@
         </div>
       </div>
       <hr class="divider">
-      <div class="flex2"><div><h3>Ingredients</h3><ul id="product-ingredients"></ul></div><div><h3>Notes</h3><p id="product-notes">Add tasting notes, storage tips, and allergy info here.</p></div></div>
+      <div class="flex2">
+        <div>
+          <h3>Ingredients</h3>
+          <ul id="product-ingredients"></ul>
+        </div>
+        <div>
+          <h3>Notes</h3>
+          <p id="product-notes">Add tasting notes, storage tips, and allergy info here.</p>
+        </div>
+      </div>
       <hr class="divider">
-      <div><h3>Nutrition (per 100g)</h3><table aria-label="Nutrition facts per 100 grams" id="nutrition-table" style="width:100%;border-collapse:collapse;border:1px solid var(--ring);border-radius:12px;overflow:hidden"><thead><tr style="background:#fafafa"><th style="padding:.65rem .75rem;text-align:left">Nutrient</th><th style="padding:.65rem .75rem;text-align:left">Amount</th></tr></thead><tbody id="product-nutrition"></tbody></table><p style="color:#565c64;margin:.5rem 0 0">Replace “—” with tested values when you have them.</p></div>
+      <div>
+        <h3>Nutrition (per 100g)</h3>
+        <table aria-label="Nutrition facts per 100 grams" id="nutrition-table" style="width:100%;border-collapse:collapse;border:1px solid var(--ring);border-radius:12px;overflow:hidden">
+          <thead><tr style="background:#fafafa"><th style="padding:.65rem .75rem;text-align:left">Nutrient</th><th style="padding:.65rem .75rem;text-align:left">Amount</th></tr></thead>
+          <tbody id="product-nutrition"></tbody>
+        </table>
+        <p style="color:#565c64;margin:.5rem 0 0">Replace “—” with tested values when you have them.</p>
+      </div>
     </section>
-    <section id="videos" class="section" aria-labelledby="videos-title"><h2 id="videos-title">Cookie Gallery: Watch Us Bake!</h2><div class="desc">See the magic—our cookies in-the-making and being enjoyed!</div><div class="video-gallery"><div class="video-wrap"><video controls poster="assets/videos/cookie-thumb.jpg" preload="metadata"><source src="assets/videos/cookies-baking.mp4" type="video/mp4">Your browser does not support this video.</video><div class="desc">Our fresh Richie-Pistachio batch, straight from the oven!</div></div><div class="video-wrap"><iframe src="https://www.youtube.com/embed/2rQrxFsgbeE" allowfullscreen title="PiNa Bakes baking process" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe><div class="desc">Behind the scenes: cookie making at PiNa Bakes</div></div></div><div class="insta-embed"><h3>See More on Instagram <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></h3><p>Follow us on Instagram for daily bakes and behind-the-scenes!</p></div></section>
-    <section id="about" class="section flex2" aria-labelledby="about-title"><div><h2 id="about-title">About PiNa Bakes</h2><p><b>PiNa Bakes</b> brings wholesome, millet-based gourmet cookies to Delhi and pan-India. Simple ingredients, balanced nutrition, and honest flavors—crafted with passion and expertise.</p><p><b>Packaging:</b> Eco-friendly cardboard, safe for shipping.<br><b>Compliance:</b> FSSAI certified.</p></div><div><h2>Why Choose Us?</h2><ul><li>100% premium-quality millet blends</li><li>Rich, honest flavors—no compromise</li><li>Gluten-friendly, wholesome indulgence</li><li>Pan-India delivery, safe packaging</li><li>Manufactured &amp; Marketed by <b>PiNa Bakes</b></li></ul></div></section>
-    <section id="contact" class="section" aria-labelledby="contact-title"><h2 id="contact-title">Contact</h2><address class="contact"><div><strong>Address:</strong> 3684, DaribaPan, Paharganj, New Delhi – 110055</div><div><strong>Call/WhatsApp:</strong> <a href="https://wa.me/917678506669" target="_blank" rel="noopener">+91 7678506669</a></div><div><strong>Email:</strong> <a href="mailto:pinabakes@gmail.com?subject=PiNa%20Bakes%20Enquiry">Pinabakes@gmail.com</a></div><div><strong>Instagram:</strong> <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></div></address><div style="margin-top:.7rem" class="fssai" aria-label="FSSAI License"><img src="assets/logo/fssai/logo.png" alt="FSSAI Logo"> <span id="fssai-text">FSSAI License: 23325005002208</span></div></section>
+
+    <!-- Videos -->
+    <section id="videos" class="section" aria-labelledby="videos-title">
+      <h2 id="videos-title">Cookie Gallery: Watch Us Bake!</h2>
+      <div class="desc">See the magic—our cookies in-the-making and being enjoyed!</div>
+      <div class="video-gallery">
+        <div class="video-wrap">
+          <video controls poster="assets/videos/cookie-thumb.jpg" preload="metadata">
+            <source src="assets/videos/cookies-baking.mp4" type="video/mp4">
+            Your browser does not support this video.
+          </video>
+          <div class="desc">Our fresh Richie-Pistachio batch, straight from the oven!</div>
+        </div>
+        <div class="video-wrap">
+          <iframe src="https://www.youtube.com/embed/2rQrxFsgbeE" allowfullscreen title="PiNa Bakes baking process" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <div class="desc">Behind the scenes: cookie making at PiNa Bakes</div>
+        </div>
+      </div>
+      <div class="insta-embed">
+        <h3>See More on Instagram <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></h3>
+        <p>Follow us on Instagram for daily bakes and behind-the-scenes!</p>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="section flex2" aria-labelledby="about-title">
+      <div>
+        <h2 id="about-title">About PiNa Bakes</h2>
+        <p><b>PiNa Bakes</b> brings wholesome, millet-based gourmet cookies to Delhi and pan-India. Simple ingredients, balanced nutrition, and honest flavors—crafted with passion and expertise.</p>
+        <p><b>Packaging:</b> Eco-friendly cardboard, safe for shipping.<br><b>Compliance:</b> FSSAI certified.</p>
+      </div>
+      <div>
+        <h2>Why Choose Us?</h2>
+        <ul>
+          <li>100% premium-quality millet blends</li>
+          <li>Rich, honest flavors—no compromise</li>
+          <li>Gluten-friendly, wholesome indulgence</li>
+          <li>Pan-India delivery, safe packaging</li>
+          <li>Manufactured &amp; Marketed by <b>PiNa Bakes</b></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="section" aria-labelledby="contact-title">
+      <h2 id="contact-title">Contact</h2>
+      <address class="contact">
+        <div><strong>Address:</strong> 3684, DaribaPan, Paharganj, New Delhi – 110055</div>
+        <div><strong>Call/WhatsApp:</strong> <a href="https://wa.me/917678506669" target="_blank" rel="noopener">+91 7678506669</a></div>
+        <div><strong>Email:</strong> <a href="mailto:pinabakes@gmail.com?subject=PiNa%20Bakes%20Enquiry">Pinabakes@gmail.com</a></div>
+        <div><strong>Instagram:</strong> <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></div>
+      </address>
+      <div style="margin-top:.7rem" class="fssai" aria-label="FSSAI License">
+        <img src="assets/logo/fssai/logo.png" alt="FSSAI Logo"> <span id="fssai-text">FSSAI License: 23325005002208</span>
+      </div>
+    </section>
   </main>
-  <footer><img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:45px;width:45px;margin-bottom:.4rem;border-radius:50%;object-fit:cover" loading="lazy"><br>© <span id="year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!<br><span class="fssai"><img src="assets/logo/fssai/logo.png" alt="FSSAI Logo"> <span id="fssai-text-footer">23325005002208</span></span></footer>
+
+  <footer>
+    <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:45px;width:45px;margin-bottom:.4rem;border-radius:50%;object-fit:cover" loading="lazy"><br>
+    © <span id="year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!<br>
+    <span class="fssai"><img src="assets/logo/fssai/logo.png" alt="FSSAI Logo"> <span id="fssai-text-footer">23325005002208</span></span>
+  </footer>
+
+  <!-- Cart Modal -->
   <aside class="cart-modal" id="cart-modal" aria-labelledby="cart-title" role="dialog" aria-modal="true">
     <div class="cart-header">
       <h2 id="cart-title">Your Cart</h2>
@@ -225,26 +336,57 @@
     </div>
     <div class="cart-body">
       <div id="cart-items"></div>
+
+      <!-- Checkout form -->
       <div class="checkout-section">
         <h3>Customer details</h3>
         <form class="cart-form" id="checkout-form" onsubmit="event.preventDefault(); App.checkout.submit();">
-          <div><label for="cf-name">Full name</label><input id="cf-name" name="name" autocomplete="name" placeholder="Your name" required><div class="err" id="err-name">Please enter your name.</div></div>
-          <div><label for="cf-phone">Phone (WhatsApp)</label><input id="cf-phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="10-digit number" required><div class="err" id="err-phone">Enter a valid 10-digit Indian number.</div></div>
-          <div class="form-row"><div><label for="cf-pincode">Pincode</label><input id="cf-pincode" name="pincode" inputmode="numeric" placeholder="6-digit pincode" required><div class="err" id="err-pincode">Pincode must be 6 digits.</div></div><div><label for="cf-city">City</label><input id="cf-city" name="city" placeholder="City / District"></div></div>
-          <div><label for="cf-address">Address</label><textarea id="cf-address" name="address" placeholder="House no., street, area" required></textarea><div class="err" id="err-address">Please enter your address.</div></div>
-          <div><label for="cf-notes">Notes (optional)</label><textarea id="cf-notes" name="notes" placeholder="Landmark, delivery instructions, etc."></textarea></div>
+          <div>
+            <label for="cf-name">Full name</label>
+            <input id="cf-name" name="name" autocomplete="name" placeholder="Your name" required>
+            <div class="err" id="err-name">Please enter your name.</div>
+          </div>
+          <div>
+            <label for="cf-phone">Phone (WhatsApp)</label>
+            <input id="cf-phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="10-digit number" required>
+            <div class="err" id="err-phone">Enter a valid 10-digit Indian number.</div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="cf-pincode">Pincode</label>
+              <input id="cf-pincode" name="pincode" inputmode="numeric" placeholder="6-digit pincode" required>
+              <div class="err" id="err-pincode">Pincode must be 6 digits.</div>
+            </div>
+            <div>
+              <label for="cf-city">City</label>
+              <input id="cf-city" name="city" placeholder="City / District">
+            </div>
+          </div>
+          <div>
+            <label for="cf-address">Address</label>
+            <textarea id="cf-address" name="address" placeholder="House no., street, area" required></textarea>
+            <div class="err" id="err-address">Please enter your address.</div>
+          </div>
+          <div>
+            <label for="cf-notes">Notes (optional)</label>
+            <textarea id="cf-notes" name="notes" placeholder="Landmark, delivery instructions, etc."></textarea>
+          </div>
         </form>
       </div>
     </div>
     <div class="cart-footer">
-      <div class="cart-total"><span>Total</span><span id="cart-total">₹0</span></div>
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cart-total">₹0</span>
+      </div>
       <button class="btn checkout-btn" onclick="App.checkout.submit()">Checkout on WhatsApp</button>
     </div>
   </aside>
+
+  <!-- Toast -->
   <div id="toast-notification" class="toast" role="status" aria-live="polite"></div>
 
   <!-- Main Application Script -->
   <script src="app.js"></script>
-
 </body>
 </html>

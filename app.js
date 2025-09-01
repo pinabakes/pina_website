@@ -67,7 +67,7 @@ const App = {
       if (!response.ok) throw new Error('HTTP ' + response.status);
       this.state.products = await response.json();
       this.ui.renderProductGrid();
-      // (Optional) You could also inject JSON-LD for products here if desired.
+      // (Optional) Inject JSON-LD for products here if desired.
     } catch (error) {
       console.error('Failed to load products:', error);
       this.elements.productGrid.innerHTML = '<p>Error loading products. Please try again later.</p>';
@@ -77,7 +77,8 @@ const App = {
   // HELPERS (image)
   helpers: {
     productImageHTML(src, alt){
-      // graceful AVIF/WebP; browsers skip missing formats
+      // Graceful AVIF/WebP; browsers skip unsupported types
+      // (If .avif/.webp don’t exist, browser falls back to <img src>)
       const base = src.replace(/\.(jpe?g|png|webp|avif)$/i,'');
       return `
         <picture>
@@ -130,6 +131,31 @@ const App = {
             </div>
           </div>
         </article>`).join('');
+    },
+
+    // Load the big product image with a skeleton wrapper that clears on load
+    loadMainProductImage(src, alt) {
+      const mainImg = document.getElementById('product-image');
+      const shell   = mainImg ? mainImg.closest('.img-shell') : null;
+
+      // Re-apply skeleton while loading the new src
+      if (shell) shell.classList.add('skeleton');
+      else mainImg && mainImg.classList.add('skeleton'); // fallback if no wrapper
+
+      // Assign handlers BEFORE setting src
+      if (mainImg) {
+        mainImg.onload = () => {
+          if (shell) shell.classList.remove('skeleton');
+          else mainImg.classList.remove('skeleton');
+        };
+        mainImg.onerror = () => {
+          if (shell) shell.classList.remove('skeleton');
+          else mainImg.classList.remove('skeleton');
+          mainImg.alt = 'Image not available';
+        };
+        mainImg.alt = alt || '';
+        mainImg.src = src;
+      }
     },
 
     toggleDrawer() {
@@ -352,8 +378,8 @@ Notes: ${user.notes || '-'}`;
     set(i){
       if(!App.state.galleryImgs.length) return;
       App.state.galleryIndex = (i + App.state.galleryImgs.length) % App.state.galleryImgs.length;
-      const main = document.getElementById('product-image');
-      main.src = App.state.galleryImgs[App.state.galleryIndex];
+      const src = App.state.galleryImgs[App.state.galleryIndex];
+      App.ui.loadMainProductImage(src, document.getElementById('product-title')?.textContent + ' cookies');
       const buttons = document.querySelectorAll('#product-thumbs button');
       buttons.forEach((b,bi)=> b.classList.toggle('active', bi===App.state.galleryIndex));
     },
@@ -379,12 +405,12 @@ Notes: ${user.notes || '-'}`;
         App.state.galleryImgs = (product.images && product.images.length) ? product.images.slice() : [product.img];
         App.state.galleryIndex = 0;
 
-        const mainImg = document.getElementById('product-image');
-        mainImg.src = App.state.galleryImgs[0];
-        mainImg.alt = `${product.name} cookies`;
-        mainImg.classList.remove('skeleton');
+        // MAIN IMAGE — use wrapper skeleton that clears AFTER load
+        App.ui.loadMainProductImage(App.state.galleryImgs[0], `${product.name} cookies`);
 
-        if (!mainImg.dataset.swipeBound) {
+        // Bind swipe once
+        const mainImg = document.getElementById('product-image');
+        if (mainImg && !mainImg.dataset.swipeBound) {
           mainImg.addEventListener('touchstart', (e) => { App.touchStartX = e.changedTouches[0].clientX; }, { passive: true });
           mainImg.addEventListener('touchend', (e) => {
             if (App.touchStartX == null) return;

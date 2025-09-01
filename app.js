@@ -44,9 +44,8 @@ const App = {
     this.cart.load();
     this.checkout.loadUserDetails();
 
-    // Start loading products with skeletons
-    this.ui.showSkeletonLoader();
-    this.loadProducts();     // grid will be rendered once fetched
+    // No skeletons: just load products and render when ready
+    this.loadProducts();
 
     // Handle initial route (deep links supported)
     this.router.renderRoute();
@@ -67,25 +66,9 @@ const App = {
       if (!response.ok) throw new Error('HTTP ' + response.status);
       this.state.products = await response.json();
       this.ui.renderProductGrid();
-      // (Optional) Inject JSON-LD for products here if desired.
     } catch (error) {
       console.error('Failed to load products:', error);
       this.elements.productGrid.innerHTML = '<p>Error loading products. Please try again later.</p>';
-    }
-  },
-
-  // HELPERS (image)
-  helpers: {
-    productImageHTML(src, alt){
-      // Graceful AVIF/WebP; browsers skip unsupported types
-      // (If .avif/.webp don’t exist, browser falls back to <img src>)
-      const base = src.replace(/\.(jpe?g|png|webp|avif)$/i,'');
-      return `
-        <picture>
-          <source srcset="${base}.avif" type="image/avif">
-          <source srcset="${base}.webp" type="image/webp">
-          <img class="thumb" loading="lazy" decoding="async" src="${src}" alt="${alt}">
-        </picture>`;
     }
   },
 
@@ -99,63 +82,26 @@ const App = {
       this._toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
     },
 
-    showSkeletonLoader() {
-      const { productGrid } = App.elements;
-      productGrid.innerHTML = Array.from({ length: 8 }).map(() => `
-        <article class="card">
-          <div class="skeleton" style="aspect-ratio:1/1;"></div>
-          <div class="card-body" style="gap:1rem;">
-            <div class="skeleton" style="height:1.2rem;width:60%;"></div>
-            <div class="skeleton" style="height:1rem;width:30%;"></div>
-            <div class="skeleton" style="height:1rem;width:80%;"></div>
-            <div class="skeleton" style="height:2.5rem;width:100%;margin-top:auto;"></div>
-          </div>
-        </article>
-      `).join('');
-    },
-
     renderProductGrid() {
       const { productGrid } = App.elements;
-      productGrid.innerHTML = App.state.products.map(p => `
-        <article class="card">
-          <a href="#/product/${p.slug}" aria-label="View ${p.name}">
-            ${App.helpers.productImageHTML((p.images && p.images[0]) || p.img, `PiNa Bakes ${p.name} cookies`)}
-          </a>
-          <div class="card-body">
-            <div class="title">${p.name}</div>
-            <div class="price">₹${p.price}</div>
-            <div class="tagline">${p.tagline}</div>
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:auto">
-              <a class="btn" href="#/product/${p.slug}">View details</a>
-              <button class="btn tertiary" onclick="App.cart.add('${p.slug}')">Add to Cart</button>
+      productGrid.innerHTML = App.state.products.map(p => {
+        const cover = (p.images && p.images[0]) || p.img;
+        return `
+          <article class="card">
+            <a href="#/product/${p.slug}" aria-label="View ${p.name}">
+              <img class="thumb" loading="lazy" decoding="async" src="${cover}" alt="PiNa Bakes ${p.name} cookies">
+            </a>
+            <div class="card-body">
+              <div class="title">${p.name}</div>
+              <div class="price">₹${p.price}</div>
+              <div class="tagline">${p.tagline}</div>
+              <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:auto">
+                <a class="btn" href="#/product/${p.slug}">View details</a>
+                <button class="btn tertiary" onclick="App.cart.add('${p.slug}')">Add to Cart</button>
+              </div>
             </div>
-          </div>
-        </article>`).join('');
-    },
-
-    // Load the big product image with a skeleton wrapper that clears on load
-    loadMainProductImage(src, alt) {
-      const mainImg = document.getElementById('product-image');
-      const shell   = mainImg ? mainImg.closest('.img-shell') : null;
-
-      // Re-apply skeleton while loading the new src
-      if (shell) shell.classList.add('skeleton');
-      else mainImg && mainImg.classList.add('skeleton'); // fallback if no wrapper
-
-      // Assign handlers BEFORE setting src
-      if (mainImg) {
-        mainImg.onload = () => {
-          if (shell) shell.classList.remove('skeleton');
-          else mainImg.classList.remove('skeleton');
-        };
-        mainImg.onerror = () => {
-          if (shell) shell.classList.remove('skeleton');
-          else mainImg.classList.remove('skeleton');
-          mainImg.alt = 'Image not available';
-        };
-        mainImg.alt = alt || '';
-        mainImg.src = src;
-      }
+          </article>`;
+      }).join('');
     },
 
     toggleDrawer() {
@@ -318,7 +264,7 @@ const App = {
       const fields = [
         { id: 'cf-name',    err: 'err-name',    check: val => val.trim().length > 1 },
         { id: 'cf-phone',   err: 'err-phone',   check: val => {
-            const digits = val.replace(/\D/g,''); // keep digits only
+            const digits = val.replace(/\D/g,'');
             return (digits.length===10) || (digits.length===11 && digits.startsWith('0')) || (digits.length===12 && digits.startsWith('91'));
           } },
         { id: 'cf-pincode', err: 'err-pincode', check: val => /^\d{6}$/.test(val.trim()) },
@@ -378,8 +324,13 @@ Notes: ${user.notes || '-'}`;
     set(i){
       if(!App.state.galleryImgs.length) return;
       App.state.galleryIndex = (i + App.state.galleryImgs.length) % App.state.galleryImgs.length;
-      const src = App.state.galleryImgs[App.state.galleryIndex];
-      App.ui.loadMainProductImage(src, document.getElementById('product-title')?.textContent + ' cookies');
+      const main = document.getElementById('product-image');
+      const src  = App.state.galleryImgs[App.state.galleryIndex];
+      if (main) {
+        main.src = src;
+        main.alt = (document.getElementById('product-title')?.textContent || 'Product') + ' cookies';
+        main.classList.remove('skeleton'); // just in case HTML still has it
+      }
       const buttons = document.querySelectorAll('#product-thumbs button');
       buttons.forEach((b,bi)=> b.classList.toggle('active', bi===App.state.galleryIndex));
     },
@@ -396,7 +347,6 @@ Notes: ${user.notes || '-'}`;
       if (hash.startsWith('#/product/')) {
         const slug = hash.split('/')[2];
 
-        // Ensure products are loaded before attempting to render
         await App.ensureProductsLoaded();
 
         const product = App.state.products.find(x => x.slug === slug);
@@ -405,11 +355,16 @@ Notes: ${user.notes || '-'}`;
         App.state.galleryImgs = (product.images && product.images.length) ? product.images.slice() : [product.img];
         App.state.galleryIndex = 0;
 
-        // MAIN IMAGE — use wrapper skeleton that clears AFTER load
-        App.ui.loadMainProductImage(App.state.galleryImgs[0], `${product.name} cookies`);
+        // MAIN IMAGE (no placeholder logic)
+        const mainImg = document.getElementById('product-image');
+        if (mainImg) {
+          mainImg.src = App.state.galleryImgs[0];
+          mainImg.alt = `${product.name} cookies`;
+          mainImg.classList.remove('skeleton'); // in case HTML had it
+          mainImg.removeAttribute('loading');    // ensure eager load for hero product
+        }
 
         // Bind swipe once
-        const mainImg = document.getElementById('product-image');
         if (mainImg && !mainImg.dataset.swipeBound) {
           mainImg.addEventListener('touchstart', (e) => { App.touchStartX = e.changedTouches[0].clientX; }, { passive: true });
           mainImg.addEventListener('touchend', (e) => {
@@ -436,7 +391,6 @@ Notes: ${user.notes || '-'}`;
         document.getElementById('product-tagline').textContent = product.tagline;
         document.getElementById('product-bullets').innerHTML = product.bullets ? `<ul>${product.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : '';
         document.getElementById('product-ingredients').innerHTML = (product.ingredients||[]).map(i=>`<li>${i}</li>`).join('');
-        document.getElementById('detail-add-to-cart-btn').onclick = () => App.cart.add(product.slug);
 
         // Nutrition placeholders (per 100g)
         const nut = product.nutrition || { energy:'— kcal', protein:'— g', fat:'— g', carbs:'— g', sugar:'— g', fibre:'— g', sodium:'— mg' };
@@ -450,6 +404,8 @@ Notes: ${user.notes || '-'}`;
           ['Sodium',nut.sodium||'— mg']
         ].map(([k,v])=>`<tr><td style="padding:.65rem .75rem;border-bottom:1px solid var(--ring)">${k}</td><td style="padding:.65rem .75rem;border-bottom:1px solid var(--ring)">${v}</td></tr>`).join('');
         document.getElementById('product-nutrition').innerHTML = rows;
+
+        document.getElementById('detail-add-to-cart-btn').onclick = () => App.cart.add(product.slug);
 
         productPage.hidden = false;
         mainSections.forEach(sec => sec.hidden = true);

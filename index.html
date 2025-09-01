@@ -123,10 +123,6 @@
     .cart-total{display:flex;justify-content:space-between;font-size:1.2rem;font-weight:800;margin-bottom:1rem}
     .checkout-btn{width:100%;padding:1rem;font-size:1.1rem}
     .empty-cart{text-align:center;padding:3rem 1rem;color:var(--muted)}
-    /* Keep space for the image before it loads */
-    .img-shell{ position:relative; min-height:320px; background:#eee; }
-    .img-shell.skeleton img{ visibility:hidden; } /* hide image until loaded so shimmer shows */
-    @media (max-width:480px){ .img-shell{ min-height:240px; } }
 
     /* Checkout form */
     .checkout-section{margin-top:1rem;border-top:1px dashed var(--ring);padding-top:1rem}
@@ -147,7 +143,7 @@
     .nav-arrow.right{right:8px}
     .nav-arrow span{font-size:22px;line-height:1;user-select:none}
 
-    /* Skeleton Loader */
+    /* Skeleton Loader (for grid placeholders) */
     .skeleton{background:#eee;border-radius:var(--radius);position:relative;overflow:hidden;}
     .skeleton::after{content:'';position:absolute;top:0;left:-150%;width:150%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);animation:shimmer 1.5s infinite;}
     @keyframes shimmer{100%{left:150%;}}
@@ -223,10 +219,9 @@
       <a href="#products" class="navlink" id="back-to-products">← Back to products</a>
       <div class="flex2" style="margin-top:1rem">
         <div>
+          <!-- SLIDER (no skeleton wrapper) -->
           <div class="slider">
-            <div class="img-shell skeleton" style="border-radius:var(--radius);overflow:hidden">
-              <img id="product-image" alt="" class="thumb" style="display:block;width:100%;height:auto">
-            </div>
+            <img id="product-image" alt="" class="thumb" style="border-radius:var(--radius);display:block;width:100%;height:auto">
             <button class="nav-arrow left" id="prev-btn" aria-label="Previous photo"><span>‹</span></button>
             <button class="nav-arrow right" id="next-btn" aria-label="Next photo"><span>›</span></button>
           </div>

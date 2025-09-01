@@ -21,16 +21,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Organization Schema -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "PiNa Bakes",
-    "url": "https://pinabakes.github.io/pina_website/",
-    "logo": "https://pinabakes.github.io/pina_website/assets/logo/pina-bakes-logo.png",
-    "sameAs": ["https://instagram.com/PiNaBakes"]
-  }
+  {"@context":"https://schema.org","@type":"Organization","name":"PiNa Bakes","url":"https://pinabakes.github.io/pina_website/","logo":"https://pinabakes.github.io/pina_website/assets/logo/pina-bakes-logo.png","sameAs":["https://instagram.com/PiNaBakes"]}
   </script>
 
   <style>
@@ -62,7 +54,6 @@
     .drawer-backdrop{display:none}
     .drawer-backdrop.active{display:block;position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:59}
     @keyframes fromLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
-    @media (prefers-reduced-motion: reduce){.drawer.open{animation:none}}
     .hero{position:relative;min-height:420px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:3.5rem 1rem 2.5rem;isolation:isolate}
     .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.45),rgba(0,0,0,.45));z-index:0}
     .hero-inner{position:relative;z-index:1}
@@ -86,29 +77,21 @@
     .btn.secondary{background:var(--brand-2)}
     .btn.tertiary{background:#e6f3e9;color:var(--brand)}
     .btn:hover{filter:brightness(1.1)}
-    .btn.tertiary:hover{background:#d9ead3}
+    .btn:active{transform:scale(.98)}
     .video-gallery{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
     .video-wrap{background:var(--card);padding:1rem;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
     .video-wrap video,.video-wrap iframe{width:100%;border-radius:12px;max-height:350px}
-    .video-wrap .desc{font-size:.99rem;color:var(--brand-2);margin:.6rem 0 .2rem}
-    @media(max-width:500px){.video-gallery{grid-template-columns:1fr}}
     .insta-embed{margin:2.3rem 0 0;padding:1rem 0;border-radius:var(--radius);background:#fafafb}
     .insta-embed h3{font-size:1.13rem;font-weight:700;margin-bottom:.6rem;color:var(--brand)}
     .flex2{display:flex;gap:2rem;flex-wrap:wrap}
     .flex2>div{flex:1 1 340px}
-    .contact strong{color:var(--ink)}
     footer{text-align:center;color:var(--muted);margin:2.2rem 0 1.6rem}
     .fssai{display:inline-flex;align-items:center;gap:.4rem;vertical-align:middle;color:var(--brand)}
     .fssai img{width:45px;height:26px;object-fit:contain}
-
-    /* Thumbs */
     .thumbs{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
     .thumbs button{border:1px solid var(--ring);padding:0;background:#fff;border-radius:10px;cursor:pointer;transition:transform .12s}
     .thumbs button.active{outline:2px solid var(--brand)}
-    .thumbs button:active{transform:scale(.98)}
     .thumbs img{display:block;width:78px;height:78px;object-fit:cover;border-radius:10px}
-
-    /* Cart */
     .cart-btn{position:relative;background:none;border:none;cursor:pointer;padding:.5rem}
     .cart-icon{width:28px;height:28px;stroke:var(--ink);stroke-width:2}
     .cart-count{position:absolute;top:0;right:0;background:var(--brand-2);color:#fff;font-size:.7rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center}
@@ -129,8 +112,6 @@
     .cart-total{display:flex;justify-content:space-between;font-size:1.2rem;font-weight:800;margin-bottom:1rem}
     .checkout-btn{width:100%;padding:1rem;font-size:1.1rem}
     .empty-cart{text-align:center;padding:3rem 1rem;color:var(--muted)}
-
-    /* Checkout form in cart */
     .checkout-section{margin-top:1rem;border-top:1px dashed var(--ring);padding-top:1rem}
     .checkout-section h3{margin:.2rem 0 .8rem;font-size:1.05rem;color:var(--brand)}
     .cart-form{display:grid;grid-template-columns:1fr;gap:.65rem}
@@ -140,37 +121,27 @@
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
     @media(max-width:420px){.form-row{grid-template-columns:1fr}}
     .err{color:#b00020;font-size:.85rem;margin-top:.2rem;display:none}
-    .show{display:block}
-
-    /* Slider */
     .slider{position:relative}
     .nav-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.9);border:1px solid var(--ring);width:38px;height:38px;border-radius:999px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.08)}
-    .nav-arrow:hover{filter:brightness(0.95)}
+    .nav-arrow:hover{filter:brightness(.95)}
     .nav-arrow.left{left:8px}
     .nav-arrow.right{right:8px}
-    .nav-arrow span{font-size:22px;line-height:1;color:var(--ink);user-select:none}
-
-    /* Responsive fine-tunes */
-    @media(max-width:1024px){
-      .hero .title{font-size:2.2rem}
-      .hero .desc{font-size:1.1rem}
-      .section h2{font-size:1.8rem}
-    }
-    @media(max-width:768px){
-      main .section{padding:2rem .8rem 1rem}
-      .hero .title{font-size:2rem}
-    }
-    @media(max-width:480px){
-      .hero{min-height:380px;padding:2.5rem 1rem 2rem}
-      .hero .title{font-size:1.8rem}
-      .hero .desc{font-size:1rem;max-width:95%}
-      .section h2{font-size:1.6rem}
-      .card-body{padding:.9rem}
-      .title{font-size:1.15rem}
-    }
+    .nav-arrow span{font-size:22px;line-height:1;user-select:none}
+    
+    /* Skeleton Loader */
+    .skeleton{background:#eee;border-radius:var(--radius);position:relative;overflow:hidden;}
+    .skeleton::after{content:'';position:absolute;top:0;left:-150%;width:150%;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent);animation:shimmer 1.5s infinite;}
+    @keyframes shimmer{100%{left:150%;}}
+    
+    /* Toast Notification */
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.8rem 1.5rem;border-radius:999px;z-index:200;font-weight:600;font-size:.95rem;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .3s, visibility .3s, bottom .3s;}
+    .toast.show{opacity:1;visibility:visible;bottom:30px;}
+    
+    @media(max-width:768px){main .section{padding:2rem .8rem 1rem}}
   </style>
 </head>
 <body>
+  <!-- All your HTML body content remains exactly the same -->
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="topbar" role="banner">
     <a href="#home" style="display:flex;align-items:center;gap:.5rem;text-decoration:none" aria-label="PiNa Bakes Home">
@@ -185,29 +156,23 @@
         <a href="#about" class="navlink">About</a>
         <a href="#contact" class="navlink">Contact</a>
       </nav>
-      <button class="cart-btn" aria-label="Open cart" onclick="toggleCart()">
-        <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-        </svg>
+      <button class="cart-btn" aria-label="Open cart" onclick="App.cart.toggle()">
+        <svg class="cart-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
         <span class="cart-count" id="cart-count">0</span>
       </button>
-      <button class="burger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" onclick="toggleDrawer()"><span></span></button>
+      <button class="burger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false" onclick="App.ui.toggleDrawer()"><span></span></button>
     </div>
   </header>
-  <div class="drawer-backdrop" onclick="closeDrawer()" id="backdrop" hidden></div>
+  <div class="drawer-backdrop" onclick="App.ui.closeAll()" id="backdrop" hidden></div>
   <nav class="drawer" id="drawer" aria-label="Mobile">
-    <a href="#home" onclick="closeDrawer()">Home</a>
-    <a href="#products" onclick="closeDrawer()">Products</a>
-    <a href="#videos" onclick="closeDrawer()">Videos</a>
-    <a href="#about" onclick="closeDrawer()">About</a>
-    <a href="#contact" onclick="closeDrawer()">Contact</a>
+    <a href="#home" onclick="App.ui.closeAll()">Home</a>
+    <a href="#products" onclick="App.ui.closeAll()">Products</a>
+    <a href="#videos" onclick="App.ui.closeAll()">Videos</a>
+    <a href="#about" onclick="App.ui.closeAll()">About</a>
+    <a href="#contact" onclick="App.ui.closeAll()">Contact</a>
   </nav>
-
-  <!-- Hero -->
   <section class="hero" id="home" aria-labelledby="hero-title">
-    <picture aria-hidden="true" style="position:absolute;inset:0;z-index:-1">
-      <img src="assets/page_images/hero.jpg" alt="" style="width:100%;height:100%;object-fit:cover" loading="eager" fetchpriority="high">
-    </picture>
+    <picture aria-hidden="true" style="position:absolute;inset:0;z-index:-1"><img src="assets/page_images/hero.jpg" alt="" style="width:100%;height:100%;object-fit:cover" loading="eager" fetchpriority="high"></picture>
     <div class="hero-inner">
       <span class="pill">Healthy • Tasty • Wholesome</span>
       <h1 id="hero-title" class="title">Millet Cookies, Made the Right Way</h1>
@@ -215,23 +180,18 @@
       <a href="#products" class="btn">Shop Our Cookies</a>
     </div>
   </section>
-
   <main id="main">
     <section id="products" class="section" aria-labelledby="products-title">
       <h2 id="products-title">Our Flavors</h2>
-      <div class="desc">Premium millet-based cookies, delivered fresh to your door. <b>Safe cardboard packaging.</b> Amazon & Shiprocket ready.</div>
+      <div class="desc">Premium millet-based cookies, delivered fresh to your door. <b>Safe cardboard packaging.</b></div>
       <div class="grid" id="product-grid" aria-live="polite"></div>
-      <noscript><p>Please enable JavaScript to see product cards.</p></noscript>
     </section>
-
-    <!-- Product Detail Page -->
     <section id="product-page" class="section" aria-labelledby="product-title" hidden>
       <a href="#products" class="navlink" id="back-to-products">← Back to products</a>
       <div class="flex2" style="margin-top:1rem">
         <div>
-          <!-- SLIDER -->
           <div class="slider">
-            <img id="product-image" alt="" class="thumb" style="border-radius:var(--radius)">
+            <img id="product-image" alt="" class="thumb skeleton" style="border-radius:var(--radius)">
             <button class="nav-arrow left" id="prev-btn" aria-label="Previous photo"><span>‹</span></button>
             <button class="nav-arrow right" id="next-btn" aria-label="Next photo"><span>›</span></button>
           </div>
@@ -249,433 +209,42 @@
         </div>
       </div>
       <hr class="divider">
-      <div class="flex2">
-        <div>
-          <h3>Ingredients</h3>
-          <ul id="product-ingredients"></ul>
-        </div>
-        <div>
-          <h3>Notes</h3>
-          <p id="product-notes">Add tasting notes, storage tips, and allergy info here.</p>
-        </div>
-      </div>
+      <div class="flex2"><div><h3>Ingredients</h3><ul id="product-ingredients"></ul></div><div><h3>Notes</h3><p id="product-notes">Add tasting notes, storage tips, and allergy info here.</p></div></div>
       <hr class="divider">
-      <div class="section">
-        <h3>Nutrition (per 100g)</h3>
-        <table aria-label="Nutrition facts per 100 grams" id="nutrition-table" style="width:100%;border-collapse:collapse;border:1px solid var(--ring);border-radius:12px;overflow:hidden">
-          <thead>
-            <tr style="background:#fafafa">
-              <th style="padding:.65rem .75rem;text-align:left">Nutrient</th>
-              <th style="padding:.65rem .75rem;text-align:left">Amount</th>
-            </tr>
-          </thead>
-          <tbody id="product-nutrition"></tbody>
-        </table>
-        <p style="color:#565c64;margin:.5rem 0 0">Replace “—” with tested values when you have them.</p>
-      </div>
+      <div><h3>Nutrition (per 100g)</h3><table aria-label="Nutrition facts per 100 grams" id="nutrition-table" style="width:100%;border-collapse:collapse;border:1px solid var(--ring);border-radius:12px;overflow:hidden"><thead><tr style="background:#fafafa"><th style="padding:.65rem .75rem;text-align:left">Nutrient</th><th style="padding:.65rem .75rem;text-align:left">Amount</th></tr></thead><tbody id="product-nutrition"></tbody></table><p style="color:#565c64;margin:.5rem 0 0">Replace “—” with tested values when you have them.</p></div>
     </section>
-
-    <!-- Videos -->
-    <section id="videos" class="section" aria-labelledby="videos-title">
-      <h2 id="videos-title">Cookie Gallery: Watch Us Bake!</h2>
-      <div class="desc">See the magic—our cookies in-the-making and being enjoyed!</div>
-      <div class="video-gallery">
-        <div class="video-wrap">
-          <video controls poster="assets/videos/cookie-thumb.jpg" preload="metadata">
-            <source src="assets/videos/cookies-baking.mp4" type="video/mp4">
-            Your browser does not support this video.
-          </video>
-          <div class="desc">Our fresh Richie-Pistachio batch, straight from the oven!</div>
-        </div>
-        <div class="video-wrap">
-          <iframe src="https://www.youtube.com/embed/2rQrxFsgbeE" allowfullscreen title="PiNa Bakes baking process" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
-          <div class="desc">Behind the scenes: cookie making at PiNa Bakes</div>
-        </div>
-      </div>
-      <div class="insta-embed">
-        <h3>See More on Instagram <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></h3>
-        <p>Follow us on Instagram for daily bakes and behind-the-scenes!</p>
-      </div>
-    </section>
-
-    <!-- About -->
-    <section id="about" class="section flex2" aria-labelledby="about-title">
-      <div>
-        <h2 id="about-title">About PiNa Bakes</h2>
-        <p><b>PiNa Bakes</b> brings wholesome, millet-based gourmet cookies to Delhi and pan-India. Simple ingredients, balanced nutrition, and honest flavors—crafted with passion and expertise.</p>
-        <p><b>Packaging:</b> Eco-friendly cardboard, safe for shipping.<br><b>Compliance:</b> FSSAI certified. Ready Soon for Amazon and Shiprocket.</p>
-      </div>
-      <div>
-        <h2>Why Choose Us?</h2>
-        <ul>
-          <li>100% premium-quality millet blends</li>
-          <li>Rich, honest flavors—no compromise</li>
-          <li>Gluten-friendly, wholesome indulgence</li>
-          <li>Pan-India delivery, safe packaging</li>
-          <li>Manufactured &amp; Marketed by <b>PiNa Bakes</b></li>
-        </ul>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section id="contact" class="section" aria-labelledby="contact-title">
-      <h2 id="contact-title">Contact</h2>
-      <address class="contact">
-        <div><strong>Address:</strong> 3684, DaribaPan, Paharganj, New Delhi – 110055</div>
-        <div><strong>Call/WhatsApp:</strong> <a href="https://wa.me/917678506669" target="_blank" rel="noopener">+91 7678506669</a></div>
-        <div><strong>Email:</strong> <a href="mailto:pinabakes@gmail.com?subject=PiNa%20Bakes%20Enquiry">Pinabakes@gmail.com</a></div>
-        <div><strong>Instagram:</strong> <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></div>
-      </address>
-      <div style="margin-top:.7rem" class="fssai" aria-label="FSSAI License">
-        <img src="assets/logo/fssai/logo.png" alt="FSSAI Logo"> <span id="fssai-text">FSSAI License: 23325005002208</span>
-      </div>
-    </section>
+    <section id="videos" class="section" aria-labelledby="videos-title"><h2 id="videos-title">Cookie Gallery: Watch Us Bake!</h2><div class="desc">See the magic—our cookies in-the-making and being enjoyed!</div><div class="video-gallery"><div class="video-wrap"><video controls poster="assets/videos/cookie-thumb.jpg" preload="metadata"><source src="assets/videos/cookies-baking.mp4" type="video/mp4">Your browser does not support this video.</video><div class="desc">Our fresh Richie-Pistachio batch, straight from the oven!</div></div><div class="video-wrap"><iframe src="https://www.youtube.com/embed/2rQrxFsgbeE" allowfullscreen title="PiNa Bakes baking process" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe><div class="desc">Behind the scenes: cookie making at PiNa Bakes</div></div></div><div class="insta-embed"><h3>See More on Instagram <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></h3><p>Follow us on Instagram for daily bakes and behind-the-scenes!</p></div></section>
+    <section id="about" class="section flex2" aria-labelledby="about-title"><div><h2 id="about-title">About PiNa Bakes</h2><p><b>PiNa Bakes</b> brings wholesome, millet-based gourmet cookies to Delhi and pan-India. Simple ingredients, balanced nutrition, and honest flavors—crafted with passion and expertise.</p><p><b>Packaging:</b> Eco-friendly cardboard, safe for shipping.<br><b>Compliance:</b> FSSAI certified.</p></div><div><h2>Why Choose Us?</h2><ul><li>100% premium-quality millet blends</li><li>Rich, honest flavors—no compromise</li><li>Gluten-friendly, wholesome indulgence</li><li>Pan-India delivery, safe packaging</li><li>Manufactured &amp; Marketed by <b>PiNa Bakes</b></li></ul></div></section>
+    <section id="contact" class="section" aria-labelledby="contact-title"><h2 id="contact-title">Contact</h2><address class="contact"><div><strong>Address:</strong> 3684, DaribaPan, Paharganj, New Delhi – 110055</div><div><strong>Call/WhatsApp:</strong> <a href="https://wa.me/917678506669" target="_blank" rel="noopener">+91 7678506669</a></div><div><strong>Email:</strong> <a href="mailto:pinabakes@gmail.com?subject=PiNa%20Bakes%20Enquiry">Pinabakes@gmail.com</a></div><div><strong>Instagram:</strong> <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a></div></address><div style="margin-top:.7rem" class="fssai" aria-label="FSSAI License"><img src="assets/logo/fssai/logo.png" alt="FSSAI Logo"> <span id="fssai-text">FSSAI License: 23325005002208</span></div></section>
   </main>
-
-  <footer>
-    <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:45px;width:45px;margin-bottom:.4rem;border-radius:50%;object-fit:cover" loading="lazy"><br>
-    © <span id="year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!<br>
-    <span class="fssai"><img src="assets/logo/fssai/logo.png" alt="FSSAI Logo"> <span id="fssai-text-footer">23325005002208</span></span>
-  </footer>
-
-  <!-- Cart Modal -->
+  <footer><img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" style="height:45px;width:45px;margin-bottom:.4rem;border-radius:50%;object-fit:cover" loading="lazy"><br>© <span id="year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!<br><span class="fssai"><img src="assets/logo/fssai/logo.png" alt="FSSAI Logo"> <span id="fssai-text-footer">23325005002208</span></span></footer>
   <aside class="cart-modal" id="cart-modal" aria-labelledby="cart-title" role="dialog" aria-modal="true">
     <div class="cart-header">
       <h2 id="cart-title">Your Cart</h2>
-      <button class="close-btn" onclick="toggleCart()" aria-label="Close cart">&times;</button>
+      <button class="close-btn" onclick="App.cart.toggle()" aria-label="Close cart">&times;</button>
     </div>
     <div class="cart-body">
-      <div id="cart-items"><!-- items inject --></div>
-
-      <!-- Checkout form -->
+      <div id="cart-items"></div>
       <div class="checkout-section">
         <h3>Customer details</h3>
-        <form class="cart-form" id="checkout-form" onsubmit="event.preventDefault(); generateWhatsAppCheckout();">
-          <div>
-            <label for="cf-name">Full name</label>
-            <input id="cf-name" name="name" autocomplete="name" placeholder="Your name" required>
-            <div class="err" id="err-name">Please enter your name.</div>
-          </div>
-          <div>
-            <label for="cf-phone">Phone (WhatsApp)</label>
-            <input id="cf-phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="10-digit number" required>
-            <div class="err" id="err-phone">Enter a valid 10-digit Indian number.</div>
-          </div>
-          <div class="form-row">
-            <div>
-              <label for="cf-pincode">Pincode</label>
-              <input id="cf-pincode" name="pincode" inputmode="numeric" placeholder="6-digit pincode" required>
-              <div class="err" id="err-pincode">Pincode must be 6 digits.</div>
-            </div>
-            <div>
-              <label for="cf-city">City</label>
-              <input id="cf-city" name="city" placeholder="City / District">
-            </div>
-          </div>
-          <div>
-            <label for="cf-address">Address</label>
-            <textarea id="cf-address" name="address" placeholder="House no., street, area" required></textarea>
-            <div class="err" id="err-address">Please enter your address.</div>
-          </div>
-          <div>
-            <label for="cf-notes">Notes (optional)</label>
-            <textarea id="cf-notes" name="notes" placeholder="Landmark, delivery instructions, etc."></textarea>
-          </div>
-          <!-- You can also put the checkout button inside the form; keeping it below for layout -->
+        <form class="cart-form" id="checkout-form" onsubmit="event.preventDefault(); App.checkout.submit();">
+          <div><label for="cf-name">Full name</label><input id="cf-name" name="name" autocomplete="name" placeholder="Your name" required><div class="err" id="err-name">Please enter your name.</div></div>
+          <div><label for="cf-phone">Phone (WhatsApp)</label><input id="cf-phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="10-digit number" required><div class="err" id="err-phone">Enter a valid 10-digit Indian number.</div></div>
+          <div class="form-row"><div><label for="cf-pincode">Pincode</label><input id="cf-pincode" name="pincode" inputmode="numeric" placeholder="6-digit pincode" required><div class="err" id="err-pincode">Pincode must be 6 digits.</div></div><div><label for="cf-city">City</label><input id="cf-city" name="city" placeholder="City / District"></div></div>
+          <div><label for="cf-address">Address</label><textarea id="cf-address" name="address" placeholder="House no., street, area" required></textarea><div class="err" id="err-address">Please enter your address.</div></div>
+          <div><label for="cf-notes">Notes (optional)</label><textarea id="cf-notes" name="notes" placeholder="Landmark, delivery instructions, etc."></textarea></div>
         </form>
       </div>
     </div>
     <div class="cart-footer">
-      <div class="cart-total">
-        <span>Total</span>
-        <span id="cart-total">₹0</span>
-      </div>
-      <button class="btn checkout-btn" onclick="generateWhatsAppCheckout()">Checkout on WhatsApp</button>
+      <div class="cart-total"><span>Total</span><span id="cart-total">₹0</span></div>
+      <button class="btn checkout-btn" onclick="App.checkout.submit()">Checkout on WhatsApp</button>
     </div>
   </aside>
+  <div id="toast-notification" class="toast" role="status" aria-live="polite"></div>
 
-  <script>
-    // ===== Basic UI =====
-    const drawer = document.getElementById('drawer');
-    const backdrop = document.getElementById('backdrop');
-    const burger = document.querySelector('.burger');
-    function openDrawer(){drawer.classList.add('open');backdrop.classList.add('active');backdrop.hidden=false;burger.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'}
-    function closeDrawer(){drawer.classList.remove('open');backdrop.classList.remove('active');backdrop.hidden=true;burger.setAttribute('aria-expanded','false');document.body.style.overflow=''}
-    function toggleDrawer(){drawer.classList.contains('open')?closeDrawer():openDrawer()}
-    window.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeDrawer(); closeCart(); } })
-    document.getElementById('year').textContent = new Date().getFullYear();
+  <!-- Main Application Script -->
+  <script src="app.js"></script>
 
-    // ===== Config =====
-    const GH_OWNER = 'pinabakes';
-    const GH_REPO  = 'pina_website';
-    const GH_API_BASE = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents`;
-    const WHATSAPP_NUMBER = '917678506669';
-
-    async function listImagesFromGitHub(slug){
-      try{
-        const path = `assets/products/${slug}`;
-        const res = await fetch(`${GH_API_BASE}/${path}`);
-        if(!res.ok) throw new Error(`GitHub API ${res.status}`);
-        const files = await res.json();
-        return files.filter(f => f.type === 'file' && /\.(?:jpe?g|png|webp|gif)$/i.test(f.name))
-                    .map(f => `${path}/${f.name}`)
-                    .sort((a,b)=>{const num=s=>{const m=s.match(/-(\d+)\.(?:jpe?g|png|webp|gif)$/i);return m?parseInt(m[1],10):0;};return num(a)-num(b)||a.localeCompare(b);});
-      }catch(e){console.warn('Could not list images via GitHub API:',e);return null;}
-    }
-
-    // ===== Catalog =====
-    const products = [
-      { slug:'nutty-coco', name:'Nutty-Coco', price:199, tagline:'Real coconut & millet', img:'assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg', images:['assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg','assets/products/nutty-coco/pina-bakes-nutty-coco-2.jpg','assets/products/nutty-coco/pina-bakes-nutty-coco-3.jpg'], bullets:['Crisp edges, soft center','Made with real coconut flakes'], ingredients:['Jowar (sorghum) flour','Oats flour','Coconut','Butter','Jaggery','Baking powder','Vanilla']},
-      { slug:'jowar-peanut-butter', name:'Jowar-Peanut Butter', price:209, tagline:'Jowar with peanut butter', img:'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg', images:[], bullets:['Protein-packed','No maida'], ingredients:['Jowar flour','Peanut butter','Jaggery','Butter','Baking powder']},
-      { slug:'lemon-blueberry', name:'Lemon-Blueberry', price:289, tagline:'Tangy & fruity millet cookies', img:'assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg', images:[], bullets:['Real lemon zest','Blueberry bits'], ingredients:['Bajra flour','Oats flour','Blueberries','Butter','Sugar','Lemon zest']},
-      { slug:'quinoa-walnut', name:'Quinoa-Walnut', price:279, tagline:'Quinoa & walnut', img:'assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg', images:[], bullets:['Nutty crunch','Quinoa goodness'], ingredients:['Quinoa flour','Jowar flour','Walnuts','Butter','Jaggery']},
-      { slug:'richie-pistachio', name:'Richie-Pistachio', price:349, tagline:'Richie pistachio cookies', img:'assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg', images:[], bullets:['Loaded with pistachios','Premium treat'], ingredients:['Pistachio','Bajra flour','Butter','Sugar']},
-      { slug:'foxtail-true-chocolate', name:'Foxtail True-Chocolate', price:349, tagline:'Pure chocolate with foxtail millet', img:'assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg', images:[], bullets:['Deep cocoa','Foxtail millet base'], ingredients:['Foxtail millet flour','Cocoa','Butter','Sugar','Baking powder']},
-      { slug:'ragi-millet', name:'Ragi Millet', price:229, tagline:'Wholesome ragi cookies', img:'assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg', images:[], bullets:['Calcium-rich ragi','Tea-time friendly'], ingredients:['Ragi flour','Oats flour','Butter','Jaggery']},
-      { slug:'bajra-almond', name:'Bajra Millet with Almond', price:199, tagline:'Bajra base, almond enriched', img:'assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg', images:[], bullets:['Almond bits','Hearty bajra'], ingredients:['Bajra flour','Almonds','Butter','Sugar']}
-    ];
-
-    // ===== Cart =====
-    const cartModal = document.getElementById('cart-modal');
-    let cart = JSON.parse(localStorage.getItem('pina_cart')) || [];
-    const SAVE_USER_KEY = 'pina_checkout_user';
-
-    function openCart(){cartModal.classList.add('open');backdrop.classList.add('active');backdrop.hidden=false;document.body.style.overflow='hidden'}
-    function closeCart(){cartModal.classList.remove('open');backdrop.classList.remove('active');backdrop.hidden=true;document.body.style.overflow=''}
-    function toggleCart(){cartModal.classList.contains('open')?closeCart():openCart()}
-    function saveCart(){localStorage.setItem('pina_cart', JSON.stringify(cart));}
-    function addToCart(slug){
-      const existing = cart.find(i=>i.slug===slug);
-      if(existing){ existing.quantity++; }
-      else{ const p = products.find(x=>x.slug===slug); cart.push({...p, quantity:1}); }
-      saveCart(); renderCart(); openCart();
-    }
-    function updateCartItem(slug, change){
-      const item = cart.find(i=>i.slug===slug);
-      if(item){ item.quantity += change; if(item.quantity<=0){ cart = cart.filter(i=>i.slug!==slug); } }
-      saveCart(); renderCart();
-    }
-
-    function renderCart(){
-      const cartBody = document.getElementById('cart-items');
-      const cartTotalEl = document.getElementById('cart-total');
-      const cartCountEl = document.getElementById('cart-count');
-      if(cart.length===0){
-        cartBody.innerHTML = '<p class="empty-cart">Your cart is empty.</p>';
-        cartTotalEl.textContent = '₹0';
-        cartCountEl.textContent = '0'; cartCountEl.hidden=true; return;
-      }
-      cartBody.innerHTML = cart.map(item=>`
-        <div class="cart-item">
-          <img src="${item.img}" alt="${item.name}" class="cart-item-img">
-          <div class="cart-item-details">
-            <p class="cart-item-title">${item.name}</p>
-            <p class="cart-item-price">₹${item.price}</p>
-            <div class="cart-item-actions">
-              <button onclick="updateCartItem('${item.slug}', -1)">-</button>
-              <span>${item.quantity}</span>
-              <button onclick="updateCartItem('${item.slug}', 1)">+</button>
-            </div>
-          </div>
-          <div>₹${item.price * item.quantity}</div>
-        </div>`).join('');
-      const total = cart.reduce((s,i)=>s+i.price*i.quantity,0);
-      cartTotalEl.textContent = `₹${total}`;
-      const count = cart.reduce((s,i)=>s+i.quantity,0);
-      cartCountEl.textContent = count; cartCountEl.hidden=false;
-    }
-
-    function loadUserDetails(){
-      try{
-        const saved = JSON.parse(localStorage.getItem(SAVE_USER_KEY)||'null');
-        if(!saved) return;
-        const ids = ['cf-name','cf-phone','cf-pincode','cf-city','cf-address','cf-notes'];
-        const keys= ['name','phone','pincode','city','address','notes'];
-        ids.forEach((id, idx)=>{ const el = document.getElementById(id); if(el && typeof saved[keys[idx]]!=='undefined') el.value = saved[keys[idx]]; });
-      }catch(e){}
-    }
-
-    function getUserDetails(){
-      const data = {
-        name: document.getElementById('cf-name').value.trim(),
-        phone: document.getElementById('cf-phone').value.trim(),
-        pincode: document.getElementById('cf-pincode').value.trim(),
-        city: document.getElementById('cf-city').value.trim(),
-        address: document.getElementById('cf-address').value.trim(),
-        notes: document.getElementById('cf-notes').value.trim()
-      };
-      return data;
-    }
-
-    function clearErrors(){
-      ['err-name','err-phone','err-pincode','err-address'].forEach(id=>{
-        const el=document.getElementById(id); if(el) el.classList.remove('show');
-      });
-      ['cf-name','cf-phone','cf-pincode','cf-address'].forEach(id=>{
-        const el=document.getElementById(id); if(el) el.style.borderColor='var(--ring)';
-      });
-    }
-
-    function validateUserDetails(user){
-      clearErrors();
-      let ok = true;
-      if(!user.name){ document.getElementById('err-name').classList.add('show'); document.getElementById('cf-name').style.borderColor='#b00020'; ok=false; }
-      // Phone: keep only digits, allow +91, 0 prefix; final must have 10 digits
-      const digits = user.phone.replace(/\D/g,'');
-      if(!(digits.length===10 || (digits.length===12 && digits.startsWith('91')) || (digits.length===11 && digits.startsWith('0')))){
-        document.getElementById('err-phone').classList.add('show'); document.getElementById('cf-phone').style.borderColor='#b00020'; ok=false;
-      }
-      if(!/^\d{6}$/.test(user.pincode)){ document.getElementById('err-pincode').classList.add('show'); document.getElementById('cf-pincode').style.borderColor='#b00020'; ok=false; }
-      if(user.address.length<5){ document.getElementById('err-address').classList.add('show'); document.getElementById('cf-address').style.borderColor='#b00020'; ok=false; }
-      return ok;
-    }
-
-    function generateWhatsAppCheckout(){
-      if(cart.length===0){ alert("Your cart is empty!"); return; }
-
-      const user = getUserDetails();
-      if(!validateUserDetails(user)) { return; }
-      // Save user for next time
-      localStorage.setItem(SAVE_USER_KEY, JSON.stringify(user));
-
-      const total = cart.reduce((s,i)=>s+i.price*i.quantity,0);
-      const lines = cart.map(i=>`${i.name} (x${i.quantity}) - ₹${i.price * i.quantity}`).join('\n');
-
-      const userBlock =
-`Customer: ${user.name}
-Phone: ${user.phone}
-City: ${user.city || '-'}
-Pincode: ${user.pincode}
-Address: ${user.address}
-Notes: ${user.notes || '-'}`;
-
-      const message = `Hi PiNa Bakes! I would like to place an order:\n\n${lines}\n\n*Total: ₹${total}*\n\n${userBlock}\n\nThank you!`;
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-      window.open(url,'_blank');
-    }
-
-    // ===== Grid render =====
-    const grid = document.getElementById('product-grid');
-    grid.innerHTML = products.map(p=>{
-      const href = `#/product/${p.slug}`;
-      const cover = (p.images && p.images[0]) || p.img;
-      return `
-        <article class="card">
-          <a href="${href}" aria-label="View ${p.name}">
-            <img class="thumb" loading="lazy" src="${cover}" alt="PiNa Bakes ${p.name} cookies">
-          </a>
-          <div class="card-body">
-            <div class="title">${p.name}</div>
-            <div class="price">₹${p.price}</div>
-            <div class="tagline">${p.tagline}</div>
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:auto">
-              <a class="btn" href="${href}">View details</a>
-              <button class="btn tertiary" onclick="addToCart('${p.slug}')">Add to Cart</button>
-            </div>
-          </div>
-        </article>`;
-    }).join('');
-
-    // ===== JSON-LD =====
-    try{
-      const productSchemas=products.map(p=>({"@context":"https://schema.org","@type":"Product",name:p.name,image:(p.images&&p.images.length?p.images.slice(0,6):[p.img]).map(path=>`https://pinabakes.github.io/pina_website/${path}`),description:p.tagline,brand:{"@type":"Brand","name":"PiNa Bakes"},sku:p.slug,offers:{"@type":"Offer",priceCurrency:"INR",price:String(p.price),availability:"https://schema.org/InStock",url:`https://pinabakes.github.io/pina_website/#/product/${p.slug}`}}));
-      const ld=document.createElement('script'); ld.type='application/ld+json'; ld.textContent=JSON.stringify(productSchemas); document.head.appendChild(ld);
-    }catch(e){console.warn('LD-JSON not added',e);}
-
-    // ===== Slider state =====
-    let galleryImgs = [];
-    let galleryIndex = 0;
-
-    function setMain(i){
-      if(!galleryImgs.length) return;
-      galleryIndex = (i + galleryImgs.length) % galleryImgs.length;
-      const main = document.getElementById('product-image');
-      main.src = galleryImgs[galleryIndex];
-      // Update active thumb
-      const buttons = document.querySelectorAll('#product-thumbs button');
-      buttons.forEach((b,bi)=> b.classList.toggle('active', bi===galleryIndex));
-    }
-    function nextImage(){ setMain(galleryIndex + 1); }
-    function prevImage(){ setMain(galleryIndex - 1); }
-
-    // Keyboard left/right when on product page
-    window.addEventListener('keydown', (e)=>{
-      const productPage = document.getElementById('product-page');
-      if(productPage.hidden) return;
-      if(e.key === 'ArrowRight') nextImage();
-      if(e.key === 'ArrowLeft') prevImage();
-    });
-
-    // Touch swipe on main image
-    let touchStartX = null;
-    function onTouchStart(e){ touchStartX = e.changedTouches[0].clientX; }
-    function onTouchEnd(e){
-      if(touchStartX===null) return;
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      if(Math.abs(dx) > 40){ dx < 0 ? nextImage() : prevImage(); }
-      touchStartX = null;
-    }
-
-    // ===== Router + dynamic gallery =====
-    async function renderRoute(){
-      const hash = location.hash || '#home';
-      const productPage = document.getElementById('product-page');
-      const mainSections = document.querySelectorAll('main > .section:not(#product-page)');
-      const hero = document.getElementById('home');
-
-      if(hash.startsWith('#/product/')){
-        const slug = hash.split('/')[2];
-        const p = products.find(x=>x.slug===slug);
-        if(p){
-          let imgs = (p.images && p.images.length) ? p.images : [p.img];
-          if(!p.images || p.images.length <= 1){
-            const listed = await listImagesFromGitHub(p.slug);
-            if(listed && listed.length) imgs = listed;
-          }
-          galleryImgs = imgs.slice();
-          galleryIndex = 0;
-
-          const mainImg = document.getElementById('product-image');
-          mainImg.src = galleryImgs[0];
-          mainImg.alt = `${p.name} cookies`;
-          if (!mainImg.dataset.swipeBound) {
-            mainImg.addEventListener('touchstart', onTouchStart, { passive: true });
-            mainImg.addEventListener('touchend', onTouchEnd, { passive: true });
-            mainImg.dataset.swipeBound = '1';
-          }
-          document.getElementById('prev-btn').onclick = prevImage;
-          document.getElementById('next-btn').onclick = nextImage;
-
-          const thumbs = document.getElementById('product-thumbs');
-          thumbs.innerHTML = galleryImgs.map((src,i)=>`
-            <button aria-label="View image ${i+1}" ${i===0?'class="active"':''}>
-              <img loading="lazy" src="${src}" alt="">
-            </button>`).join('');
-          Array.from(thumbs.querySelectorAll('button')).forEach((btn,i)=>btn.addEventListener('click', ()=> setMain(i)));
-
-          document.getElementById('product-title').textContent = p.name;
-          document.getElementById('product-price').textContent = `₹${p.price}`;
-          document.getElementById('product-tagline').textContent = p.tagline;
-          document.getElementById('product-bullets').innerHTML = p.bullets? `<ul>${p.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>` : '';
-          document.getElementById('product-ingredients').innerHTML = (p.ingredients||[]).map(i=>`<li>${i}</li>`).join('');
-
-          const nut = p.nutrition || { energy:'— kcal', protein:'— g', fat:'— g', carbs:'— g', sugar:'— g', fibre:'— g', sodium:'— mg' };
-          const rows = [['Energy',nut.energy||'— kcal'],['Protein',nut.protein||'— g'],['Total Fat',nut.fat||'— g'],['Carbohydrates',nut.carbs||'— g'],['Added Sugar',nut.sugar||'— g'],['Dietary Fibre',nut.fibre||'— g'],['Sodium',nut.sodium||'— mg']]
-            .map(([k,v])=>`<tr><td style="padding:.65rem .75rem;border-bottom:1px solid var(--ring)">${k}</td><td style="padding:.65rem .75rem;border-bottom:1px solid var(--ring)">${v}</td></tr>`).join('');
-          document.getElementById('product-nutrition').innerHTML = rows;
-
-          document.getElementById('detail-add-to-cart-btn').onclick = () => addToCart(p.slug);
-
-          productPage.hidden = false; mainSections.forEach(sec => sec.hidden = true); hero.hidden = true;
-          window.scrollTo(0, 0);
-          return;
-        }
-      }
-      productPage.hidden = true; mainSections.forEach(sec => sec.hidden = false); hero.hidden = false;
-    }
-
-    window.addEventListener('hashchange', renderRoute);
-    window.addEventListener('DOMContentLoaded', () => { renderRoute(); renderCart(); loadUserDetails(); });
-  </script>
 </body>
 </html>

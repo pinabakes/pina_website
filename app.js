@@ -40,6 +40,9 @@ class PinaBakesApp {
       this.setupIntersectionObserver();
       this.setupHeaderScrollEffect();
       this.ui.hideLoader();
+
+      // Ensure hidden overlays never block clicks
+      this.ui._applyOverlayPointerSafety();
     } catch (error) {
       console.error('App initialization failed:', error);
       this.ui.showToast('Failed to load application. Please refresh the page.', 'error');
@@ -104,6 +107,17 @@ class PinaBakesApp {
     
     // Resize handling
     window.addEventListener('resize', this.debounce(this.handleResize.bind(this), 250));
+
+    // 🔒 Bulletproof routing: delegate clicks on product "View Details"
+    if (this.elements.productsGrid) {
+      this.elements.productsGrid.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="#/product/"]');
+        if (!link) return;
+        e.preventDefault();
+        const slug = link.getAttribute('href').split('/').pop();
+        this.router.navigate(`/product/${slug}`);
+      });
+    }
   }
 
   handleKeyboardShortcuts(e) {
@@ -334,7 +348,12 @@ class PinaBakesApp {
       this.elements.mobileNavOverlay.classList.add('active');
       this.elements.mobileMenuToggle.classList.add('active');
       this.elements.mobileMenuToggle.setAttribute('aria-expanded', 'true');
+      // prevent scroll
       document.body.style.overflow = 'hidden';
+      // overlay should capture clicks only when active
+      if (this.elements.mobileNavOverlay) {
+        this.elements.mobileNavOverlay.style.pointerEvents = 'auto';
+      }
     },
 
     closeMobileMenu: () => {
@@ -344,6 +363,10 @@ class PinaBakesApp {
       this.elements.mobileMenuToggle.classList.remove('active');
       this.elements.mobileMenuToggle.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
+      // make overlay non-clickable when hidden
+      if (this.elements.mobileNavOverlay) {
+        this.elements.mobileNavOverlay.style.pointerEvents = 'none';
+      }
     },
 
     closeAllModals: () => {
@@ -406,6 +429,7 @@ class PinaBakesApp {
       }).join('');
       
       this.elements.productsGrid.innerHTML = productsHTML;
+      // (No need to reattach the delegated click; we attached it once in setupEventListeners)
     },
 
     renderProductDetail: (product) => {
@@ -494,6 +518,16 @@ class PinaBakesApp {
         section.style.display = 'block';
       });
       this.state.currentProduct = null;
+    },
+
+    // Ensures overlays never block clicks when hidden
+    _applyOverlayPointerSafety: () => {
+      if (this.elements.mobileNavOverlay && !this.state.isMobileMenuOpen) {
+        this.elements.mobileNavOverlay.style.pointerEvents = 'none';
+      }
+      if (this.elements.cartOverlay && !this.state.isCartOpen) {
+        this.elements.cartOverlay.style.pointerEvents = 'none';
+      }
     }
   };
 
@@ -737,6 +771,10 @@ class PinaBakesApp {
       this.state.isCartOpen = true;
       this.elements.cartModal.classList.add('active');
       this.elements.cartOverlay.classList.add('active');
+      // capture clicks only when active
+      if (this.elements.cartOverlay) {
+        this.elements.cartOverlay.style.pointerEvents = 'auto';
+      }
       document.body.style.overflow = 'hidden';
     },
 
@@ -744,6 +782,10 @@ class PinaBakesApp {
       this.state.isCartOpen = false;
       this.elements.cartModal.classList.remove('active');
       this.elements.cartOverlay.classList.remove('active');
+      // disable click interception when hidden
+      if (this.elements.cartOverlay) {
+        this.elements.cartOverlay.style.pointerEvents = 'none';
+      }
       document.body.style.overflow = '';
     },
 
@@ -919,7 +961,8 @@ Please confirm the order and let me know the delivery timeline.`;
   router = {
     handleRoute: () => {
       const hash = window.location.hash || '#home';
-      
+      // console.log('route →', hash); // uncomment for debugging
+
       if (hash.startsWith('#/product/')) {
         const productSlug = hash.split('/')[2];
         this.router.showProduct(productSlug);
@@ -975,10 +1018,10 @@ const App = new PinaBakesApp();
 // Export for global access (for onclick handlers in HTML)
 window.App = App;
 
-// Service Worker Registration (if available)
+// Service Worker Registration (optional, safer path for GitHub Pages subfolder)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('./sw.js')
       .then(registration => {
         console.log('SW registered: ', registration);
       })

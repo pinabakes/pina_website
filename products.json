@@ -19,6 +19,7 @@
     "price": 209,
     "tagline": "Jowar with peanut butter",
     "img": "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg",
+    "images": [],
     "bullets": ["Protein-packed", "No maida"],
     "ingredients": ["Jowar flour", "Peanut butter", "Jaggery", "Butter", "Baking powder"]
   },
@@ -28,6 +29,7 @@
     "price": 289,
     "tagline": "Tangy & fruity millet cookies",
     "img": "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg",
+    "images": [],
     "bullets": ["Real lemon zest", "Blueberry bits"],
     "ingredients": ["Bajra flour", "Oats flour", "Blueberries", "Butter", "Sugar", "Lemon zest"]
   },
@@ -37,6 +39,7 @@
     "price": 279,
     "tagline": "Quinoa & walnut",
     "img": "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg",
+    "images": [],
     "bullets": ["Nutty crunch", "Quinoa goodness"],
     "ingredients": ["Quinoa flour", "Jowar flour", "Walnuts", "Butter", "Jaggery"]
   },
@@ -46,6 +49,7 @@
     "price": 349,
     "tagline": "Richie pistachio cookies",
     "img": "assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg",
+    "images": [],
     "bullets": ["Loaded with pistachios", "Premium treat"],
     "ingredients": ["Pistachio", "Bajra flour", "Butter", "Sugar"]
   },
@@ -55,6 +59,7 @@
     "price": 349,
     "tagline": "Pure chocolate with foxtail millet",
     "img": "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg",
+    "images": [],
     "bullets": ["Deep cocoa", "Foxtail millet base"],
     "ingredients": ["Foxtail millet flour", "Cocoa", "Butter", "Sugar", "Baking powder"]
   },
@@ -64,6 +69,7 @@
     "price": 229,
     "tagline": "Wholesome ragi cookies",
     "img": "assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg",
+    "images": [],
     "bullets": ["Calcium-rich ragi", "Tea-time friendly"],
     "ingredients": ["Ragi flour", "Oats flour", "Butter", "Jaggery"]
   },
@@ -73,6 +79,7 @@
     "price": 199,
     "tagline": "Bajra base, almond enriched",
     "img": "assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg",
+    "images": [],
     "bullets": ["Almond bits", "Hearty bajra"],
     "ingredients": ["Bajra flour", "Almonds", "Butter", "Sugar"]
   }

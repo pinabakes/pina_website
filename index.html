@@ -10,7 +10,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="PiNa Bakes – Millet Cookies" />
   <meta property="og:description" content="Gourmet millet-based cookies from Delhi. Healthy, tasty & wholesome." />
-  <meta property="og:image" content="https://pinabakes.github.io/pina_website/assets/hero.jpg" />
+  <meta property="og:image" content="https://pinabakes.github.io/pina_website/assets/page_images/hero.jpg" />
   <meta property="og:url" content="https://pinabakes.github.io/pina_website/" />
   <meta property="og:site_name" content="PiNa Bakes" />
   <meta name="twitter:card" content="summary_large_image" />
@@ -345,7 +345,7 @@
       <button class="close-btn" onclick="toggleCart()" aria-label="Close cart">&times;</button>
     </div>
     <div class="cart-body">
-      <div id="cart-body"><!-- items inject --></div>
+      <div id="cart-items"><!-- items inject --></div>
 
       <!-- Checkout form -->
       <div class="checkout-section">
@@ -457,7 +457,7 @@
     }
 
     function renderCart(){
-      const cartBody = document.getElementById('cart-body');
+      const cartBody = document.getElementById('cart-items');
       const cartTotalEl = document.getElementById('cart-total');
       const cartCountEl = document.getElementById('cart-count');
       if(cart.length===0){
@@ -638,9 +638,11 @@ Notes: ${user.notes || '-'}`;
           const mainImg = document.getElementById('product-image');
           mainImg.src = galleryImgs[0];
           mainImg.alt = `${p.name} cookies`;
-          mainImg.addEventListener('touchstart', onTouchStart, {passive:true});
-          mainImg.addEventListener('touchend', onTouchEnd, {passive:true});
-
+          if (!mainImg.dataset.swipeBound) {
+            mainImg.addEventListener('touchstart', onTouchStart, { passive: true });
+            mainImg.addEventListener('touchend', onTouchEnd, { passive: true });
+            mainImg.dataset.swipeBound = '1';
+          }
           document.getElementById('prev-btn').onclick = prevImage;
           document.getElementById('next-btn').onclick = nextImage;
 

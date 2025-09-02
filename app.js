@@ -108,14 +108,14 @@ class PinaBakesApp {
     // Resize handling
     window.addEventListener('resize', this.debounce(this.handleResize.bind(this), 250));
 
-    // 🔒 Bulletproof routing: delegate clicks on product "View Details"
+    // Delegate clicks on product "View Details"
     if (this.elements.productsGrid) {
       this.elements.productsGrid.addEventListener('click', (e) => {
         const link = e.target.closest('a[href^="#/product/"]');
         if (!link) return;
         e.preventDefault();
         const slug = link.getAttribute('href').split('/').pop();
-        this.router.navigate(`/product/${slug}`);
+        this.router.navigate(`#/product/${slug}`);
       });
     }
   }
@@ -429,7 +429,6 @@ class PinaBakesApp {
       }).join('');
       
       this.elements.productsGrid.innerHTML = productsHTML;
-      // (No need to reattach the delegated click; we attached it once in setupEventListeners)
     },
 
     renderProductDetail: (product) => {
@@ -463,8 +462,8 @@ class PinaBakesApp {
           product.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('');
       }
       
-      // Render nutrition information (placeholder data)
-      this.renderNutritionInfo(product);
+      // 🔧 FIX: call the method on ui (not on this)
+      this.ui.renderNutritionInfo(product);
       
       // Setup add to cart button
       if (this.elements.addToCartDetail) {
@@ -637,7 +636,6 @@ class PinaBakesApp {
       }
       
       const existingItem = this.state.cart.find(item => item.slug === productSlug);
-      
       if (existingItem) {
         existingItem.quantity += quantity;
       } else {
@@ -957,71 +955,51 @@ Please confirm the order and let me know the delivery timeline.`;
     }
   };
 
-    // Router Management (robust slug parsing + tiny logs)
-    router = {
+  // Router Management (robust slug parsing)
+  router = {
     handleRoute: () => {
-        const hash = window.location.hash || '#home';
-        // console.log('[router] hash:', hash); // uncomment to see routes
-
-        // robustly extract slug like "#/product/nutty-coco"
-        const m = hash.match(/^#\/product\/([^?#]+)/);
-        if (m && m[1]) {
+      const hash = window.location.hash || '#home';
+      const m = hash.match(/^#\/product\/([^?#]+)/);
+      if (m && m[1]) {
         const slug = decodeURIComponent(m[1]);
-        // console.log('[router] product slug:', slug);
         this.router.showProduct(slug);
         return;
-        }
-
-        // fall back to sections like "#products", "#home", etc.
-        const sectionId = hash.replace(/^#/, '') || 'home';
-        this.router.showSection(sectionId);
+      }
+      const sectionId = hash.replace(/^#/, '') || 'home';
+      this.router.showSection(sectionId);
     },
 
     navigate: (path) => {
-        // accept either "/product/slug" or "#/product/slug" or "products"
-        if (path.startsWith('#')) {
-        window.location.hash = path;
-        } else if (path.startsWith('/')) {
-        window.location.hash = `#${path}`;
-        } else {
-        window.location.hash = `#${path}`;
-        }
+      if (path.startsWith('#')) window.location.hash = path;
+      else if (path.startsWith('/')) window.location.hash = `#${path}`;
+      else window.location.hash = `#${path}`;
     },
 
     showProduct: async (slug) => {
-        await this.loadProducts();
-        // defensive: ensure products are loaded
-        if (!Array.isArray(this.state.products) || !this.state.products.length) {
+      await this.loadProducts();
+      if (!Array.isArray(this.state.products) || !this.state.products.length) {
         this.ui.showError('Products not loaded yet.');
         return;
-        }
-
-        const product = this.state.products.find(p => String(p.slug) === String(slug));
-        if (!product) {
+      }
+      const product = this.state.products.find(p => String(p.slug) === String(slug));
+      if (!product) {
         this.ui.showError(`Product not found: ${slug}`);
         this.router.navigate('products');
         return;
-        }
-
-        this.ui.renderProductDetail(product);
+      }
+      this.ui.renderProductDetail(product);
     },
 
     showSection: (sectionId) => {
-        this.ui.hideProductDetail();
-
-        if (sectionId && sectionId !== 'home') {
+      this.ui.hideProductDetail();
+      if (sectionId && sectionId !== 'home') {
         const section = document.getElementById(sectionId);
-        if (section) {
-            section.scrollIntoView({ behavior: 'smooth' });
-        } else {
-            // no matching section? go home
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        } else {
+        section ? section.scrollIntoView({ behavior: 'smooth' }) : window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+      }
     }
-    };
+  };
 
   // Utility methods
   isNewProduct(product) {

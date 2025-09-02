@@ -1,7 +1,7 @@
 class PinaBakesApp {
   constructor() {
     this.config = {
-      orderWebhook: 'https://script.google.com/macros/s/AKfycbxb4i7Pmj7sG4gFaotJSsp8N8u7cob2GKdKUVQuHa5_K6CNrcv__enrWqY5FDjUFrt7/exec',
+      orderWebhook: 'https://script.google.com/macros/s/AKfycbwR_3cz5m-FOJertmmRos7-Zc7nundBbNTJ0HuZoLPZ9gHuDwxNO9Th4ThXIru_Kztc/exec',
       whatsappNumber: '917678506669',
       storageKeys: { cart: 'pinabakes_cart', user: 'pinabakes_user', preferences: 'pinabakes_preferences', orders: 'pinabakes_orders', wishlist: 'pinabakes_wishlist' },
       apiEndpoints: { products: 'products.json' },
@@ -703,7 +703,6 @@ class PinaBakesApp {
         localStorage.setItem(key, JSON.stringify(prev));
       } catch (e) { console.warn('Could not persist orders locally:', e); }
       this.backend.sendOrder(order);
-      this.checkout.downloadOrderCSV(order);
       const message = this.checkout.generateWhatsAppMessage(order, itemsList);
       const whatsappUrl = `https://wa.me/${this.config.whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, '_blank');
@@ -736,22 +735,7 @@ class PinaBakesApp {
         `Please confirm the order and let me know the delivery timeline.`
       );
       return lines.join('\n');
-    },
-    downloadOrderCSV: (order) => {
-      const headers = ['OrderID','DateTimeISO','Coupon','Subtotal','Discount','Shipping','Total','CustName','CustPhone','CustPincode','CustCity','CustAddress','CustNotes','Items'];
-      const itemsStr = order.items.map(i => `${i.name} x${i.qty} @ ${i.price}`).join(' | ');
-      const row = [order.id, order.createdAt, order.coupon, order.subtotal, order.discount, order.shipping, order.total, order.customer.name, order.customer.phone, order.customer.pincode, order.customer.city, order.customer.address, order.customer.notes, itemsStr];
-      const esc = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-      const csv = headers.join(',') + '\n' + row.map(esc).join(',');
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      const stamp = new Date().toISOString().replace(/[:.]/g,'-');
-      a.href = url; a.download = `pina-order-${stamp}.csv`;
-      document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
-    }
-  };
+    };
   router = {
     handleRoute: () => {
       const hash = window.location.hash || '#home';

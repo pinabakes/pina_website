@@ -315,6 +315,27 @@
     .toast.success { background: #16a34a; color: #fff; }
     .toast.error   { background: #dc2626; color: #fff; }
     .toast.info    { background: var(--toast-bg); color: var(--toast-fg); }
+    /* Let the whole cart panel scroll on mobile; footer not locked */
+    @media (max-width: 768px) {
+      .cart-modal {
+        /* the panel itself scrolls, not just the body */
+        display: block;          /* undo flex column behavior */
+        overflow-y: auto;        /* enable scrolling for the whole panel */
+      }
+      .cart-body {
+        /* no separate scroll area */
+        max-height: none;
+        overflow: visible;
+      }
+      .cart-footer {
+        /* make it part of the normal flow so it scrolls away */
+        position: static;
+        background: transparent; /* optional: match body background */
+        border-top: none;        /* optional: cleaner when it scrolls */
+        margin-top: 0.75rem;     /* small spacing above totals */
+      }
+    }
+
   </style>
 </head>
 <body>

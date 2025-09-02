@@ -1,4 +1,4 @@
-// Enhanced PiNa Bakes Application (with coupons, smooth slide, CSV export, non-mandatory checkout)
+// Enhanced PiNa Bakes Application (unlimited images + fixed detail view + coupons + smooth slide + CSV export + non-mandatory checkout)
 class PinaBakesApp {
   constructor() {
     this.config = {
@@ -27,6 +27,7 @@ class PinaBakesApp {
       isCartOpen: false,
       currentImageIndex: 0,
       appliedCoupon: null, // { code, type, value }
+      // slide/drag
       isDragging: false,
       dragStartX: 0,
       dragDeltaX: 0
@@ -73,7 +74,7 @@ class PinaBakesApp {
       cartTotal: document.getElementById('cart-total'),
       checkoutForm: document.getElementById('checkout-form'),
 
-      // NEW: coupon UI (added in HTML snippet below)
+      // Coupon UI
       couponCode: document.getElementById('coupon-code'),
       couponMsg: document.getElementById('coupon-msg'),
       cartSubtotal: document.getElementById('cart-subtotal'),
@@ -128,7 +129,7 @@ class PinaBakesApp {
       });
     }
 
-    // Coupon apply on enter
+    // Coupon apply on Enter
     if (this.elements.couponCode) {
       this.elements.couponCode.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') { e.preventDefault(); this.cart.applyCoupon(); }
@@ -165,9 +166,7 @@ class PinaBakesApp {
 
   setupIntersectionObserver() {
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) this.ui.updateActiveNavLink(entry.target.id);
-      });
+      entries.forEach(entry => { if (entry.isIntersecting) this.ui.updateActiveNavLink(entry.target.id); });
     }, { threshold: 0.1, rootMargin: '-50px' });
 
     document.querySelectorAll('section[id]').forEach(section => observer.observe(section));
@@ -189,7 +188,7 @@ class PinaBakesApp {
     if (this.elements.currentYear) this.elements.currentYear.textContent = new Date().getFullYear();
   }
 
-  // Utils
+  // ===== Utils =====
   debounce(func, wait) {
     let timeout;
     return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); };
@@ -204,7 +203,21 @@ class PinaBakesApp {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(price);
   }
 
-  // Data
+  // Normalize any image schema into a single array (unlimited images)
+  normalizeImages(product) {
+    const out = [];
+    if (Array.isArray(product.images)) out.push(...product.images.filter(Boolean));
+    if (typeof product.images === 'string') {
+      out.push(...product.images.split(',').map(s => s.trim()).filter(Boolean));
+    }
+    ['img','image','image1','image2','image3','image4','image5','image6'].forEach(k => {
+      const v = product[k];
+      if (v && !out.includes(v)) out.push(v);
+    });
+    return out.length ? out : [product.img].filter(Boolean);
+  }
+
+  // ===== Data =====
   async loadProducts() {
     if (this.state.products.length > 0) return;
     this.state.isLoading = true;
@@ -232,7 +245,7 @@ class PinaBakesApp {
     catch (error) { console.error('Failed to save user data:', error); }
   }
 
-  // UI
+  // ===== UI =====
   ui = {
     showToast: (message, type = 'info', duration = 3000) => {
       const toast = this.elements.toast; if (!toast) return;
@@ -272,7 +285,8 @@ class PinaBakesApp {
     renderProducts: () => {
       if (!this.elements.productsGrid) return;
       const productsHTML = this.state.products.map(product => {
-        const coverImage = (product.images && product.images.length > 0) ? product.images[0] : product.img;
+        const images = this.normalizeImages(product);
+        const coverImage = images[0] || product.img;
         const isNew = this.isNewProduct(product);
         const isPremium = product.price >= 300;
         return `
@@ -323,9 +337,8 @@ class PinaBakesApp {
 
       if (this.elements.addToCartDetail) this.elements.addToCartDetail.onclick = () => this.cart.add(product.slug);
 
+      // Show only the detail section
       this.elements.productDetail.style.display = 'block';
-      document.querySelectorAll('section:not(#product-detail)').forEach(s => s.style.display = 'block');
-      // hide others except product-detail
       document.querySelectorAll('main > section').forEach(s => { if (s.id !== 'product-detail') s.style.display = 'none'; });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
@@ -339,8 +352,12 @@ class PinaBakesApp {
     },
 
     hideProductDetail: () => {
-      this.elements.productDetail.style.display = 'none';
-      document.querySelectorAll('main > section').forEach(s => s.style.display = 'block');
+      // Show all sections EXCEPT product-detail
+      document.querySelectorAll('main > section').forEach(s => {
+        if (s.id !== 'product-detail') s.style.display = 'block';
+      });
+      // Hide the detail pane
+      if (this.elements.productDetail) this.elements.productDetail.style.display = 'none';
       this.state.currentProduct = null;
     },
 
@@ -350,10 +367,10 @@ class PinaBakesApp {
     }
   };
 
-  // Gallery (smooth slide + desktop drag)
+  // ===== Gallery (smooth slide + desktop drag) =====
   gallery = {
     setup: (product) => {
-      const images = (product.images && product.images.length > 0) ? product.images : [product.img];
+      const images = this.normalizeImages(product);
       this.state.currentImageIndex = 0;
       this.gallery.updateMainImage(images[0], product.name, null); // no direction
       this.gallery.renderThumbnails(images, product.name);
@@ -389,8 +406,7 @@ class PinaBakesApp {
 
     selectImage: (index) => {
       if (!this.state.currentProduct) return;
-      const images = (this.state.currentProduct.images && this.state.currentProduct.images.length > 0)
-        ? this.state.currentProduct.images : [this.state.currentProduct.img];
+      const images = this.normalizeImages(this.state.currentProduct);
       if (index >= 0 && index < images.length) {
         const dir = index > this.state.currentImageIndex ? 'next' : 'prev';
         this.state.currentImageIndex = index;
@@ -406,7 +422,7 @@ class PinaBakesApp {
 
     nextImage: () => {
       if (!this.state.currentProduct) return;
-      const images = (this.state.currentProduct.images?.length) ? this.state.currentProduct.images : [this.state.currentProduct.img];
+      const images = this.normalizeImages(this.state.currentProduct);
       const nextIndex = (this.state.currentImageIndex + 1) % images.length;
       this.state.currentImageIndex = nextIndex;
       this.gallery.updateMainImage(images[nextIndex], this.state.currentProduct.name, 'next');
@@ -415,7 +431,7 @@ class PinaBakesApp {
 
     previousImage: () => {
       if (!this.state.currentProduct) return;
-      const images = (this.state.currentProduct.images?.length) ? this.state.currentProduct.images : [this.state.currentProduct.img];
+      const images = this.normalizeImages(this.state.currentProduct);
       const prevIndex = (this.state.currentImageIndex - 1 + images.length) % images.length;
       this.state.currentImageIndex = prevIndex;
       this.gallery.updateMainImage(images[prevIndex], this.state.currentProduct.name, 'prev');
@@ -435,7 +451,7 @@ class PinaBakesApp {
       if (!this.state.isDragging || !this.elements.productMainImage) return;
       this.state.dragDeltaX = e.clientX - this.state.dragStartX;
       // follow finger/mouse
-      const t = Math.max(-80, Math.min(80, this.state.dragDeltaX)); // clamp so it doesn’t go wild
+      const t = Math.max(-80, Math.min(80, this.state.dragDeltaX)); // clamp
       this.elements.productMainImage.style.transform = `translateX(${t}px)`;
       this.elements.productMainImage.style.transition = 'none';
     },
@@ -447,7 +463,6 @@ class PinaBakesApp {
       this.state.isDragging = false;
       document.body.style.userSelect = '';
 
-      // decide
       if (delta > threshold) this.gallery.previousImage();
       else if (delta < -threshold) this.gallery.nextImage();
 
@@ -458,7 +473,7 @@ class PinaBakesApp {
     }
   };
 
-  // Cart (with coupons)
+  // ===== Cart (with coupons) =====
   cart = {
     load: () => {
       try {
@@ -568,9 +583,10 @@ class PinaBakesApp {
       const total = subtotal - discount;
 
       if (this.elements.cartSubtotal) this.elements.cartSubtotal.textContent = this.formatPrice(subtotal);
-      if (this.elements.cartDiscount) this.elements.cartDiscount.textContent =
-        discount > 0 ? `- ${this.formatPrice(discount)} (${this.state.appliedCoupon?.code})` : this.formatPrice(0);
-
+      if (this.elements.cartDiscount) {
+        this.elements.cartDiscount.textContent = discount > 0
+          ? `- ${this.formatPrice(discount)} (${this.state.appliedCoupon?.code})` : this.formatPrice(0);
+      }
       if (this.elements.cartTotal) this.elements.cartTotal.textContent = this.formatPrice(total);
 
       if (this.elements.checkoutForm) {
@@ -601,7 +617,7 @@ class PinaBakesApp {
     }
   };
 
-  // Checkout (no mandatory fields + CSV export + coupon shown)
+  // ===== Checkout (optional fields + CSV export) =====
   checkout = {
     populateForm: () => {
       if (!this.state.user || !this.elements.checkoutForm) return;
@@ -611,9 +627,8 @@ class PinaBakesApp {
       });
     },
 
-    // No mandatory fields now; we only validate *if provided*
+    // Soft validation only (all fields optional)
     validateForm: () => {
-      // soft validation only
       const phoneField = document.getElementById('customer-phone');
       if (phoneField) {
         const digits = phoneField.value.replace(/\D/g, '');
@@ -628,15 +643,14 @@ class PinaBakesApp {
           this.ui.showToast('Pincode format looks unusual (optional).', 'info');
         }
       }
-      return true; // always allow submit
+      return true;
     },
 
-    clearErrors: () => {}, // no-op now
+    clearErrors: () => {}, // no-op
     handleFormSubmit: (e) => { e.preventDefault(); this.checkout.proceed(); },
 
     proceed: () => {
       if (this.state.cart.length === 0) return this.ui.showToast('Your cart is empty!', 'error');
-
       if (!this.checkout.validateForm()) return;
 
       const formData = {
@@ -649,7 +663,6 @@ class PinaBakesApp {
       };
       this.saveUserData(formData);
 
-      // Build order for CSV + WhatsApp
       const subtotal = this.cart.getSubtotal();
       const discount = this.cart.getDiscount(subtotal);
       const total = this.cart.getTotal();
@@ -666,7 +679,7 @@ class PinaBakesApp {
         items: this.state.cart.map(i => ({ slug: i.slug, name: i.name, qty: i.quantity, price: i.price }))
       };
 
-      // save to localStorage orders
+      // persist orders locally
       try {
         const key = this.config.storageKeys.orders;
         const prev = JSON.parse(localStorage.getItem(key) || '[]');
@@ -710,7 +723,7 @@ class PinaBakesApp {
       return lines.join('\n');
     },
 
-    // Generate a single-row CSV for the order and download
+    // Generate single-row CSV for the order and download
     downloadOrderCSV: (order) => {
       const headers = [
         'OrderID','DateTimeISO','Coupon','Subtotal','Discount','Total',
@@ -726,11 +739,10 @@ class PinaBakesApp {
         order.customer.address, order.customer.notes, itemsStr
       ];
 
-      // CSV escape
       const esc = (v) => {
         const s = String(v ?? '');
         return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-        };
+      };
       const csv = headers.join(',') + '\n' + row.map(esc).join(',');
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -743,7 +755,7 @@ class PinaBakesApp {
     }
   };
 
-  // Router
+  // ===== Router =====
   router = {
     handleRoute: () => {
       const hash = window.location.hash || '#home';
@@ -775,7 +787,7 @@ class PinaBakesApp {
     }
   };
 
-  // Misc
+  // ===== Misc =====
   isNewProduct(product) {
     return product.price >= 300 ||
            product.name?.toLowerCase().includes('new') ||

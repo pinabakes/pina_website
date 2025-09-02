@@ -1,6 +1,7 @@
 class PinaBakesApp {
   constructor() {
     this.config = {
+      orderWebhook: 'https://script.google.com/macros/s/AKfycbxb4i7Pmj7sG4gFaotJSsp8N8u7cob2GKdKUVQuHa5_K6CNrcv__enrWqY5FDjUFrt7/exec',
       whatsappNumber: '917678506669',
       storageKeys: { cart: 'pinabakes_cart', user: 'pinabakes_user', preferences: 'pinabakes_preferences', orders: 'pinabakes_orders', wishlist: 'pinabakes_wishlist' },
       apiEndpoints: { products: 'products.json' },
@@ -30,6 +31,8 @@ class PinaBakesApp {
   async init() {
     try {
       this.cacheElements();
+      this.telemetry.ensureSession();
+      this.backend.sendVisit();
       this.setupEventListeners();
       this.loadUserData();
       this.cart.load();
@@ -692,13 +695,14 @@ class PinaBakesApp {
         total,
         customer: formData,
         items: this.state.cart.map(i => ({ slug: i.slug, name: i.name, qty: i.quantity, price: i.price }))
-      };
+      };    
       try {
         const key = this.config.storageKeys.orders;
         const prev = JSON.parse(localStorage.getItem(key) || '[]');
         prev.push(order);
         localStorage.setItem(key, JSON.stringify(prev));
       } catch (e) { console.warn('Could not persist orders locally:', e); }
+      this.backend.sendOrder(order);
       this.checkout.downloadOrderCSV(order);
       const message = this.checkout.generateWhatsAppMessage(order, itemsList);
       const whatsappUrl = `https://wa.me/${this.config.whatsappNumber}?text=${encodeURIComponent(message)}`;
@@ -778,6 +782,79 @@ class PinaBakesApp {
       }
     }
   };
+  backend = {
+    sendVisit: async () => {
+        if (!this.config.orderWebhook) return;
+        try {
+        const payload = {
+            kind: 'visit',
+            session: this.telemetry.sessionSnapshot(),
+            meta: this.telemetry.metaSnapshot(),
+            utm: this.telemetry.utmSnapshot()
+        };
+        // no-cors: we don't need the response, avoids CORS preflight friction
+        await fetch(this.config.orderWebhook, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload)
+        });
+        } catch (e) { console.warn('visit webhook failed', e); }
+    },
+    sendOrder: async (order) => {
+        if (!this.config.orderWebhook) return;
+        try {
+        const payload = {
+            kind: 'order',
+            order,
+            session: this.telemetry.sessionSnapshot(),
+            meta: this.telemetry.metaSnapshot()
+        };
+        await fetch(this.config.orderWebhook, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(payload)
+        });
+        } catch (e) { console.warn('order webhook failed', e); }
+    }
+  };
+  telemetry = {
+    key: 'pb_session',
+    ensureSession: () => {
+        try {
+        const now = new Date().toISOString();
+        const raw = localStorage.getItem('pb_session');
+        if (raw) {
+            const s = JSON.parse(raw);
+            s.lastVisitAt = now;
+            localStorage.setItem('pb_session', JSON.stringify(s));
+        } else {
+            const s = { id: 'pb_' + Math.random().toString(36).slice(2) + Date.now(), firstVisitAt: now, lastVisitAt: now };
+            localStorage.setItem('pb_session', JSON.stringify(s));
+        }
+        } catch {}
+    },
+    sessionSnapshot: () => {
+        try { return JSON.parse(localStorage.getItem('pb_session') || '{}'); } catch { return {}; }
+    },
+    metaSnapshot: () => ({
+        page: location.href,
+        referrer: document.referrer || '',
+        userAgent: navigator.userAgent || '',
+        screen: `${window.screen?.width || 0}x${window.screen?.height || 0}`,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || ''
+    }),
+    utmSnapshot: () => {
+        const p = new URLSearchParams(location.search);
+        return {
+        utm_source: p.get('utm_source') || '',
+        utm_medium: p.get('utm_medium') || '',
+        utm_campaign: p.get('utm_campaign') || ''
+        };
+    }
+  };
+
   isNewProduct(product) {
     return product.price >= 300 || product.name?.toLowerCase().includes('new') || product.tagline?.toLowerCase().includes('new');
   }

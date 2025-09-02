@@ -397,7 +397,7 @@
     /* Hero Section */
     .hero {
       position: relative;
-      min-height: 100vh;
+      min-height: 80vh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1580,38 +1580,38 @@
       <!-- Checkout Form -->
       <form class="checkout-form" id="checkout-form" style="display: none;">
         <h3>Delivery Information</h3>
-        
+
         <div class="form-group">
-          <label class="form-label" for="customer-name">Full Name *</label>
-          <input type="text" id="customer-name" name="name" class="form-input" required autocomplete="name">
-          <div class="form-error">Please enter your full name</div>
+          <label class="form-label" for="customer-name">Full Name</label>
+          <input type="text" id="customer-name" name="name" class="form-input" autocomplete="name">
+          <div class="form-error"></div>
         </div>
-        
+
         <div class="form-group">
-          <label class="form-label" for="customer-phone">Phone (WhatsApp) *</label>
-          <input type="tel" id="customer-phone" name="phone" class="form-input" required autocomplete="tel">
-          <div class="form-error">Please enter a valid phone number</div>
+          <label class="form-label" for="customer-phone">Phone (WhatsApp)</label>
+          <input type="tel" id="customer-phone" name="phone" class="form-input" autocomplete="tel">
+          <div class="form-error"></div>
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label" for="customer-pincode">Pincode *</label>
-            <input type="text" id="customer-pincode" name="pincode" class="form-input" required>
-            <div class="form-error">Please enter a valid 6-digit pincode</div>
+            <label class="form-label" for="customer-pincode">Pincode</label>
+            <input type="text" id="customer-pincode" name="pincode" class="form-input">
+            <div class="form-error"></div>
           </div>
-          
+
           <div class="form-group">
             <label class="form-label" for="customer-city">City</label>
             <input type="text" id="customer-city" name="city" class="form-input" autocomplete="address-level2">
           </div>
         </div>
-        
+
         <div class="form-group">
-          <label class="form-label" for="customer-address">Full Address *</label>
-          <textarea id="customer-address" name="address" class="form-textarea" rows="3" required autocomplete="street-address" placeholder="House no., street, area, landmark"></textarea>
-          <div class="form-error">Please enter your complete address</div>
+          <label class="form-label" for="customer-address">Full Address</label>
+          <textarea id="customer-address" name="address" class="form-textarea" rows="3" autocomplete="street-address" placeholder="House no., street, area, landmark"></textarea>
+          <div class="form-error"></div>
         </div>
-        
+
         <div class="form-group">
           <label class="form-label" for="customer-notes">Special Instructions</label>
           <textarea id="customer-notes" name="notes" class="form-textarea" rows="2" placeholder="Any special delivery instructions or preferences"></textarea>
@@ -1620,11 +1620,25 @@
     </div>
     
     <div class="cart-footer">
-      <div class="cart-total">
-        <span>Total</span>
-        <span id="cart-total">₹0</span>
+      <div style="display:flex; gap:.5rem; margin-bottom: .75rem;">
+        <input id="coupon-code" class="form-input" placeholder='Coupon code (e.g., "PINA10")' style="flex:1;">
+        <button class="btn btn-outline" onclick="App.cart.applyCoupon()">Apply</button>
       </div>
-      <button class="btn btn-primary" style="width: 100%;" onclick="App.checkout.proceed()">
+      <div id="coupon-msg" style="font-size:.9rem; color: var(--text-secondary); margin-bottom:.5rem;"></div>
+
+      <div class="cart-total" style="display:block">
+        <div style="display:flex; justify-content:space-between; margin-bottom:.25rem;">
+          <span>Subtotal</span><span id="cart-subtotal">₹0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:.25rem;">
+          <span>Discount</span><span id="cart-discount">₹0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:1.25rem; font-weight:700; margin-top:.5rem;">
+          <span>Total</span><span id="cart-total">₹0</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" style="width: 100%; margin-top: .75rem;" onclick="App.checkout.proceed()">
         Proceed to Checkout
       </button>
     </div>

@@ -656,12 +656,14 @@ class PinaBakesApp {
       const phoneField = document.getElementById('customer-phone');
       if (phoneField) {
         const digits = phoneField.value.replace(/\D/g, '');
-        if (digits && (digits.length < 10 || digits.length > 12)) this.ui.showToast('Phone looks unusual (optional): please check.', 'info');
+        if (digits && (digits.length < 10 || digits.length > 12))
+          this.ui.showToast('Phone looks unusual (optional): please check.', 'info');
       }
       const pincodeField = document.getElementById('customer-pincode');
       if (pincodeField) {
         const pin = pincodeField.value.trim();
-        if (pin && !/^\d{6}$/.test(pin)) this.ui.showToast('Pincode format looks unusual (optional).', 'info');
+        if (pin && !/^\d{6}$/.test(pin))
+          this.ui.showToast('Pincode format looks unusual (optional).', 'info');
       }
       return true;
     },
@@ -670,6 +672,7 @@ class PinaBakesApp {
     proceed: () => {
       if (this.state.cart.length === 0) return this.ui.showToast('Your cart is empty!', 'error');
       if (!this.checkout.validateForm()) return;
+
       const formData = {
         name: document.getElementById('customer-name')?.value.trim() || '',
         phone: document.getElementById('customer-phone')?.value.trim() || '',
@@ -679,12 +682,17 @@ class PinaBakesApp {
         notes: document.getElementById('customer-notes')?.value.trim() || ''
       };
       this.saveUserData(formData);
+
       const subtotal = this.cart.getSubtotal();
       const discount = this.cart.getDiscount(subtotal);
       const subtotalAfter = Math.max(0, subtotal - discount);
       const shipping = this.cart.getShipping(subtotalAfter);
       const total = subtotalAfter + shipping;
-      const itemsList = this.state.cart.map(i => `• ${i.name} (×${i.quantity}) - ${this.formatPrice(i.price * i.quantity)}`).join('\n');
+
+      const itemsList = this.state.cart
+        .map(i => `• ${i.name} (×${i.quantity}) - ${this.formatPrice(i.price * i.quantity)}`)
+        .join('\n');
+
       const order = {
         id: `PIN${Date.now()}`,
         createdAt: new Date().toISOString(),
@@ -695,14 +703,17 @@ class PinaBakesApp {
         total,
         customer: formData,
         items: this.state.cart.map(i => ({ slug: i.slug, name: i.name, qty: i.quantity, price: i.price }))
-      };    
+      };
+
       try {
         const key = this.config.storageKeys.orders;
         const prev = JSON.parse(localStorage.getItem(key) || '[]');
         prev.push(order);
         localStorage.setItem(key, JSON.stringify(prev));
       } catch (e) { console.warn('Could not persist orders locally:', e); }
+
       this.backend.sendOrder(order);
+
       const message = this.checkout.generateWhatsAppMessage(order, itemsList);
       const whatsappUrl = `https://wa.me/${this.config.whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, '_blank');
@@ -735,7 +746,9 @@ class PinaBakesApp {
         `Please confirm the order and let me know the delivery timeline.`
       );
       return lines.join('\n');
-    };
+    }
+  }; // ✅ close the checkout object and end the field with a semicolon
+
   router = {
     handleRoute: () => {
       const hash = window.location.hash || '#home';
@@ -751,7 +764,8 @@ class PinaBakesApp {
     },
     showProduct: async (slug) => {
       await this.loadProducts();
-      if (!Array.isArray(this.state.products) || !this.state.products.length) return this.ui.showError('Products not loaded yet.');
+      if (!Array.isArray(this.state.products) || !this.state.products.length)
+        return this.ui.showError('Products not loaded yet.');
       const product = this.state.products.find(p => String(p.slug) === String(slug));
       if (!product) { this.ui.showError(`Product not found: ${slug}`); this.router.navigate('products'); return; }
       this.ui.renderProductDetail(product);
@@ -765,88 +779,84 @@ class PinaBakesApp {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
-  };
+  }; // ✅ end router field
+
   backend = {
     sendVisit: async () => {
-        if (!this.config.orderWebhook) return;
-        try {
+      if (!this.config.orderWebhook) return;
+      try {
         const payload = {
-            kind: 'visit',
-            session: this.telemetry.sessionSnapshot(),
-            meta: this.telemetry.metaSnapshot(),
-            utm: this.telemetry.utmSnapshot()
+          kind: 'visit',
+          session: this.telemetry.sessionSnapshot(),
+          meta: this.telemetry.metaSnapshot(),
+          utm: this.telemetry.utmSnapshot()
         };
-        // no-cors: we don't need the response, avoids CORS preflight friction
         await fetch(this.config.orderWebhook, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(payload)
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
         });
-        } catch (e) { console.warn('visit webhook failed', e); }
+      } catch (e) { console.warn('visit webhook failed', e); }
     },
     sendOrder: async (order) => {
-        if (!this.config.orderWebhook) return;
-        try {
+      if (!this.config.orderWebhook) return;
+      try {
         const payload = {
-            kind: 'order',
-            order,
-            session: this.telemetry.sessionSnapshot(),
-            meta: this.telemetry.metaSnapshot()
+          kind: 'order',
+          order,
+          session: this.telemetry.sessionSnapshot(),
+          meta: this.telemetry.metaSnapshot()
         };
         await fetch(this.config.orderWebhook, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(payload)
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
         });
-        } catch (e) { console.warn('order webhook failed', e); }
+      } catch (e) { console.warn('order webhook failed', e); }
     }
-  };
+  }; // ✅ end backend field
+
   telemetry = {
     key: 'pb_session',
     ensureSession: () => {
-        try {
+      try {
         const now = new Date().toISOString();
         const raw = localStorage.getItem('pb_session');
         if (raw) {
-            const s = JSON.parse(raw);
-            s.lastVisitAt = now;
-            localStorage.setItem('pb_session', JSON.stringify(s));
+          const s = JSON.parse(raw);
+          s.lastVisitAt = now;
+          localStorage.setItem('pb_session', JSON.stringify(s));
         } else {
-            const s = { id: 'pb_' + Math.random().toString(36).slice(2) + Date.now(), firstVisitAt: now, lastVisitAt: now };
-            localStorage.setItem('pb_session', JSON.stringify(s));
+          const s = { id: 'pb_' + Math.random().toString(36).slice(2) + Date.now(), firstVisitAt: now, lastVisitAt: now };
+          localStorage.setItem('pb_session', JSON.stringify(s));
         }
-        } catch {}
+      } catch {}
     },
     sessionSnapshot: () => {
-        try { return JSON.parse(localStorage.getItem('pb_session') || '{}'); } catch { return {}; }
+      try { return JSON.parse(localStorage.getItem('pb_session') || '{}'); } catch { return {}; }
     },
     metaSnapshot: () => ({
-        page: location.href,
-        referrer: document.referrer || '',
-        userAgent: navigator.userAgent || '',
-        screen: `${window.screen?.width || 0}x${window.screen?.height || 0}`,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || ''
+      page: location.href,
+      referrer: document.referrer || '',
+      userAgent: navigator.userAgent || '',
+      screen: `${window.screen?.width || 0}x${window.screen?.height || 0}`,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || ''
     }),
     utmSnapshot: () => {
-        const p = new URLSearchParams(location.search);
-        return {
+      const p = new URLSearchParams(location.search);
+      return {
         utm_source: p.get('utm_source') || '',
         utm_medium: p.get('utm_medium') || '',
         utm_campaign: p.get('utm_campaign') || ''
-        };
+      };
     }
-  };
+  }; // ✅ end telemetry field
 
   isNewProduct(product) {
-    return product.price >= 300 || product.name?.toLowerCase().includes('new') || product.tagline?.toLowerCase().includes('new');
+    return product.price >= 300
+      || product.name?.toLowerCase().includes('new')
+      || product.tagline?.toLowerCase().includes('new');
   }
-}
-const App = new PinaBakesApp();
-window.App = App;
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW registered:', reg)).catch(err => console.log('SW registration failed:', err));
-  });
 }

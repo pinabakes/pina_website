@@ -34,7 +34,8 @@
       "fibre": "4.8 g",
       "sodium": "156 mg"
     },
-    "tags": ["gluten-friendly", "high-fiber", "natural-sweetener"]
+    "tags": ["gluten-friendly", "high-fiber", "natural-sweetener"],
+    "isNew": false
   },
   {
     "slug": "jowar-peanut-butter",
@@ -73,7 +74,8 @@
       "fibre": "5.2 g",
       "sodium": "142 mg"
     },
-    "tags": ["high-protein", "maida-free", "post-workout"]
+    "tags": ["high-protein", "maida-free", "post-workout"],
+    "isNew": false
   },
   {
     "slug": "lemon-blueberry",
@@ -111,7 +113,8 @@
       "fibre": "4.1 g",
       "sodium": "128 mg"
     },
-    "tags": ["antioxidant-rich", "citrusy", "superfruit"]
+    "tags": ["antioxidant-rich", "citrusy", "superfruit"],
+    "isNew": true
   },
   {
     "slug": "quinoa-walnut",
@@ -136,7 +139,7 @@
     ],
     "ingredients": [
       "Quinoa flour",
-      "Jowar (sorghum) flour", 
+      "Jowar (sorghum) flour",
       "Premium walnut pieces",
       "Pure butter",
       "Natural jaggery"
@@ -150,7 +153,8 @@
       "fibre": "6.8 g",
       "sodium": "98 mg"
     },
-    "tags": ["superfood", "complete-protein", "omega-3", "premium"]
+    "tags": ["superfood", "complete-protein", "omega-3", "premium"],
+    "isNew": false
   },
   {
     "slug": "richie-pistachio",
@@ -184,8 +188,9 @@
       "sugar": "21.4 g",
       "fibre": "7.2 g",
       "sodium": "106 mg"
-    },
-    "tags": ["premium", "luxury", "pistachio-loaded", "signature"]
+    ],
+    "tags": ["premium", "luxury", "pistachio-loaded", "signature"],
+    "isNew": false
   },
   {
     "slug": "foxtail-true-chocolate",
@@ -221,8 +226,9 @@
       "sugar": "28.6 g",
       "fibre": "8.4 g",
       "sodium": "164 mg"
-    },
-    "tags": ["premium", "belgian-cocoa", "ancient-grain", "fudgy"]
+    ],
+    "tags": ["premium", "belgian-cocoa", "ancient-grain", "fudgy"],
+    "isNew": true
   },
   {
     "slug": "ragi-millet",
@@ -259,7 +265,8 @@
       "fibre": "6.2 g",
       "sodium": "118 mg"
     },
-    "tags": ["high-calcium", "gluten-free", "traditional"]
+    "tags": ["high-calcium", "gluten-free", "traditional"],
+    "isNew": false
   },
   {
     "slug": "bajra-almond",
@@ -295,6 +302,7 @@
       "fibre": "5.4 g",
       "sodium": "134 mg"
     },
-    "tags": ["almond-rich", "energy-boost", "healthy-fats"]
+    "tags": ["almond-rich", "energy-boost", "healthy-fats"],
+    "isNew": false
   }
 ]

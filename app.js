@@ -1,20 +1,12 @@
-// Enhanced PiNa Bakes Application (unlimited images + fixed detail view + coupons + smooth slide + CSV export + non-mandatory checkout)
 class PinaBakesApp {
   constructor() {
     this.config = {
       whatsappNumber: '917678506669',
-      storageKeys: {
-        cart: 'pinabakes_cart',
-        user: 'pinabakes_user',
-        preferences: 'pinabakes_preferences',
-        orders: 'pinabakes_orders'
-      },
-      apiEndpoints: {
-        products: 'products.json'
-      },
-      coupons: {
-        'PINA10': { type: 'percent', value: 10 } // 10% off
-      }
+      storageKeys: { cart: 'pinabakes_cart', user: 'pinabakes_user', preferences: 'pinabakes_preferences', orders: 'pinabakes_orders' },
+      apiEndpoints: { products: 'products.json' },
+      coupons: { 'PINA10': { type: 'percent', value: 10 } },
+      shippingCharge: 60,
+      freeShippingThreshold: 999
     };
 
     this.state = {
@@ -26,14 +18,16 @@ class PinaBakesApp {
       isMobileMenuOpen: false,
       isCartOpen: false,
       currentImageIndex: 0,
-      appliedCoupon: null, // { code, type, value }
-      // slide/drag
+      appliedCoupon: null,
       isDragging: false,
       dragStartX: 0,
       dragDeltaX: 0
     };
 
     this.elements = {};
+    this._trapHandler = null;
+    this._savedFocus = null;
+
     this.init();
   }
 
@@ -48,6 +42,7 @@ class PinaBakesApp {
       this.updateCurrentYear();
       this.setupIntersectionObserver();
       this.setupHeaderScrollEffect();
+      this.setupYouTubeLazyLoad();
       this.ui.hideLoader();
       this.ui._applyOverlayPointerSafety();
     } catch (error) {
@@ -58,14 +53,11 @@ class PinaBakesApp {
 
   cacheElements() {
     this.elements = {
-      // Header
       header: document.getElementById('header'),
       mobileMenuToggle: document.querySelector('.mobile-menu-toggle'),
       mobileNav: document.querySelector('.mobile-nav'),
       mobileNavOverlay: document.querySelector('.mobile-nav-overlay'),
       navLinks: document.querySelectorAll('.nav-link'),
-
-      // Cart
       cartButton: document.querySelector('.cart-button'),
       cartModal: document.getElementById('cart-modal'),
       cartOverlay: document.getElementById('cart-overlay'),
@@ -73,14 +65,11 @@ class PinaBakesApp {
       cartItems: document.getElementById('cart-items'),
       cartTotal: document.getElementById('cart-total'),
       checkoutForm: document.getElementById('checkout-form'),
-
-      // Coupon UI
       couponCode: document.getElementById('coupon-code'),
       couponMsg: document.getElementById('coupon-msg'),
       cartSubtotal: document.getElementById('cart-subtotal'),
       cartDiscount: document.getElementById('cart-discount'),
-
-      // Products
+      cartShipping: document.getElementById('cart-shipping'),
       productsGrid: document.getElementById('products-grid'),
       productDetail: document.getElementById('product-detail'),
       productMainImage: document.getElementById('product-main-image'),
@@ -92,60 +81,65 @@ class PinaBakesApp {
       productIngredients: document.getElementById('product-ingredients'),
       nutritionTable: document.getElementById('nutrition-table'),
       addToCartDetail: document.getElementById('add-to-cart-detail'),
-
-      // UI
       toast: document.getElementById('toast'),
       currentYear: document.getElementById('current-year')
     };
   }
 
   setupEventListeners() {
-    // Routing
     window.addEventListener('hashchange', () => this.router.handleRoute());
     window.addEventListener('popstate', () => this.router.handleRoute());
-
-    // Keyboard shortcuts
     document.addEventListener('keydown', this.handleKeyboardShortcuts.bind(this));
-
-    // Form
     if (this.elements.checkoutForm) {
-      this.elements.checkoutForm.addEventListener('submit', this.checkout.handleFormSubmit.bind(this));
+      this.elements.checkoutForm.addEventListener('submit', (e) => { e.preventDefault(); this.checkout.proceed(); });
     }
-
-    // Click outside mobile nav
     document.addEventListener('click', this.handleOutsideClick.bind(this));
-
-    // Resize
     window.addEventListener('resize', this.debounce(this.handleResize.bind(this), 250));
 
-    // Delegate "View Details"
     if (this.elements.productsGrid) {
       this.elements.productsGrid.addEventListener('click', (e) => {
-        const link = e.target.closest('a[href^="#/product/"]');
-        if (!link) return;
-        e.preventDefault();
-        const slug = link.getAttribute('href').split('/').pop();
-        this.router.navigate(`#/product/${slug}`);
+        const viewLink = e.target.closest('a[href^="#/product/"]');
+        if (viewLink) {
+          e.preventDefault();
+          const slug = viewLink.getAttribute('href').split('/').pop();
+          this.router.navigate(`#/product/${slug}`);
+          return;
+        }
+        const addBtn = e.target.closest('button[data-add-to-cart]');
+        if (addBtn) {
+          e.preventDefault();
+          const slug = addBtn.getAttribute('data-slug');
+          this.cart.add(slug);
+        }
       });
     }
 
-    // Coupon apply on Enter
     if (this.elements.couponCode) {
       this.elements.couponCode.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') { e.preventDefault(); this.cart.applyCoupon(); }
       });
     }
+    const couponBtn = document.getElementById('coupon-apply-btn');
+    couponBtn?.addEventListener('click', (e) => { e.preventDefault(); this.cart.applyCoupon(); });
 
-    // Smooth slide gestures (pointer events cover both mouse + touch)
-    if (this.elements.productMainImage) {
-      const img = this.elements.productMainImage;
-      img.style.touchAction = 'pan-y'; // keep vertical page scroll
-      img.addEventListener('pointerdown', this.gallery.onPointerDown.bind(this));
-      img.addEventListener('pointermove', this.gallery.onPointerMove.bind(this));
-      img.addEventListener('pointerup', this.gallery.onPointerUp.bind(this));
-      img.addEventListener('pointercancel', this.gallery.onPointerUp.bind(this));
-      img.addEventListener('dragstart', (e) => e.preventDefault()); // prevent ghost-drag
-    }
+    const proceedBtn = document.getElementById('proceed-checkout');
+    proceedBtn?.addEventListener('click', (e) => { e.preventDefault(); this.checkout.proceed(); });
+
+    this.elements.productMainImage?.addEventListener('pointerdown', this.gallery.onPointerDown.bind(this));
+    this.elements.productMainImage?.addEventListener('pointermove', this.gallery.onPointerMove.bind(this));
+    this.elements.productMainImage?.addEventListener('pointerup', this.gallery.onPointerUp.bind(this));
+    this.elements.productMainImage?.addEventListener('pointercancel', this.gallery.onPointerUp.bind(this));
+    this.elements.productMainImage?.addEventListener('dragstart', (e) => e.preventDefault());
+    if (this.elements.productMainImage) this.elements.productMainImage.style.touchAction = 'pan-y';
+
+    this.elements.cartButton?.addEventListener('click', () => this.cart.toggle());
+    document.querySelector('.cart-close')?.addEventListener('click', () => this.cart.close());
+    this.elements.cartOverlay?.addEventListener('click', () => this.cart.close());
+
+    this.elements.mobileMenuToggle?.addEventListener('click', () => this.ui.toggleMobileMenu());
+    this.elements.mobileNavOverlay?.addEventListener('click', () => this.ui.closeMobileMenu());
+    document.querySelector('.mobile-nav-close')?.addEventListener('click', () => this.ui.closeMobileMenu());
+    document.querySelectorAll('.mobile-nav-link').forEach(a => a.addEventListener('click', () => this.ui.closeMobileMenu()));
   }
 
   handleKeyboardShortcuts(e) {
@@ -159,7 +153,8 @@ class PinaBakesApp {
   handleOutsideClick(e) {
     if (this.state.isMobileMenuOpen &&
         !this.elements.mobileNav.contains(e.target) &&
-        !this.elements.mobileMenuToggle.contains(e.target)) {
+        !this.elements.mobileMenuToggle.contains(e.target) &&
+        !e.target.closest('.mobile-menu-toggle')) {
       this.ui.closeMobileMenu();
     }
   }
@@ -168,7 +163,6 @@ class PinaBakesApp {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => { if (entry.isIntersecting) this.ui.updateActiveNavLink(entry.target.id); });
     }, { threshold: 0.1, rootMargin: '-50px' });
-
     document.querySelectorAll('section[id]').forEach(section => observer.observe(section));
   }
 
@@ -180,6 +174,21 @@ class PinaBakesApp {
     }, 10));
   }
 
+  setupYouTubeLazyLoad() {
+    const wrappers = document.querySelectorAll('.video-wrapper[data-yt]');
+    if (!wrappers.length) return;
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        const id = el.dataset.yt;
+        el.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}" allowfullscreen loading="lazy" title="PiNa Bakes baking process" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
+        io.unobserve(el);
+      });
+    }, { rootMargin: '200px' });
+    wrappers.forEach(el => io.observe(el));
+  }
+
   handleResize() {
     if (window.innerWidth > 768 && this.state.isMobileMenuOpen) this.ui.closeMobileMenu();
   }
@@ -188,36 +197,19 @@ class PinaBakesApp {
     if (this.elements.currentYear) this.elements.currentYear.textContent = new Date().getFullYear();
   }
 
-  // ===== Utils =====
-  debounce(func, wait) {
-    let timeout;
-    return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func(...args), wait); };
-  }
-  throttle(func, limit) {
-    let inThrottle;
-    return (...args) => {
-      if (!inThrottle) { func(...args); inThrottle = true; setTimeout(() => inThrottle = false, limit); }
-    };
-  }
-  formatPrice(price) {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(price);
-  }
+  debounce(func, wait) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => func(...a), wait); }; }
+  throttle(func, limit) { let inT; return (...a) => { if (!inT) { func(...a); inT = true; setTimeout(() => inT = false, limit); } }; }
+  formatPrice(price) { return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(price); }
+  esc(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 
-  // Normalize any image schema into a single array (unlimited images)
   normalizeImages(product) {
     const out = [];
     if (Array.isArray(product.images)) out.push(...product.images.filter(Boolean));
-    if (typeof product.images === 'string') {
-      out.push(...product.images.split(',').map(s => s.trim()).filter(Boolean));
-    }
-    ['img','image','image1','image2','image3','image4','image5','image6'].forEach(k => {
-      const v = product[k];
-      if (v && !out.includes(v)) out.push(v);
-    });
+    if (typeof product.images === 'string') out.push(...product.images.split(',').map(s => s.trim()).filter(Boolean));
+    ['img','image','image1','image2','image3','image4','image5','image6'].forEach(k => { const v = product[k]; if (v && !out.includes(v)) out.push(v); });
     return out.length ? out : [product.img].filter(Boolean);
   }
 
-  // ===== Data =====
   async loadProducts() {
     if (this.state.products.length > 0) return;
     this.state.isLoading = true;
@@ -245,7 +237,6 @@ class PinaBakesApp {
     catch (error) { console.error('Failed to save user data:', error); }
   }
 
-  // ===== UI =====
   ui = {
     showToast: (message, type = 'info', duration = 3000) => {
       const toast = this.elements.toast; if (!toast) return;
@@ -281,129 +272,43 @@ class PinaBakesApp {
         link.classList.toggle('active', href === activeId);
       });
     },
-
-    renderProducts: () => {
-      if (!this.elements.productsGrid) return;
-      const productsHTML = this.state.products.map(product => {
-        const images = this.normalizeImages(product);
-        const coverImage = images[0] || product.img;
-        const isNew = this.isNewProduct(product);
-        const isPremium = product.price >= 300;
-        return `
-          <article class="product-card" data-product-id="${product.slug}">
-            <div class="product-image-container">
-              <img src="${coverImage}" alt="${product.name} cookies by PiNa Bakes"
-                   class="product-image" loading="lazy" decoding="async">
-              ${isNew ? '<span class="product-badge">New</span>' : ''}
-              ${isPremium ? '<span class="product-badge" style="top: 3rem;">Premium</span>' : ''}
-            </div>
-            <div class="product-content">
-              <h3 class="product-title">${product.name}</h3>
-              <div class="product-price">${this.formatPrice(product.price)}</div>
-              <p class="product-tagline">${product.tagline}</p>
-              <div class="product-actions">
-                <a href="#/product/${product.slug}" class="btn btn-secondary">View Details</a>
-                <button class="btn btn-primary" onclick="App.cart.add('${product.slug}')"
-                        aria-label="Add ${product.name} to cart">Add to Cart</button>
-              </div>
-            </div>
-          </article>
-        `;
-      }).join('');
-      this.elements.productsGrid.innerHTML = productsHTML;
-    },
-
-    renderProductDetail: (product) => {
-      if (!product || !this.elements.productDetail) return;
-      this.state.currentProduct = product;
-
-      this.elements.productTitle.textContent = product.name;
-      this.elements.productPrice.textContent = this.formatPrice(product.price);
-      this.elements.productTagline.textContent = product.tagline;
-
-      this.gallery.setup(product);
-
-      if (product.bullets && product.bullets.length > 0) {
-        this.elements.productFeatures.innerHTML = `
-          <h3>Key Features</h3>
-          <ul>${product.bullets.map(b => `<li>${b}</li>`).join('')}</ul>`;
-      } else { this.elements.productFeatures.innerHTML = ''; }
-
-      if (product.ingredients && product.ingredients.length > 0) {
-        this.elements.productIngredients.innerHTML = product.ingredients.map(ing => `<li>${ing}</li>`).join('');
-      }
-
-      this.ui.renderNutritionInfo(product);
-
-      if (this.elements.addToCartDetail) this.elements.addToCartDetail.onclick = () => this.cart.add(product.slug);
-
-      // Show only the detail section
-      this.elements.productDetail.style.display = 'block';
-      document.querySelectorAll('main > section').forEach(s => { if (s.id !== 'product-detail') s.style.display = 'none'; });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
-
-    renderNutritionInfo: (product) => {
-      const n = product.nutrition || { energy:'— kcal', protein:'— g', fat:'— g', carbs:'— g', sugar:'— g', fibre:'— g', sodium:'— mg' };
-      const rows = [['Energy', n.energy],['Protein', n.protein],['Total Fat', n.fat],['Carbohydrates', n.carbs],['Added Sugar', n.sugar],['Dietary Fibre', n.fibre],['Sodium', n.sodium]];
-      this.elements.nutritionTable.innerHTML = rows.map(([k,v]) => `
-        <tr><td style="padding: .75rem; border: 1px solid #dee2e6;">${k}</td>
-            <td style="padding: .75rem; border: 1px solid #dee2e6;">${v}</td></tr>`).join('');
-    },
-
-    hideProductDetail: () => {
-      // Show all sections EXCEPT product-detail
-      document.querySelectorAll('main > section').forEach(s => {
-        if (s.id !== 'product-detail') s.style.display = 'block';
-      });
-      // Hide the detail pane
-      if (this.elements.productDetail) this.elements.productDetail.style.display = 'none';
-      this.state.currentProduct = null;
-    },
-
     _applyOverlayPointerSafety: () => {
       if (this.elements.mobileNavOverlay && !this.state.isMobileMenuOpen) this.elements.mobileNavOverlay.style.pointerEvents = 'none';
       if (this.elements.cartOverlay && !this.state.isCartOpen) this.elements.cartOverlay.style.pointerEvents = 'none';
     }
   };
 
-  // ===== Gallery (smooth slide + desktop drag) =====
   gallery = {
     setup: (product) => {
       const images = this.normalizeImages(product);
       this.state.currentImageIndex = 0;
-      this.gallery.updateMainImage(images[0], product.name, null); // no direction
+      this.gallery.updateMainImage(images[0], product.name, null);
       this.gallery.renderThumbnails(images, product.name);
     },
-
     updateMainImage: (src, productName, direction) => {
       const img = this.elements.productMainImage;
       if (!img) return;
-
-      // simple slide-in animation based on direction
       img.style.transition = 'none';
-      img.style.transform = direction === 'next' ? 'translateX(40px)' :
-                            direction === 'prev' ? 'translateX(-40px)' : 'translateX(0)';
+      img.style.transform = direction === 'next' ? 'translateX(40px)' : direction === 'prev' ? 'translateX(-40px)' : 'translateX(0)';
       img.style.opacity = '0.1';
-      // swap source a tick later to allow transition
       requestAnimationFrame(() => {
         img.src = src;
         img.alt = `${productName} cookies - Image ${this.state.currentImageIndex + 1}`;
+        img.width = 800; img.height = 800;
         img.style.transition = 'transform 250ms ease, opacity 250ms ease';
         img.style.transform = 'translateX(0)';
         img.style.opacity = '1';
       });
     },
-
     renderThumbnails: (images, productName) => {
       if (!this.elements.productThumbnails) return;
       this.elements.productThumbnails.innerHTML = images.map((image, index) => `
-        <img src="${image}" alt="${productName} - Thumbnail ${index + 1}"
+        <img src="${image}" alt="${this.esc(productName)} - Thumbnail ${index + 1}"
              class="product-thumbnail ${index === 0 ? 'active' : ''}"
-             onclick="App.gallery.selectImage(${index})" loading="lazy">
+             loading="lazy" width="80" height="80"
+             onclick="App.gallery.selectImage(${index})">
       `).join('');
     },
-
     selectImage: (index) => {
       if (!this.state.currentProduct) return;
       const images = this.normalizeImages(this.state.currentProduct);
@@ -414,12 +319,10 @@ class PinaBakesApp {
         this.gallery.updateActiveThumbnail(index);
       }
     },
-
     updateActiveThumbnail: (activeIndex) => {
       const thumbs = this.elements.productThumbnails?.querySelectorAll('.product-thumbnail') || [];
       thumbs.forEach((t, i) => t.classList.toggle('active', i === activeIndex));
     },
-
     nextImage: () => {
       if (!this.state.currentProduct) return;
       const images = this.normalizeImages(this.state.currentProduct);
@@ -428,7 +331,6 @@ class PinaBakesApp {
       this.gallery.updateMainImage(images[nextIndex], this.state.currentProduct.name, 'next');
       this.gallery.updateActiveThumbnail(nextIndex);
     },
-
     previousImage: () => {
       if (!this.state.currentProduct) return;
       const images = this.normalizeImages(this.state.currentProduct);
@@ -437,7 +339,6 @@ class PinaBakesApp {
       this.gallery.updateMainImage(images[prevIndex], this.state.currentProduct.name, 'prev');
       this.gallery.updateActiveThumbnail(prevIndex);
     },
-
     onPointerDown: (e) => {
       if (!this.elements.productMainImage) return;
       this.state.isDragging = true;
@@ -446,44 +347,34 @@ class PinaBakesApp {
       this.elements.productMainImage.setPointerCapture?.(e.pointerId);
       document.body.style.userSelect = 'none';
     },
-
     onPointerMove: (e) => {
       if (!this.state.isDragging || !this.elements.productMainImage) return;
       this.state.dragDeltaX = e.clientX - this.state.dragStartX;
-      // follow finger/mouse
-      const t = Math.max(-80, Math.min(80, this.state.dragDeltaX)); // clamp
+      const t = Math.max(-80, Math.min(80, this.state.dragDeltaX));
       this.elements.productMainImage.style.transform = `translateX(${t}px)`;
       this.elements.productMainImage.style.transition = 'none';
     },
-
     onPointerUp: () => {
       if (!this.elements.productMainImage) return;
       const threshold = 60;
       const delta = this.state.dragDeltaX;
       this.state.isDragging = false;
       document.body.style.userSelect = '';
-
       if (delta > threshold) this.gallery.previousImage();
       else if (delta < -threshold) this.gallery.nextImage();
-
-      // reset transform
       this.elements.productMainImage.style.transition = 'transform 200ms ease';
       this.elements.productMainImage.style.transform = 'translateX(0)';
       this.state.dragDeltaX = 0;
     }
   };
 
-  // ===== Cart (with coupons) =====
   cart = {
     load: () => {
       try {
         const savedCart = localStorage.getItem(this.config.storageKeys.cart);
         this.state.cart = savedCart ? JSON.parse(savedCart) : [];
         this.cart.render();
-      } catch (error) {
-        console.error('Failed to load cart:', error);
-        this.state.cart = [];
-      }
+      } catch (error) { console.error('Failed to load cart:', error); this.state.cart = []; }
     },
     save: () => {
       try { localStorage.setItem(this.config.storageKeys.cart, JSON.stringify(this.state.cart)); }
@@ -513,10 +404,14 @@ class PinaBakesApp {
       if (c.type === 'percent') return Math.round((subtotal * c.value) / 100);
       return 0;
     },
+    getShipping: (subtotalAfterDiscount) => {
+      return subtotalAfterDiscount >= this.config.freeShippingThreshold ? 0 : this.config.shippingCharge;
+    },
     getTotal: () => {
       const sub = this.cart.getSubtotal();
       const disc = this.cart.getDiscount(sub);
-      return Math.max(0, sub - disc);
+      const ship = this.cart.getShipping(Math.max(0, sub - disc));
+      return Math.max(0, sub - disc + ship);
     },
     applyCoupon: () => {
       const input = this.elements.couponCode;
@@ -535,15 +430,12 @@ class PinaBakesApp {
       this.ui.showToast(`Coupon applied: ${code} (${def.value}% off)`, 'success');
       if (this.elements.couponMsg) this.elements.couponMsg.textContent = `Applied ${code}: ${def.value}% off`;
     },
-
     render: () => {
       const itemCount = this.state.cart.reduce((c, i) => c + i.quantity, 0);
       if (this.elements.cartCount) {
         this.elements.cartCount.textContent = itemCount;
         this.elements.cartCount.style.display = itemCount > 0 ? 'flex' : 'none';
       }
-
-      // items
       if (this.elements.cartItems) {
         if (this.state.cart.length === 0) {
           this.elements.cartItems.innerHTML = `
@@ -558,34 +450,36 @@ class PinaBakesApp {
         } else {
           this.elements.cartItems.innerHTML = this.state.cart.map(item => `
             <div class="cart-item">
-              <img src="${item.img}" alt="${item.name}" class="cart-item-image">
+              <img src="${item.img}" alt="${this.esc(item.name)}" class="cart-item-image" width="60" height="60">
               <div class="cart-item-details">
-                <div class="cart-item-title">${item.name}</div>
+                <div class="cart-item-title">${this.esc(item.name)}</div>
                 <div class="cart-item-price">${this.formatPrice(item.price)}</div>
                 <div class="cart-item-actions">
-                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${item.slug}', ${item.quantity - 1})" aria-label="Decrease quantity">-</button>
+                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${this.esc(item.slug)}', ${item.quantity - 1})" aria-label="Decrease quantity">-</button>
                   <span style="min-width:2rem; text-align:center;">${item.quantity}</span>
-                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${item.slug}', ${item.quantity + 1})" aria-label="Increase quantity">+</button>
+                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${this.esc(item.slug)}', ${item.quantity + 1})" aria-label="Increase quantity">+</button>
                 </div>
               </div>
               <div style="text-align:right;">
                 <div style="font-weight:600;">${this.formatPrice(item.price * item.quantity)}</div>
-                <button onclick="App.cart.remove('${item.slug}')" style="color:#dc2626; background:none; border:none; cursor:pointer; margin-top:.5rem; font-size:.875rem;" aria-label="Remove ${item.name} from cart">Remove</button>
+                <button onclick="App.cart.remove('${this.esc(item.slug)}')" style="color:#dc2626; background:none; border:none; cursor:pointer; margin-top:.5rem; font-size:.875rem;" aria-label="Remove ${this.esc(item.name)} from cart">Remove</button>
               </div>
             </div>
           `).join('');
         }
       }
-
-      // totals (with coupon)
       const subtotal = this.cart.getSubtotal();
       const discount = this.cart.getDiscount(subtotal);
-      const total = subtotal - discount;
+      const shipping = this.cart.getShipping(Math.max(0, subtotal - discount));
+      const total = Math.max(0, subtotal - discount + shipping);
 
       if (this.elements.cartSubtotal) this.elements.cartSubtotal.textContent = this.formatPrice(subtotal);
       if (this.elements.cartDiscount) {
         this.elements.cartDiscount.textContent = discount > 0
           ? `- ${this.formatPrice(discount)} (${this.state.appliedCoupon?.code})` : this.formatPrice(0);
+      }
+      if (this.elements.cartShipping) {
+        this.elements.cartShipping.textContent = shipping === 0 ? 'Free' : this.formatPrice(shipping);
       }
       if (this.elements.cartTotal) this.elements.cartTotal.textContent = this.formatPrice(total);
 
@@ -593,7 +487,6 @@ class PinaBakesApp {
         this.elements.checkoutForm.style.display = this.state.cart.length > 0 ? 'block' : 'none';
       }
     },
-
     toggle: () => this.state.isCartOpen ? this.cart.close() : this.cart.open(),
     open: () => {
       this.state.isCartOpen = true;
@@ -601,6 +494,18 @@ class PinaBakesApp {
       this.elements.cartOverlay.classList.add('active');
       if (this.elements.cartOverlay) this.elements.cartOverlay.style.pointerEvents = 'auto';
       document.body.style.overflow = 'hidden';
+      this._savedFocus = document.activeElement;
+      const focusable = this.elements.cartModal.querySelector('button, a, input, textarea, [tabindex]:not([tabindex="-1"])');
+      focusable?.focus();
+      this._trapHandler = (e) => {
+        if (e.key !== 'Tab') return;
+        const nodes = [...this.elements.cartModal.querySelectorAll('button, a, input, textarea, [tabindex]:not([tabindex="-1"])')].filter(n => !n.disabled && n.offsetParent);
+        if (!nodes.length) return;
+        let i = nodes.indexOf(document.activeElement);
+        if (e.shiftKey && (i <= 0)) { nodes[nodes.length - 1].focus(); e.preventDefault(); }
+        else if (!e.shiftKey && (i === nodes.length - 1)) { nodes[0].focus(); e.preventDefault(); }
+      };
+      document.addEventListener('keydown', this._trapHandler);
     },
     close: () => {
       this.state.isCartOpen = false;
@@ -608,6 +513,8 @@ class PinaBakesApp {
       this.elements.cartOverlay.classList.remove('active');
       if (this.elements.cartOverlay) this.elements.cartOverlay.style.pointerEvents = 'none';
       document.body.style.overflow = '';
+      if (this._trapHandler) document.removeEventListener('keydown', this._trapHandler);
+      if (this._savedFocus) this._savedFocus.focus();
     },
     animateCartButton: () => {
       if (this.elements.cartCount) {
@@ -617,7 +524,6 @@ class PinaBakesApp {
     }
   };
 
-  // ===== Checkout (optional fields + CSV export) =====
   checkout = {
     populateForm: () => {
       if (!this.state.user || !this.elements.checkoutForm) return;
@@ -626,8 +532,6 @@ class PinaBakesApp {
         if (el && this.state.user[field]) el.value = this.state.user[field];
       });
     },
-
-    // Soft validation only (all fields optional)
     validateForm: () => {
       const phoneField = document.getElementById('customer-phone');
       if (phoneField) {
@@ -645,10 +549,8 @@ class PinaBakesApp {
       }
       return true;
     },
-
-    clearErrors: () => {}, // no-op
+    clearErrors: () => {},
     handleFormSubmit: (e) => { e.preventDefault(); this.checkout.proceed(); },
-
     proceed: () => {
       if (this.state.cart.length === 0) return this.ui.showToast('Your cart is empty!', 'error');
       if (!this.checkout.validateForm()) return;
@@ -665,6 +567,7 @@ class PinaBakesApp {
 
       const subtotal = this.cart.getSubtotal();
       const discount = this.cart.getDiscount(subtotal);
+      const shipping = this.cart.getShipping(Math.max(0, subtotal - discount));
       const total = this.cart.getTotal();
       const itemsList = this.state.cart.map(i => `• ${i.name} (×${i.quantity}) - ${this.formatPrice(i.price * i.quantity)}`).join('\n');
 
@@ -674,12 +577,12 @@ class PinaBakesApp {
         coupon: this.state.appliedCoupon?.code || '',
         subtotal,
         discount,
+        shipping,
         total,
         customer: formData,
         items: this.state.cart.map(i => ({ slug: i.slug, name: i.name, qty: i.quantity, price: i.price }))
       };
 
-      // persist orders locally
       try {
         const key = this.config.storageKeys.orders;
         const prev = JSON.parse(localStorage.getItem(key) || '[]');
@@ -687,16 +590,13 @@ class PinaBakesApp {
         localStorage.setItem(key, JSON.stringify(prev));
       } catch (e) { console.warn('Could not persist orders locally:', e); }
 
-      // CSV download
       this.checkout.downloadOrderCSV(order);
 
-      // WhatsApp message
       const message = this.checkout.generateWhatsAppMessage(order, itemsList);
       const whatsappUrl = `https://wa.me/${this.config.whatsappNumber}?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, '_blank');
       this.ui.showToast('Redirecting to WhatsApp...', 'success');
     },
-
     generateWhatsAppMessage: (order, itemsList) => {
       const lines = [
         `🍪 *PiNa Bakes Order Request*`,
@@ -704,9 +604,10 @@ class PinaBakesApp {
         `*Items Ordered:*`,
         itemsList,
         ``,
-        `*Subtotal:* ${this.formatPrice(order.subtotal)}`,
+        `*Subtotal:* ${this.formatPrice(order.subtotal)}`
       ];
       if (order.discount > 0) lines.push(`*Discount (${order.coupon}):* -${this.formatPrice(order.discount)}`);
+      lines.push(`*Shipping:* ${order.shipping === 0 ? 'Free' : this.formatPrice(order.shipping)}`);
       lines.push(`*Total Amount:* ${this.formatPrice(order.total)}`, ``);
       const c = order.customer;
       lines.push(`*Customer Details:*`,
@@ -722,29 +623,20 @@ class PinaBakesApp {
       );
       return lines.join('\n');
     },
-
-    // Generate single-row CSV for the order and download
     downloadOrderCSV: (order) => {
       const headers = [
-        'OrderID','DateTimeISO','Coupon','Subtotal','Discount','Total',
+        'OrderID','DateTimeISO','Coupon','Subtotal','Discount','Shipping','Total',
         'CustName','CustPhone','CustPincode','CustCity','CustAddress','CustNotes',
-        'Items' // "name x qty @ price" list
+        'Items'
       ];
-
       const itemsStr = order.items.map(i => `${i.name} x${i.qty} @ ${i.price}`).join(' | ');
-
       const row = [
-        order.id, order.createdAt, order.coupon, order.subtotal, order.discount, order.total,
+        order.id, order.createdAt, order.coupon, order.subtotal, order.discount, order.shipping, order.total,
         order.customer.name, order.customer.phone, order.customer.pincode, order.customer.city,
         order.customer.address, order.customer.notes, itemsStr
       ];
-
-      const esc = (v) => {
-        const s = String(v ?? '');
-        return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-      };
+      const esc = (v) => { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
       const csv = headers.join(',') + '\n' + row.map(esc).join(',');
-
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -755,7 +647,6 @@ class PinaBakesApp {
     }
   };
 
-  // ===== Router =====
   router = {
     handleRoute: () => {
       const hash = window.location.hash || '#home';
@@ -775,31 +666,153 @@ class PinaBakesApp {
       const product = this.state.products.find(p => String(p.slug) === String(slug));
       if (!product) { this.ui.showError(`Product not found: ${slug}`); this.router.navigate('products'); return; }
       this.ui.renderProductDetail(product);
+      this.injectProductSchemas(product);
     },
     showSection: (id) => {
       this.ui.hideProductDetail();
       if (id && id !== 'home') {
         const el = document.getElementById(id);
         el ? el.scrollIntoView({ behavior: 'smooth' }) : window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      } else { window.scrollTo({ top: 0, behavior: 'smooth' }); }
     }
   };
 
-  // ===== Misc =====
-  isNewProduct(product) {
-    return product.price >= 300 ||
-           product.name?.toLowerCase().includes('new') ||
-           product.tagline?.toLowerCase().includes('new');
+  isNewProduct(product) { return !!product.isNew; }
+
+  uiRenderProductsSchema() {
+    const itemList = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": this.state.products.map((p, idx) => ({
+        "@type": "Product",
+        "name": p.name,
+        "image": this.normalizeImages(p).map(src => new URL(src, location.href).href),
+        "description": p.tagline,
+        "brand": {"@type":"Brand","name":"PiNa Bakes"},
+        "sku": p.slug,
+        "offers": {
+          "@type":"Offer",
+          "priceCurrency":"INR",
+          "price": String(p.price),
+          "availability":"https://schema.org/InStock",
+          "url": `${location.origin}${location.pathname}#/product/${encodeURIComponent(p.slug)}`
+        },
+        "position": idx + 1
+      }))
+    };
+    const n = document.getElementById('schema-products');
+    if (n) n.textContent = JSON.stringify(itemList);
   }
+
+  injectProductSchemas(product) {
+    const productSchema = {
+      "@context":"https://schema.org",
+      "@type":"Product",
+      "name": product.name,
+      "image": this.normalizeImages(product).map(src => new URL(src, location.href).href),
+      "description": product.tagline,
+      "brand": {"@type":"Brand","name":"PiNa Bakes"},
+      "sku": product.slug,
+      "offers": {
+        "@type":"Offer",
+        "priceCurrency":"INR",
+        "price": String(product.price),
+        "availability":"https://schema.org/InStock",
+        "url": `${location.origin}${location.pathname}#/product/${encodeURIComponent(product.slug)}`
+      }
+    };
+    const breadcrumbs = {
+      "@context":"https://schema.org",
+      "@type":"BreadcrumbList",
+      "itemListElement":[
+        {"@type":"ListItem","position":1,"name":"Products","item":`${location.origin}${location.pathname}#products`},
+        {"@type":"ListItem","position":2,"name":product.name,"item":`${location.origin}${location.pathname}#/product/${encodeURIComponent(product.slug)}`}
+      ]
+    };
+    const ps = document.getElementById('schema-product');
+    const bc = document.getElementById('schema-breadcrumbs');
+    if (ps) ps.textContent = JSON.stringify(productSchema);
+    if (bc) bc.textContent = JSON.stringify(breadcrumbs);
+  }
+
+  ui = { ...this.ui, ...{
+    renderProducts: () => {
+      if (!this.elements.productsGrid) return;
+      const html = this.state.products.map(product => {
+        const images = this.normalizeImages(product);
+        const coverImage = images[0] || product.img;
+        const isNew = this.isNewProduct(product);
+        const isPremium = product.price >= 300;
+        const name = this.esc(product.name);
+        const tagline = this.esc(product.tagline);
+        const slug = this.esc(product.slug);
+        const price = this.formatPrice(product.price);
+        const alt = `${name} cookies by PiNa Bakes`;
+        return `
+          <article class="product-card" data-product-id="${slug}">
+            <div class="product-image-container">
+              <img src="${coverImage}" alt="${alt}" class="product-image" loading="lazy" decoding="async" width="600" height="600">
+              ${isNew ? '<span class="product-badge">New</span>' : ''}
+              ${isPremium ? '<span class="product-badge" style="top: 3rem;">Premium</span>' : ''}
+            </div>
+            <div class="product-content">
+              <h3 class="product-title">${name}</h3>
+              <div class="product-price">${price}</div>
+              <p class="product-tagline">${tagline}</p>
+              <div class="product-actions">
+                <a href="#/product/${slug}" class="btn btn-secondary">View Details</a>
+                <button class="btn btn-primary" data-add-to-cart data-slug="${slug}" aria-label="Add ${name} to cart">Add to Cart</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+      this.elements.productsGrid.innerHTML = html;
+      this.uiRenderProductsSchema();
+    },
+    renderProductDetail: (product) => {
+      if (!product || !this.elements.productDetail) return;
+      this.state.currentProduct = product;
+      this.elements.productTitle.textContent = product.name;
+      this.elements.productPrice.textContent = this.formatPrice(product.price);
+      this.elements.productTagline.textContent = product.tagline;
+      this.gallery.setup(product);
+      if (product.bullets && product.bullets.length > 0) {
+        this.elements.productFeatures.innerHTML = `
+          <h3>Key Features</h3>
+          <ul>${product.bullets.map(b => `<li>${this.esc(b)}</li>`).join('')}</ul>`;
+      } else { this.elements.productFeatures.innerHTML = ''; }
+      if (product.ingredients && product.ingredients.length > 0) {
+        this.elements.productIngredients.innerHTML = product.ingredients.map(ing => `<li>${this.esc(ing)}</li>`).join('');
+      }
+      this.ui.renderNutritionInfo(product);
+      if (this.elements.addToCartDetail) {
+        this.elements.addToCartDetail.replaceWith(this.elements.addToCartDetail.cloneNode(true));
+        const btn = document.getElementById('add-to-cart-detail');
+        btn.addEventListener('click', () => this.cart.add(product.slug));
+      }
+      this.elements.productDetail.style.display = 'block';
+      document.querySelectorAll('main > section').forEach(s => { if (s.id !== 'product-detail') s.style.display = 'none'; });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    renderNutritionInfo: (product) => {
+      const n = product.nutrition || { energy:'— kcal', protein:'— g', fat:'— g', carbs:'— g', sugar:'— g', fibre:'— g', sodium:'— mg' };
+      const rows = [['Energy', n.energy],['Protein', n.protein],['Total Fat', n.fat],['Carbohydrates', n.carbs],['Added Sugar', n.sugar],['Dietary Fibre', n.fibre],['Sodium', n.sodium]];
+      this.elements.nutritionTable.innerHTML = rows.map(([k,v]) => `
+        <tr><td style="padding: .75rem; border: 1px solid #dee2e6;">${this.esc(k)}</td>
+            <td style="padding: .75rem; border: 1px solid #dee2e6;">${this.esc(v)}</td></tr>`).join('');
+    },
+    hideProductDetail: () => {
+      document.querySelectorAll('main > section').forEach(s => { if (s.id !== 'product-detail') s.style.display = 'block'; });
+      if (this.elements.productDetail) this.elements.productDetail.style.display = 'none';
+      this.state.currentProduct = null;
+    }
+  }};
 }
 
-// Init
 const App = new PinaBakesApp();
 window.App = App;
 
-// Service Worker (optional)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')

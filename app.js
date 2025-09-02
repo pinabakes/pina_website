@@ -210,7 +210,7 @@ class PinaBakesApp {
       this.elements.mobileNavOverlay.classList.add('active');
       this.elements.mobileMenuToggle.classList.add('active');
       this.elements.mobileMenuToggle.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
+      this.ui.lockScroll();
       if (this.elements.mobileNavOverlay) this.elements.mobileNavOverlay.style.pointerEvents = 'auto';
     },
     closeMobileMenu: () => {
@@ -219,10 +219,32 @@ class PinaBakesApp {
       this.elements.mobileNavOverlay.classList.remove('active');
       this.elements.mobileMenuToggle.classList.remove('active');
       this.elements.mobileMenuToggle.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
+      this.ui.unlockScroll();
       if (this.elements.mobileNavOverlay) this.elements.mobileNavOverlay.style.pointerEvents = 'none';
     },
     closeAllModals: () => { this.ui.closeMobileMenu(); this.cart.close(); this.wishlist.close(); },
+    lockScroll: () => {
+      if (document.body.dataset.locked === '1') return;
+      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      document.body.dataset.locked = '1';
+      document.body.dataset.scrollY = String(scrollY);
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.left = '0';
+      document.body.style.right = '0';
+      document.body.style.width = '100%';
+    },
+    unlockScroll: () => {
+      if (document.body.dataset.locked !== '1') return;
+      const y = parseInt(document.body.dataset.scrollY || '0', 10);
+      document.body.dataset.locked = '0';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.width = '';
+      window.scrollTo(0, y);
+    },
     updateActiveNavLink: (activeId) => {
       this.elements.navLinks.forEach(link => {
         const href = link.getAttribute('href').substring(1);
@@ -502,14 +524,14 @@ class PinaBakesApp {
       this.elements.cartModal.classList.add('active');
       this.elements.cartOverlay.classList.add('active');
       if (this.elements.cartOverlay) this.elements.cartOverlay.style.pointerEvents = 'auto';
-      document.body.style.overflow = 'hidden';
+      this.ui.lockScroll();
     },
     close: () => {
       this.state.isCartOpen = false;
       this.elements.cartModal.classList.remove('active');
       this.elements.cartOverlay.classList.remove('active');
       if (this.elements.cartOverlay) this.elements.cartOverlay.style.pointerEvents = 'none';
-      document.body.style.overflow = '';
+      this.ui.unlockScroll();
     },
     animateCartButton: () => {
       if (this.elements.cartCount) {
@@ -603,14 +625,14 @@ class PinaBakesApp {
       this.elements.wishlistModal.classList.add('active');
       this.elements.wishlistOverlay.classList.add('active');
       if (this.elements.wishlistOverlay) this.elements.wishlistOverlay.style.pointerEvents = 'auto';
-      document.body.style.overflow = 'hidden';
+      this.ui.lockScroll();
     },
     close: () => {
       this.state.isWishlistOpen = false;
       this.elements.wishlistModal.classList.remove('active');
       this.elements.wishlistOverlay.classList.remove('active');
       if (this.elements.wishlistOverlay) this.elements.wishlistOverlay.style.pointerEvents = 'none';
-      document.body.style.overflow = '';
+      this.ui.unlockScroll();
     },
     animateWishlistButton: () => {
       if (this.elements.wishlistCount) {

@@ -120,6 +120,7 @@
     .mobile-nav-link:hover { color: var(--brand-primary); }
     .mobile-nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); z-index: 150; opacity: 0; visibility: hidden; transition: var(--transition-normal); }
     .mobile-nav-overlay.active { opacity: 1; visibility: visible; }
+
     .hero { position: relative; min-height: 80vh; display: flex; align-items: center; justify-content: center; text-align: center; color: white; overflow: hidden; }
     .hero-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
     .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(47, 106, 58, 0.8) 0%, rgba(107, 66, 38, 0.6) 100%); z-index: 1; }
@@ -130,11 +131,13 @@
     .hero-description { font-size: 1.25rem; font-weight: 300; margin-bottom: var(--spacing-2xl); opacity: 0.95; line-height: 1.6; }
     .hero-cta { display: inline-flex; align-items: center; gap: var(--spacing-sm); background: white; color: var(--brand-primary); padding: var(--spacing-lg) var(--spacing-2xl); border-radius: 50px; font-weight: 600; font-size: 1.125rem; text-decoration: none; box-shadow: var(--shadow-lg); transition: var(--transition-normal); }
     .hero-cta:hover { transform: translateY(-2px); box-shadow: var(--shadow-xl); color: var(--brand-primary); }
+
     .section { padding: var(--spacing-2xl) var(--spacing-lg); }
     .section-container { max-width: 1200px; margin: 0 auto; }
     .section-header { text-align: center; margin-bottom: var(--spacing-2xl); }
     .section-title { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3rem); font-weight: 600; color: var(--brand-primary); margin-bottom: var(--spacing-md); }
     .section-description { font-size: 1.125rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
     .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-xl); margin-top: var(--spacing-2xl); }
     .product-card { background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition-normal); display: flex; flex-direction: column; }
     .product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
@@ -147,6 +150,7 @@
     .product-price { font-size: 1.5rem; font-weight: 800; color: var(--brand-primary); margin-bottom: var(--spacing-sm); }
     .product-tagline { color: var(--text-secondary); margin-bottom: var(--spacing-lg); flex-grow: 1; }
     .product-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-top: auto; }
+
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius-sm); font-weight: 600; font-size: 0.875rem; text-decoration: none; border: none; cursor: pointer; transition: var(--transition-fast); position: relative; overflow: hidden; }
     .btn-primary { background: var(--brand-gradient); color: white; box-shadow: var(--shadow-sm); }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); color: white; }
@@ -155,6 +159,7 @@
     .btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border-medium); }
     .btn-outline:hover { background: var(--text-primary); color: white; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
     .product-detail { padding: var(--spacing-2xl) var(--spacing-lg); }
     .product-detail-container { max-width: 1200px; margin: 0 auto; }
     .product-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-2xl); align-items: start; }
@@ -169,14 +174,19 @@
     .product-features ul { list-style: none; padding: 0; }
     .product-features li { padding: var(--spacing-xs) 0; position: relative; padding-left: var(--spacing-lg); }
     .product-features li::before { content: '✓'; position: absolute; left: 0; color: var(--brand-primary); font-weight: bold; }
+
     .cart-modal { position: fixed; top: 0; right: -100%; width: 90vw; max-width: 400px; height: 100vh; background: var(--bg-card); box-shadow: var(--shadow-xl); z-index: 300; transition: var(--transition-normal); display: flex; flex-direction: column; }
     .cart-modal.active { right: 0; }
     .wishlist-modal { position: fixed; top: 0; right: -100%; width: 90vw; max-width: 400px; height: 100vh; background: var(--bg-card); box-shadow: var(--shadow-xl); z-index: 300; transition: var(--transition-normal); display: flex; flex-direction: column; }
     .wishlist-modal.active { right: 0; }
+
     .cart-header, .wishlist-header { display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-lg); border-bottom: 1px solid var(--border-light); }
     .cart-header h2, .wishlist-header h2 { font-size: 1.5rem; color: var(--brand-primary); }
     .cart-close, .wishlist-close { font-size: 1.5rem; color: var(--text-secondary); }
+
     .cart-body, .wishlist-body { flex: 1; overflow-y: auto; padding: var(--spacing-lg); }
+    .cart-body { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }
+
     .cart-item, .wishlist-item { display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-light); }
     .cart-item-image, .wishlist-item-image { width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-sm); }
     .cart-item-details, .wishlist-item-details { flex: 1; }
@@ -186,12 +196,24 @@
     .wishlist-item-actions { display: flex; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-sm); flex-wrap: wrap; }
     .quantity-btn { width: 32px; height: 32px; border: 1px solid var(--border-medium); border-radius: 50%; background: var(--bg-card); font-weight: 600; }
     .quantity-btn:hover { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+
     .cart-footer, .wishlist-footer { padding: var(--spacing-lg); border-top: 1px solid var(--border-light); background: var(--bg-secondary); }
     .cart-total { display: block; }
+
+    /* Checkout form styles (added so the form looks consistent) */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); }
+    .form-group { margin-top: var(--spacing-md); }
+    .form-label { display: block; font-weight: 600; margin-bottom: var(--spacing-xs); color: var(--text-primary); }
+    .form-input, .form-textarea { width: 100%; background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; color: var(--text-primary); }
+    .form-input:focus, .form-textarea:focus { outline: 2px solid var(--brand-primary); outline-offset: 2px; border-color: transparent; }
+    .form-error { color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem; min-height: 1em; }
+
     .toast { position: fixed; bottom: var(--spacing-lg); left: 50%; transform: translateX(-50%); background: var(--text-primary); color: white; padding: var(--spacing-md) var(--spacing-xl); border-radius: 50px; font-weight: 600; box-shadow: var(--shadow-lg); z-index: 400; opacity: 0; visibility: hidden; transition: var(--transition-normal); }
     .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-10px); }
+
     .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
     @media (max-width: 768px) {
       .nav-desktop { display: none; }
       .mobile-menu-toggle { display: flex; }
@@ -202,11 +224,16 @@
       .video-grid { grid-template-columns: 1fr; }
       .about-grid { grid-template-columns: 1fr; }
       .contact-info { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
     }
     @media (max-width: 480px) {
       .hero-title { font-size: 2rem; }
       .section-title { font-size: 1.75rem; }
       .cart-modal, .wishlist-modal { width: 100vw; max-width: none; }
+      .cart-modal { height: 100dvh; }
+      @supports (height: 100svh) {
+        .cart-modal { height: 100svh; }
+      }
       .mobile-nav { width: 100vw; }
     }
     @media print {
@@ -232,19 +259,23 @@
       .btn-outline { border-width: 2px; }
       .product-card { border: 1px solid var(--border-medium); }
     }
+
     .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: var(--spacing-xl); margin-top: var(--spacing-2xl); }
     .video-card { background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition-normal); }
     .video-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .video-wrapper { position: relative; width: 100%; height: 250px; }
     .video-wrapper video, .video-wrapper iframe { width: 100%; height: 100%; object-fit: cover; border: none; }
     .video-content { padding: var(--spacing-lg); }
+
     .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-2xl); margin-top: var(--spacing-2xl); }
     .about-card { background: var(--bg-card); padding: var(--spacing-2xl); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
     .about-card h3 { font-family: var(--font-heading); font-size: 1.5rem; color: var(--brand-primary); margin-bottom: var(--spacing-lg); }
+
     .contact-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-lg); margin-top: var(--spacing-2xl); }
     .contact-item { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-lg); background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); transition: var(--transition-fast); }
     .contact-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
     .contact-icon { width: 48px; height: 48px; background: var(--brand-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--brand-primary); }
+
     .footer { background: var(--text-primary); color: white; padding: var(--spacing-2xl) var(--spacing-lg); text-align: center; }
     .footer-content { max-width: 1200px; margin: 0 auto; }
     .footer-logo { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto var(--spacing-lg); }
@@ -254,12 +285,14 @@
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
+
   <header class="header" id="header">
     <div class="header-container">
       <a href="#home" class="brand-logo" aria-label="PiNa Bakes - Home">
         <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" loading="eager">
         <span>PiNa Bakes</span>
       </a>
+
       <nav class="nav-desktop" aria-label="Main navigation">
         <ul class="nav-links">
           <li><a href="#home" class="nav-link active">Home</a></li>
@@ -269,6 +302,7 @@
           <li><a href="#contact" class="nav-link">Contact</a></li>
         </ul>
       </nav>
+
       <div class="header-actions">
         <button class="icon-button" onclick="App.wishlist.toggle()" aria-label="Open wishlist">
           <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -276,18 +310,21 @@
           </svg>
           <span class="badge-count" id="wishlist-count">0</span>
         </button>
+
         <button class="icon-button" onclick="App.cart.toggle()" aria-label="Open shopping cart">
           <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" />
           </svg>
           <span class="badge-count" id="cart-count">0</span>
         </button>
+
         <button class="mobile-menu-toggle" onclick="App.ui.toggleMobileMenu()" aria-label="Toggle menu" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
       </div>
     </div>
   </header>
+
   <div class="mobile-nav-overlay" onclick="App.ui.closeMobileMenu()"></div>
   <nav class="mobile-nav" aria-label="Mobile navigation">
     <button class="mobile-nav-close" onclick="App.ui.closeMobileMenu()" aria-label="Close menu">&times;</button>
@@ -297,6 +334,7 @@
     <a href="#about" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">About</a>
     <a href="#contact" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Contact</a>
   </nav>
+
   <main id="main-content">
     <section id="home" class="hero" aria-labelledby="hero-title">
       <img src="assets/page_images/hero.jpg" alt="Hero background" class="hero-background">
@@ -313,6 +351,7 @@
         </a>
       </div>
     </section>
+
     <section id="products" class="section">
       <div class="section-container">
         <div class="section-header">
@@ -322,6 +361,7 @@
         <div class="products-grid" id="products-grid" aria-live="polite"></div>
       </div>
     </section>
+
     <section id="product-detail" class="product-detail" style="display: none;">
       <div class="product-detail-container">
         <nav aria-label="Breadcrumb">
@@ -361,6 +401,7 @@
         </div>
       </div>
     </section>
+
     <section id="videos" class="section">
       <div class="section-container">
         <div class="section-header">
@@ -396,6 +437,7 @@
         </div>
       </div>
     </section>
+
     <section id="about" class="section">
       <div class="section-container">
         <div class="section-header">
@@ -422,6 +464,7 @@
         </div>
       </div>
     </section>
+
     <section id="contact" class="section">
       <div class="section-container">
         <div class="section-header">
@@ -479,6 +522,7 @@
       </div>
     </section>
   </main>
+
   <footer class="footer">
     <div class="footer-content">
       <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" class="footer-logo" loading="lazy">
@@ -489,9 +533,10 @@
       </div>
     </div>
   </footer>
-  <div class="cart-modal" id="cart-modal">
+
+  <div class="cart-modal" id="cart-modal" role="dialog" aria-modal="true" aria-labelledby="cart-title">
     <div class="cart-header">
-      <h2>Your Cart</h2>
+      <h2 id="cart-title">Your Cart</h2>
       <button class="cart-close" onclick="App.cart.close()" aria-label="Close cart">&times;</button>
     </div>
     <div class="cart-body">
@@ -554,9 +599,10 @@
       <button class="btn btn-primary" style="width: 100%; margin-top: .75rem;" onclick="App.checkout.proceed()">Proceed to Checkout</button>
     </div>
   </div>
-  <div class="wishlist-modal" id="wishlist-modal">
+
+  <div class="wishlist-modal" id="wishlist-modal" role="dialog" aria-modal="true" aria-labelledby="wishlist-title">
     <div class="wishlist-header">
-      <h2>Your Wishlist</h2>
+      <h2 id="wishlist-title">Your Wishlist</h2>
       <button class="wishlist-close" onclick="App.wishlist.close()" aria-label="Close wishlist">&times;</button>
     </div>
     <div class="wishlist-body">
@@ -566,9 +612,12 @@
       <button class="btn btn-primary" style="width:100%" onclick="App.wishlist.moveAllToCart()">Move All To Cart</button>
     </div>
   </div>
+
   <div class="mobile-nav-overlay" id="cart-overlay" onclick="App.cart.close()"></div>
   <div class="mobile-nav-overlay" id="wishlist-overlay" onclick="App.wishlist.close()"></div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
   <script src="app.js"></script>
 </body>
 </html>

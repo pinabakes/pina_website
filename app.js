@@ -957,51 +957,71 @@ Please confirm the order and let me know the delivery timeline.`;
     }
   };
 
-  // Router Management
-  router = {
+    // Router Management (robust slug parsing + tiny logs)
+    router = {
     handleRoute: () => {
-      const hash = window.location.hash || '#home';
-      // console.log('route →', hash); // uncomment for debugging
+        const hash = window.location.hash || '#home';
+        // console.log('[router] hash:', hash); // uncomment to see routes
 
-      if (hash.startsWith('#/product/')) {
-        const productSlug = hash.split('/')[2];
-        this.router.showProduct(productSlug);
-      } else {
-        this.router.showSection(hash.substring(1));
-      }
+        // robustly extract slug like "#/product/nutty-coco"
+        const m = hash.match(/^#\/product\/([^?#]+)/);
+        if (m && m[1]) {
+        const slug = decodeURIComponent(m[1]);
+        // console.log('[router] product slug:', slug);
+        this.router.showProduct(slug);
+        return;
+        }
+
+        // fall back to sections like "#products", "#home", etc.
+        const sectionId = hash.replace(/^#/, '') || 'home';
+        this.router.showSection(sectionId);
     },
 
     navigate: (path) => {
-      window.location.hash = path;
+        // accept either "/product/slug" or "#/product/slug" or "products"
+        if (path.startsWith('#')) {
+        window.location.hash = path;
+        } else if (path.startsWith('/')) {
+        window.location.hash = `#${path}`;
+        } else {
+        window.location.hash = `#${path}`;
+        }
     },
 
     showProduct: async (slug) => {
-      await this.loadProducts();
-      
-      const product = this.state.products.find(p => p.slug === slug);
-      if (!product) {
-        this.router.navigate('products');
-        this.ui.showError('Product not found');
+        await this.loadProducts();
+        // defensive: ensure products are loaded
+        if (!Array.isArray(this.state.products) || !this.state.products.length) {
+        this.ui.showError('Products not loaded yet.');
         return;
-      }
-      
-      this.ui.renderProductDetail(product);
+        }
+
+        const product = this.state.products.find(p => String(p.slug) === String(slug));
+        if (!product) {
+        this.ui.showError(`Product not found: ${slug}`);
+        this.router.navigate('products');
+        return;
+        }
+
+        this.ui.renderProductDetail(product);
     },
 
     showSection: (sectionId) => {
-      this.ui.hideProductDetail();
-      
-      // Scroll to section if not home
-      if (sectionId && sectionId !== 'home') {
+        this.ui.hideProductDetail();
+
+        if (sectionId && sectionId !== 'home') {
         const section = document.getElementById(sectionId);
         if (section) {
-          section.scrollIntoView({ behavior: 'smooth' });
+            section.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // no matching section? go home
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-      } else {
+        } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+        }
     }
-  };
+    };
 
   // Utility methods
   isNewProduct(product) {

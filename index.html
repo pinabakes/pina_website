@@ -308,14 +308,14 @@
           <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 8.25 12 9 12 .75 0 9-4.78 9-12z"/>
           </svg>
-          <span class="badge-count" id="wishlist-count">0</span>
+          <span class="badge-count" id="wishlist-count" aria-live="polite" aria-atomic="true">0</span>
         </button>
 
         <button class="icon-button" onclick="App.cart.toggle()" aria-label="Open shopping cart">
           <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" />
           </svg>
-          <span class="badge-count" id="cart-count">0</span>
+          <span class="badge-count" id="cart-count" aria-live="polite" aria-atomic="true">0</span>
         </button>
 
         <button class="mobile-menu-toggle" onclick="App.ui.toggleMobileMenu()" aria-label="Toggle menu" aria-expanded="false">
@@ -337,7 +337,7 @@
 
   <main id="main-content">
     <section id="home" class="hero" aria-labelledby="hero-title">
-      <img src="assets/page_images/hero.jpg" alt="Hero background" class="hero-background">
+      <img src="assets/page_images/hero.jpg" alt="Hero background" class="hero-background" fetchpriority="high" decoding="async">
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <div class="hero-badge">🌾 Healthy • Tasty • Wholesome</div>

@@ -43,7 +43,13 @@
     "tagline": "Protein-rich jowar meets creamy peanut butter",
     "img": "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg",
     "images": [
-      "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg"
+      "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg",
+      "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-2.jpg",
+      "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-3.jpg",
+      "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-4.jpg",
+      "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-5.jpg",
+      "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-6.jpg",
+      "assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-7.jpg"
     ],
     "bullets": [
       "High in plant-based protein",
@@ -76,7 +82,10 @@
     "tagline": "Zesty lemon meets antioxidant-rich blueberries",
     "img": "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg",
     "images": [
-      "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg"
+      "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-1.jpg",
+      "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-2.jpg",
+      "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-3.jpg",
+      "assets/products/lemon-blueberry/pina-bakes-lemon-blueberry-4.jpg"
     ],
     "bullets": [
       "Fresh lemon zest for natural tanginess",
@@ -111,7 +120,13 @@
     "tagline": "Superfood quinoa with premium walnuts",
     "img": "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg",
     "images": [
-      "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg"
+      "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-1.jpg",
+      "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-2.jpg",
+      "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-3.jpg",
+      "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-4.jpg",
+      "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-5.jpg",
+      "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-6.jpg",
+      "assets/products/quinoa-walnut/pina-bakes-quinoa-walnut-7.jpg"
     ],
     "bullets": [
       "Quinoa - complete protein superfood",
@@ -144,7 +159,9 @@
     "tagline": "Luxuriously loaded with premium pistachios",
     "img": "assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg",
     "images": [
-      "assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg"
+      "assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg",
+      "assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-2.jpg",
+      "assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-3.jpg"
     ],
     "bullets": [
       "Generously loaded with pistachios",
@@ -177,7 +194,11 @@
     "tagline": "Pure Belgian cocoa with ancient foxtail millet",
     "img": "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg",
     "images": [
-      "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg"
+      "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-1.jpg",
+      "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-2.jpg",
+      "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-3.jpg",
+      "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-4.jpg",
+      "assets/products/foxtail-true-chocolate/pina-bakes-foxtail-true-chocolate-5.jpg"
     ],
     "bullets": [
       "Belgian cocoa for deep chocolate flavor",
@@ -210,7 +231,12 @@
     "tagline": "Calcium-rich ragi in a wholesome cookie",
     "img": "assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg",
     "images": [
-      "assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg"
+      "assets/products/ragi-millet/pina-bakes-ragi-millet-1.jpg",
+      "assets/products/ragi-millet/pina-bakes-ragi-millet-2.jpg",
+      "assets/products/ragi-millet/pina-bakes-ragi-millet-3.jpg",
+      "assets/products/ragi-millet/pina-bakes-ragi-millet-4.jpg",
+      "assets/products/ragi-millet/pina-bakes-ragi-millet-5.jpg",
+      "assets/products/ragi-millet/pina-bakes-ragi-millet-6.jpg"
     ],
     "bullets": [
       "High in natural calcium from ragi",
@@ -242,7 +268,11 @@
     "tagline": "Bajra base enriched with crunchy almonds",
     "img": "assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg",
     "images": [
-      "assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg"
+      "assets/products/bajra-almond/pina-bakes-bajra-almond-1.jpg",
+      "assets/products/bajra-almond/pina-bakes-bajra-almond-2.jpg",
+      "assets/products/bajra-almond/pina-bakes-bajra-almond-3.jpg",
+      "assets/products/bajra-almond/pina-bakes-bajra-almond-4.jpg",
+      "assets/products/bajra-almond/pina-bakes-bajra-almond-5.jpg"
     ],
     "bullets": [
       "Crunchy almond pieces in every bite",

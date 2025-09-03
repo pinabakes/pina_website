@@ -24,7 +24,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="assets/page_images/hero.jpg" as="image" imagesrcset="assets/page_images/hero.avif 1x, assets/page_images/hero.webp 1x, assets/page_images/hero.jpg 1x">
+  <link rel="preload" href="assets/page_images/hero.jpg" as="image" fetchpriority="high">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -57,13 +57,13 @@
     "name": "Nutty-Coco Delight",
     "description": "Premium millet cookies with real coconut flakes",
     "brand": { "@type": "Brand", "name": "PiNa Bakes" },
-    "image": ["https://pinabakes.github.io/pina_website/assets/products/nutty-coco-delight.jpg"],
+    "image": ["https://pinabakes.github.io/pina_website/assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg"],
     "offers": {
       "@type": "Offer",
       "price": "199",
       "priceCurrency": "INR",
       "availability": "https://schema.org/InStock",
-      "url": "https://pinabakes.github.io/pina_website/#/product/nutty-coco-delight"
+      "url": "https://pinabakes.github.io/pina_website/#/product/nutty-coco"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -321,6 +321,52 @@
       .btn-outline { border-width: 2px; }
       .product-card { border: 1px solid var(--border-medium); }
     }
+    /* ==== REQUIREMENT 1: Hide header search on mobile ==== */
+    @media (max-width: 768px) {
+      .site-search,
+      #site-search,
+      .header .search,
+      .header [data-role="search"] {
+        display: none !important;
+      }
+      }
+      /* ==== REQUIREMENT 2: Review stars UI ==== */
+    .stars-input { direction: rtl; display: inline-flex; gap: .25rem; }
+    .stars-input input { display: none; }
+    .stars-input label { color: #d1d5db; font-size: 1.25rem; cursor: pointer; user-select: none; }
+    .stars-input input:checked ~ label,
+    .stars-input label:hover,
+    .stars-input label:hover ~ label { color: #f59e0b; }
+    .review-item { padding: .75rem 0; border-bottom: 1px solid var(--border-light); }
+    .review-header { display: flex; gap: .5rem; align-items: center; justify-content: space-between; }
+    .review-header .stars { letter-spacing: 1px; color: #f59e0b; }
+    .review-date { font-size: .8rem; color: var(--text-secondary); margin-top: .25rem; }
+    
+    /* ==== REQUIREMENT 3: Cart totals should scroll and sit at the end (mobile) ==== */
+    @media (max-width: 768px) {
+      .cart-modal {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        left: auto;
+        width: 100vw;
+        max-width: none;
+        height: 100dvh;         /* full screen height */
+        overflow-y: auto;       /* scroll the whole panel */
+        display: block;         /* not flex column (prevents sticky footer behavior) */
+        transform: none !important;      /* cancel bottom-sheet translate */
+        border-radius: 0 !important;     /* full-screen panel */
+      }
+      .cart-modal.active { right: 0; }
+      .cart-body { max-height: none; overflow: visible; }
+      .cart-footer {
+        position: static;       /* scrolls away with content */
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border-light);
+        margin-top: .75rem;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -386,7 +432,16 @@
       <picture class="hero-background">
         <source srcset="assets/page_images/hero.avif" type="image/avif">
         <source srcset="assets/page_images/hero.webp" type="image/webp">
-        <img src="assets/page_images/hero.jpg" alt="Fresh, wholesome millet cookies by PiNa Bakes" class="hero-background" fetchpriority="high" decoding="async">
+      <picture class="hero-background">
+        <source srcset="assets/page_images/hero.avif" type="image/avif">
+        <source srcset="assets/page_images/hero.webp" type="image/webp">
+        <img
+          src="assets/page_images/hero.jpg"
+          alt="Fresh, wholesome millet cookies by PiNa Bakes"
+          fetchpriority="high"
+          decoding="async"
+          class="hero-background"
+        >
       </picture>
       <div class="hero-overlay"></div>
       <div class="hero-content">
@@ -399,7 +454,6 @@
         </a>
       </div>
     </section>
-
     <section id="products" class="section">
       <div class="section-container">
         <div class="section-header">

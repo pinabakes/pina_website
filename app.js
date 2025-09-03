@@ -554,7 +554,9 @@ class PinaBakesApp {
         this.elements.addToCartDetail.onclick = () => this.cart.add(product.slug);
       if (this.elements.addToWishlistDetail)
         this.elements.addToWishlistDetail.onclick = () => this.wishlist.add(product.slug);
-
+      
+      this.reviews.mount(product);
+      
       // Recommendations
       this.ui.renderRecommendations(product);
 
@@ -1888,6 +1890,125 @@ class PinaBakesApp {
       return indianMobileRegex.test(String(phone).replace(/\D/g, "").slice(-10));
     },
     validatePincode: (pincode) => /^[1-9][0-9]{5}$/.test(String(pincode).trim()),
+  };
+  reviews = {
+    key: 'pinabakes_reviews',
+
+    _readAll() { try { return JSON.parse(localStorage.getItem(this.key) || '{}'); } catch { return {}; } },
+    _writeAll(db) { try { localStorage.setItem(this.key, JSON.stringify(db)); } catch {} },
+
+    list(slug) {
+      const db = this._readAll();
+      return Array.isArray(db[slug]) ? db[slug] : [];
+    },
+
+    add(slug, review) {
+      const db = this._readAll();
+      const arr = this.list(slug).concat([{ ...review, id: 'r' + Date.now(), createdAt: new Date().toISOString() }]);
+      db[slug] = arr;
+      this._writeAll(db);
+    },
+
+    average(slug) {
+      const arr = this.list(slug);
+      if (!arr.length) return 0;
+      const sum = arr.reduce((t, r) => t + (Number(r.rating) || 0), 0);
+      return Math.round((sum / arr.length) * 10) / 10;
+    },
+
+    escape(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); },
+
+    template() {
+      return `
+        <section id="reviews-section" class="reviews" style="margin-top:2rem;">
+          <h3 style="margin-bottom:.5rem;">Customer Reviews</h3>
+          <div id="reviews-average" style="font-weight:600; margin-bottom:.75rem;"></div>
+          <div id="reviews-list" style="display:flex; flex-direction:column; gap:1rem;"></div>
+
+          <div class="add-review" style="margin-top:1.5rem;">
+            <h4 style="margin-bottom:.5rem;">Add a Review</h4>
+            <form id="review-form" class="review-form">
+              <div style="display:flex; gap:.75rem; align-items:center; margin:.5rem 0;">
+                <span>Rating:</span>
+                <div class="stars-input">
+                  ${[5,4,3,2,1].map(v => `
+                    <input type="radio" id="star${v}" name="review-rating" value="${v}">
+                    <label for="star${v}" title="${v} star${v>1?'s':''}">★</label>
+                  `).join('')}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="review-name">Name (optional)</label>
+                <input type="text" id="review-name" class="form-input" placeholder="Your name">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="review-comment">Your review</label>
+                <textarea id="review-comment" class="form-textarea" rows="3" placeholder="What did you like?"></textarea>
+              </div>
+
+              <button class="btn btn-primary" type="submit">Submit Review</button>
+            </form>
+          </div>
+        </section>
+      `;
+    },
+
+    mount(product) {
+      const info = document.querySelector('.product-info');
+      if (!info) return;
+
+      // create once per product view
+      let existing = info.querySelector('#reviews-section');
+      if (!existing) {
+        info.insertAdjacentHTML('beforeend', this.template());
+        existing = info.querySelector('#reviews-section');
+      }
+
+      // render list + average
+      this.render(product.slug);
+
+      // bind form
+      const form = existing.querySelector('#review-form');
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        const name = existing.querySelector('#review-name').value.trim() || 'Anonymous';
+        const rating = Number(existing.querySelector('input[name="review-rating"]:checked')?.value || 0);
+        const comment = existing.querySelector('#review-comment').value.trim();
+
+        if (rating < 1) { App.ui.showToast('Please select a rating.', 'error'); return; }
+        if (comment.length < 3) { App.ui.showToast('Please write a short review.', 'error'); return; }
+
+        this.add(product.slug, { name: this.escape(name), rating, comment: this.escape(comment) });
+        form.reset();
+        this.render(product.slug);
+        App.ui.showToast('Thanks for your review!', 'success');
+      };
+    },
+
+    render(slug) {
+      const section = document.querySelector('#reviews-section');
+      if (!section) return;
+
+      const listEl = section.querySelector('#reviews-list');
+      const avgEl = section.querySelector('#reviews-average');
+      const list = this.list(slug).slice().sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      avgEl.textContent = list.length ? `${this.average(slug)} ★ (${list.length})` : 'No reviews yet';
+      listEl.innerHTML = list.length
+        ? list.map(r => `
+            <div class="review-item">
+              <div class="review-header">
+                <strong>${this.escape(r.name)}</strong>
+                <span class="stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+              </div>
+              <p>${this.escape(r.comment)}</p>
+              <div class="review-date">${new Date(r.createdAt).toLocaleDateString()}</div>
+            </div>
+          `).join('')
+        : `<p style="color:var(--text-secondary)">Be the first to review.</p>`;
+    }
   };
 
   util = {

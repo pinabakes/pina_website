@@ -1,13 +1,39 @@
 {
   "name": "PiNa Bakes",
   "short_name": "PiNa Bakes",
-  "start_url": "./index.html",
+  "description": "Premium millet-based gourmet cookies from Delhi. Healthy, wholesome & delicious.",
+  "id": "/pina_website/",
+  "start_url": "./?source=pwa",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#fffdf7",
   "theme_color": "#2f6a3a",
+  "background_color": "#fffdf7",
+  "categories": ["food-and-drink", "shopping"],
   "icons": [
-    { "src": "assets/logo/pina-bakes-logo.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "assets/logo/pina-bakes-logo.png", "sizes": "512x512", "type": "image/png" }
-  ]
+    {
+      "src": "assets/logo/pina-bakes-logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/logo/pina-bakes-logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Products",
+      "url": "#products",
+      "icons": [{ "src": "assets/logo/pina-bakes-logo-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Open Cart",
+      "url": "#cart",
+      "icons": [{ "src": "assets/logo/pina-bakes-logo-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "prefer_related_applications": false
 }

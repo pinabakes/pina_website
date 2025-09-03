@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>PiNa Bakes – Premium Millet Cookies | Healthy & Delicious</title>
   <meta name="description" content="PiNa Bakes: Premium millet-based gourmet cookies from Delhi. Healthy, wholesome & delicious. Free delivery across India. FSSAI certified." />
   <link rel="canonical" href="https://pinabakes.github.io/pina_website/" />
@@ -23,6 +23,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/page_images/hero.jpg" as="image" imagesrcset="assets/page_images/hero.avif 1x, assets/page_images/hero.webp 1x, assets/page_images/hero.jpg 1x">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -46,6 +48,28 @@
     ],
     "servesCuisine": "Bakery",
     "priceRange": "₹199-₹349"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Nutty-Coco Delight",
+    "description": "Premium millet cookies with real coconut flakes",
+    "brand": { "@type": "Brand", "name": "PiNa Bakes" },
+    "image": ["https://pinabakes.github.io/pina_website/assets/products/nutty-coco-delight.jpg"],
+    "offers": {
+      "@type": "Offer",
+      "price": "199",
+      "priceCurrency": "INR",
+      "availability": "https://schema.org/InStock",
+      "url": "https://pinabakes.github.io/pina_website/#/product/nutty-coco-delight"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "127"
+    }
   }
   </script>
   <style>
@@ -81,6 +105,16 @@
       --transition-fast: 0.15s ease;
       --transition-normal: 0.25s ease;
       --transition-slow: 0.35s ease;
+      --color-primary-50: #f0f9f4;
+      --color-primary-500: #22c55e;
+      --color-primary-900: #14532d;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1rem;
+      --text-lg: 1.125rem;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-4: 1rem;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; font-size: 16px; }
@@ -89,20 +123,21 @@
     a { color: var(--brand-primary); text-decoration: none; transition: var(--transition-fast); }
     a:hover { color: var(--brand-secondary); }
     button { border: none; background: none; cursor: pointer; font-family: inherit; transition: var(--transition-fast); }
+    input, textarea { font-family: inherit; }
     .skip-link { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; z-index: 999999; }
     .skip-link:focus { left: 1rem; top: 1rem; width: auto; height: auto; background: var(--bg-card); padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); font-weight: 600; }
     .header { position: sticky; top: 0; z-index: 100; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border-light); transition: var(--transition-normal); }
     .header.scrolled { background: rgba(255, 255, 255, 0.98); border-bottom-color: var(--border-medium); box-shadow: var(--shadow-sm); }
-    .header-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-md) var(--spacing-lg); }
+    .header-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-md) var(--spacing-lg); }
     .brand-logo { display: flex; align-items: center; gap: var(--spacing-sm); font-weight: 800; font-size: 1.25rem; color: var(--brand-primary); text-decoration: none; }
     .brand-logo img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
-    .nav-desktop { display: flex; align-items: center; gap: var(--spacing-xl); }
+    .nav-desktop { display: flex; align-items: center; gap: var(--spacing-xl); justify-content: center; }
     .nav-links { display: flex; list-style: none; gap: var(--spacing-lg); }
     .nav-link { font-weight: 500; color: var(--text-primary); position: relative; padding: var(--spacing-sm) 0; transition: var(--transition-fast); }
     .nav-link:hover { color: var(--brand-primary); }
     .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 2px; background: var(--brand-gradient); transition: var(--transition-normal); }
     .nav-link:hover::after, .nav-link.active::after { width: 100%; }
-    .header-actions { display: flex; align-items: center; gap: var(--spacing-md); }
+    .header-actions { display: flex; align-items: center; gap: var(--spacing-md); justify-self: end; }
     .icon-button { position: relative; background: var(--brand-light); color: var(--brand-primary); padding: var(--spacing-sm); border-radius: var(--radius-sm); transition: var(--transition-fast); }
     .icon-button:hover { background: var(--brand-primary); color: white; }
     .icon { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; }
@@ -120,27 +155,33 @@
     .mobile-nav-link:hover { color: var(--brand-primary); }
     .mobile-nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); z-index: 150; opacity: 0; visibility: hidden; transition: var(--transition-normal); }
     .mobile-nav-overlay.active { opacity: 1; visibility: visible; }
-
+    .search { position: relative; display: flex; align-items: center; gap: .5rem; }
+    .search-input { width: 260px; max-width: 45vw; padding: .55rem .75rem; border: 1px solid var(--border-medium); background: var(--bg-card); color: var(--text-primary); border-radius: 999px; font-size: .95rem; outline: none; transition: box-shadow .15s ease, border-color .15s ease; }
+    .search-input:focus { border-color: transparent; box-shadow: 0 0 0 3px rgba(47,106,58,.18); }
+    .search-suggestions { position: absolute; top: calc(100% + .5rem); left: 0; width: 100%; max-height: 60vh; overflow: auto; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 12px; box-shadow: var(--shadow-lg); display: none; z-index: 250; }
+    .search-suggestions.active { display: block; }
+    .search-suggestion { padding: .75rem 1rem; border-bottom: 1px solid var(--border-light); cursor: pointer; }
+    .search-suggestion:last-child { border-bottom: none; }
     .hero { position: relative; min-height: 80vh; display: flex; align-items: center; justify-content: center; text-align: center; color: white; overflow: hidden; }
     .hero-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
     .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(47, 106, 58, 0.8) 0%, rgba(107, 66, 38, 0.6) 100%); z-index: 1; }
     .hero-content { position: relative; z-index: 2; }
-    @keyframes heroFadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     .hero-badge { display: inline-block; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); color: white; padding: var(--spacing-sm) var(--spacing-lg); border-radius: 50px; font-weight: 600; font-size: 0.875rem; margin-bottom: var(--spacing-lg); border: 1px solid rgba(255, 255, 255, 0.2); }
     .hero-title { font-family: var(--font-heading); font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 700; line-height: 1.2; margin-bottom: var(--spacing-lg); text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3); }
     .hero-description { font-size: 1.25rem; font-weight: 300; margin-bottom: var(--spacing-2xl); opacity: 0.95; line-height: 1.6; }
     .hero-cta { display: inline-flex; align-items: center; gap: var(--spacing-sm); background: white; color: var(--brand-primary); padding: var(--spacing-lg) var(--spacing-2xl); border-radius: 50px; font-weight: 600; font-size: 1.125rem; text-decoration: none; box-shadow: var(--shadow-lg); transition: var(--transition-normal); }
     .hero-cta:hover { transform: translateY(-2px); box-shadow: var(--shadow-xl); color: var(--brand-primary); }
-
     .section { padding: var(--spacing-2xl) var(--spacing-lg); }
     .section-container { max-width: 1200px; margin: 0 auto; }
     .section-header { text-align: center; margin-bottom: var(--spacing-2xl); }
     .section-title { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3rem); font-weight: 600; color: var(--brand-primary); margin-bottom: var(--spacing-md); }
     .section-description { font-size: 1.125rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; line-height: 1.6; }
-
+    .filters-bar { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; justify-content: space-between; background: var(--bg-card); padding: .75rem; border: 1px solid var(--border-light); border-radius: 12px; margin-top: 1rem; }
+    .filters-left, .filters-right { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+    .filter-chip, .sort-select, .price-input { padding: .45rem .7rem; border: 1px solid var(--border-medium); background: var(--bg-primary); border-radius: 999px; font-size: .9rem; }
     .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-xl); margin-top: var(--spacing-2xl); }
-    .product-card { background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition-normal); display: flex; flex-direction: column; }
-    .product-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .product-card { background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; transform-origin: center; }
+    .product-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
     .product-image-container { position: relative; aspect-ratio: 1; overflow: hidden; }
     .product-image { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-slow); }
     .product-card:hover .product-image { transform: scale(1.05); }
@@ -150,22 +191,22 @@
     .product-price { font-size: 1.5rem; font-weight: 800; color: var(--brand-primary); margin-bottom: var(--spacing-sm); }
     .product-tagline { color: var(--text-secondary); margin-bottom: var(--spacing-lg); flex-grow: 1; }
     .product-actions { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); margin-top: auto; }
-
+    .trust-signals { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+    .trust-badge { display: inline-flex; align-items: center; gap: .35rem; padding: .35rem .6rem; font-size: .8rem; border-radius: 999px; border: 1px solid var(--border-light); color: var(--text-secondary); background: var(--bg-secondary); }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-lg); border-radius: var(--radius-sm); font-weight: 600; font-size: 0.875rem; text-decoration: none; border: none; cursor: pointer; transition: var(--transition-fast); position: relative; overflow: hidden; }
     .btn-primary { background: var(--brand-gradient); color: white; box-shadow: var(--shadow-sm); }
     .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); color: white; }
     .btn-secondary { background: var(--brand-light); color: var(--brand-primary); border: 1px solid var(--brand-primary); }
     .btn-secondary:hover { background: var(--brand-primary); color: white; }
     .btn-outline { background: transparent; color: var(--text-primary); border: 1px solid var(--border-medium); }
-    :root { --btn-outline-hover-bg: #1f2937; }
-    @media (prefers-color-scheme: dark) { :root { --btn-outline-hover-bg: #374151; } }
-    .btn-outline:hover { background: var(--btn-outline-hover-bg); color: #fff; }
+    .btn-outline:hover { background: #1f2937; color: #fff; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
     .product-detail { padding: var(--spacing-2xl) var(--spacing-lg); }
     .product-detail-container { max-width: 1200px; margin: 0 auto; }
     .product-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-2xl); align-items: start; }
     .product-gallery { position: relative; }
-    .product-main-image { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-lg); margin-bottom: var(--spacing-md); }
+    .product-main-image { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-lg); margin-bottom: var(--spacing-md); touch-action: pan-y; }
+    .product-main-image[data-zoom="1"] { cursor: zoom-in; }
     .product-thumbnails { display: flex; gap: var(--spacing-sm); overflow-x: auto; padding-bottom: var(--spacing-sm); }
     .product-thumbnail { flex-shrink: 0; width: 80px; height: 80px; border-radius: var(--radius-sm); object-fit: cover; cursor: pointer; border: 2px solid transparent; transition: var(--transition-fast); }
     .product-thumbnail.active { border-color: var(--brand-primary); }
@@ -175,19 +216,16 @@
     .product-features ul { list-style: none; padding: 0; }
     .product-features li { padding: var(--spacing-xs) 0; position: relative; padding-left: var(--spacing-lg); }
     .product-features li::before { content: '✓'; position: absolute; left: 0; color: var(--brand-primary); font-weight: bold; }
-
+    .detail-trust { margin-top: 1rem; }
     .cart-modal { position: fixed; top: 0; right: -100%; width: 90vw; max-width: 400px; height: 100vh; background: var(--bg-card); box-shadow: var(--shadow-xl); z-index: 300; transition: var(--transition-normal); display: flex; flex-direction: column; }
     .cart-modal.active { right: 0; }
     .wishlist-modal { position: fixed; top: 0; right: -100%; width: 90vw; max-width: 400px; height: 100vh; background: var(--bg-card); box-shadow: var(--shadow-xl); z-index: 300; transition: var(--transition-normal); display: flex; flex-direction: column; }
     .wishlist-modal.active { right: 0; }
-
     .cart-header, .wishlist-header { display: flex; align-items: center; justify-content: space-between; padding: var(--spacing-lg); border-bottom: 1px solid var(--border-light); }
     .cart-header h2, .wishlist-header h2 { font-size: 1.5rem; color: var(--brand-primary); }
     .cart-close, .wishlist-close { font-size: 1.5rem; color: var(--text-secondary); }
-
     .cart-body, .wishlist-body { flex: 1; overflow-y: auto; padding: var(--spacing-lg); }
     .cart-body { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; }
-
     .cart-item, .wishlist-item { display: flex; gap: var(--spacing-md); padding: var(--spacing-md) 0; border-bottom: 1px solid var(--border-light); }
     .cart-item-image, .wishlist-item-image { width: 60px; height: 60px; object-fit: cover; border-radius: var(--radius-sm); }
     .cart-item-details, .wishlist-item-details { flex: 1; }
@@ -197,21 +235,46 @@
     .wishlist-item-actions { display: flex; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-sm); flex-wrap: wrap; }
     .quantity-btn { width: 32px; height: 32px; border: 1px solid var(--border-medium); border-radius: 50%; background: var(--bg-card); font-weight: 600; }
     .quantity-btn:hover { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
-
     .cart-footer, .wishlist-footer { padding: var(--spacing-lg); border-top: 1px solid var(--border-light); background: var(--bg-secondary); }
     .cart-total { display: block; }
-
-    /* Checkout form styles (added so the form looks consistent) */
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-lg); }
     .form-group { margin-top: var(--spacing-md); }
     .form-label { display: block; font-weight: 600; margin-bottom: var(--spacing-xs); color: var(--text-primary); }
     .form-input, .form-textarea { width: 100%; background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-sm); padding: 0.65rem 0.75rem; color: var(--text-primary); }
     .form-input:focus, .form-textarea:focus { outline: 2px solid var(--brand-primary); outline-offset: 2px; border-color: transparent; }
     .form-error { color: #dc2626; font-size: 0.8rem; margin-top: 0.25rem; min-height: 1em; }
-
     .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+    .skeleton-product { background: linear-gradient(90deg, #f0f0f0 25%, #e6e6e6 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 16px; min-height: 360px; }
     @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: var(--spacing-xl); margin-top: var(--spacing-2xl); }
+    .video-card { background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition-normal); }
+    .video-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .video-wrapper { position: relative; width: 100%; height: 250px; }
+    .video-wrapper video, .video-wrapper iframe { width: 100%; height: 100%; object-fit: cover; border: none; }
+    .video-content { padding: var(--spacing-lg); }
+    .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-2xl); margin-top: var(--spacing-2xl); }
+    .about-card { background: var(--bg-card); padding: var(--spacing-2xl); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+    .about-card h3 { font-family: var(--font-heading); font-size: 1.5rem; color: var(--brand-primary); margin-bottom: var(--spacing-lg); }
+    .reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--spacing-xl); margin-top: var(--spacing-2xl); }
+    .review-card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); padding: 1.25rem; display: grid; grid-template-columns: auto 1fr; gap: .85rem; align-items: center; }
+    .review-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+    .review-name { font-weight: 700; }
+    .review-stars { color: #f59e0b; font-size: 1rem; letter-spacing: .05em; }
+    .footer { background: var(--text-primary); color: white; padding: var(--spacing-2xl) var(--spacing-lg); text-align: center; }
+    .footer-content { max-width: 1200px; margin: 0 auto; }
+    .footer-logo { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto var(--spacing-lg); }
+    .fssai-info { display: inline-flex; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-lg); padding: var(--spacing-sm) var(--spacing-md); background: rgba(255, 255, 255, 0.1); border-radius: var(--radius-sm); }
+    .fssai-logo { width: 30px; height: 20px; object-fit: contain; }
+    :root { --toast-bg: #1f2937; --toast-fg: #ffffff; }
+    @media (prefers-color-scheme: dark) { :root { --toast-bg: #111827; --toast-fg: #ffffff; } }
+    .toast { position: fixed; bottom: var(--spacing-lg); left: 50%; transform: translateX(-50%); background: var(--toast-bg); color: var(--toast-fg); padding: var(--spacing-md) var(--spacing-xl); border-radius: 50px; font-weight: 600; box-shadow: var(--shadow-lg); z-index: 400; opacity: 0; visibility: hidden; transition: var(--transition-normal); }
+    .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-10px); }
+    .toast.success { background: #16a34a; color: #fff; }
+    .toast.error { background: #dc2626; color: #fff; }
+    .toast.info { background: var(--toast-bg); color: var(--toast-fg); }
+    @media (max-width: 1024px) { .search-input { width: 200px; } }
+    @media (max-width: 900px) { .header-container { grid-template-columns: auto auto auto; } }
     @media (max-width: 768px) {
       .nav-desktop { display: none; }
       .mobile-menu-toggle { display: flex; }
@@ -223,15 +286,15 @@
       .about-grid { grid-template-columns: 1fr; }
       .contact-info { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
+      .search-input { max-width: 50vw; }
+      .cart-modal, .wishlist-modal { top: auto; bottom: 0; right: 0; left: 0; width: 100%; max-width: none; height: 70vh; border-radius: 20px 20px 0 0; transform: translateY(100%); transition: transform 0.3s ease; }
+      .cart-modal.active, .wishlist-modal.active { transform: translateY(0); }
+      .cart-header, .wishlist-header { border-top-left-radius: 20px; border-top-right-radius: 20px; }
+      .cart-footer { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); background: var(--bg-card); }
     }
     @media (max-width: 480px) {
       .hero-title { font-size: 2rem; }
       .section-title { font-size: 1.75rem; }
-      .cart-modal, .wishlist-modal { width: 100vw; max-width: none; }
-      .cart-modal { height: 100dvh; }
-      @supports (height: 100svh) {
-        .cart-modal { height: 100svh; }
-      }
       .mobile-nav { width: 100vw; }
     }
     @media print {
@@ -243,97 +306,20 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
       .hero-content { animation: none; }
-      .skeleton { animation: none; }
+      .skeleton, .skeleton-product { animation: none; }
     }
     @media (prefers-color-scheme: dark) {
       :root { --bg-primary: #1a1a1a; --bg-secondary: #2a2a2a; --bg-card: #2d2d2d; --text-primary: #ffffff; --text-secondary: #b0b0b0; --text-muted: #808080; --border-light: rgba(255, 255, 255, 0.1); --border-medium: rgba(255, 255, 255, 0.2); }
       .header { background: rgba(26, 26, 26, 0.95); }
       .header.scrolled { background: rgba(26, 26, 26, 0.98); }
+      .btn-outline:hover { background: #374151; color: #fff; }
     }
     *:focus { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
-    .btn:focus, .icon-button:focus, .mobile-menu-toggle:focus { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
+    .btn:focus, .icon-button:focus, .mobile-menu-toggle:focus, .search-input:focus { outline: 2px solid var(--brand-primary); outline-offset: 2px; }
     @media (prefers-contrast: high) {
       :root { --brand-primary: #1a5d26; --text-secondary: #333333; --border-medium: rgba(0, 0, 0, 0.3); }
       .btn-outline { border-width: 2px; }
       .product-card { border: 1px solid var(--border-medium); }
-    }
-
-    .video-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: var(--spacing-xl); margin-top: var(--spacing-2xl); }
-    .video-card { background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: var(--transition-normal); }
-    .video-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .video-wrapper { position: relative; width: 100%; height: 250px; }
-    .video-wrapper video, .video-wrapper iframe { width: 100%; height: 100%; object-fit: cover; border: none; }
-    .video-content { padding: var(--spacing-lg); }
-
-    .about-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-2xl); margin-top: var(--spacing-2xl); }
-    .about-card { background: var(--bg-card); padding: var(--spacing-2xl); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
-    .about-card h3 { font-family: var(--font-heading); font-size: 1.5rem; color: var(--brand-primary); margin-bottom: var(--spacing-lg); }
-
-    .contact-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-lg); margin-top: var(--spacing-2xl); }
-    .contact-item { display: flex; align-items: center; gap: var(--spacing-md); padding: var(--spacing-lg); background: var(--bg-card); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); transition: var(--transition-fast); }
-    .contact-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .contact-icon { width: 48px; height: 48px; background: var(--brand-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--brand-primary); }
-
-    .footer { background: var(--text-primary); color: white; padding: var(--spacing-2xl) var(--spacing-lg); text-align: center; }
-    .footer-content { max-width: 1200px; margin: 0 auto; }
-    .footer-logo { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto var(--spacing-lg); }
-    .fssai-info { display: inline-flex; align-items: center; gap: var(--spacing-sm); margin-top: var(--spacing-lg); padding: var(--spacing-sm) var(--spacing-md); background: rgba(255, 255, 255, 0.1); border-radius: var(--radius-sm); }
-    .fssai-logo { width: 30px; height: 20px; object-fit: contain; }
-    /* Toast theme tokens */
-    :root {
-      --toast-bg: #1f2937;  /* dark slate */
-      --toast-fg: #ffffff;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        /* keep toasts dark in dark mode so text stays readable */
-        --toast-bg: #111827;
-        --toast-fg: #ffffff;
-      }
-    }
-
-    /* Override the old toast colors */
-    .toast {
-      position: fixed;
-      bottom: var(--spacing-lg);
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--toast-bg);
-      color: var(--toast-fg);
-      padding: var(--spacing-md) var(--spacing-xl);
-      border-radius: 50px;
-      font-weight: 600;
-      box-shadow: var(--shadow-lg);
-      z-index: 400;
-      opacity: 0;
-      visibility: hidden;
-      transition: var(--transition-normal);
-    }
-    .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-10px); }
-
-    /* Optional variants (your JS already adds `success`/`error`/`info`) */
-    .toast.success { background: #16a34a; color: #fff; }
-    .toast.error   { background: #dc2626; color: #fff; }
-    .toast.info    { background: var(--toast-bg); color: var(--toast-fg); }
-    /* Let the whole cart panel scroll on mobile; footer not locked */
-    @media (max-width: 768px) {
-      .cart-modal {
-        /* the panel itself scrolls, not just the body */
-        display: block;          /* undo flex column behavior */
-        overflow-y: auto;        /* enable scrolling for the whole panel */
-      }
-      .cart-body {
-        /* no separate scroll area */
-        max-height: none;
-        overflow: visible;
-      }
-      .cart-footer {
-        /* make it part of the normal flow so it scrolls away */
-        position: static;
-        background: transparent; /* optional: match body background */
-        border-top: none;        /* optional: cleaner when it scrolls */
-        margin-top: 0.75rem;     /* small spacing above totals */
-      }
     }
   </style>
 </head>
@@ -353,22 +339,24 @@
           <li><a href="#products" class="nav-link">Products</a></li>
           <li><a href="#videos" class="nav-link">Videos</a></li>
           <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#reviews" class="nav-link">Reviews</a></li>
           <li><a href="#contact" class="nav-link">Contact</a></li>
         </ul>
       </nav>
 
       <div class="header-actions">
+        <div class="search" role="search">
+          <input id="site-search" class="search-input" type="search" placeholder="Search cookies…" autocomplete="off" aria-label="Search products">
+          <div id="search-suggestions" class="search-suggestions" role="listbox" aria-label="Search suggestions"></div>
+        </div>
+
         <button class="icon-button" onclick="App.wishlist.toggle()" aria-label="Open wishlist">
-          <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 8.25 12 9 12 .75 0 9-4.78 9-12z"/>
-          </svg>
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 8.25 12 9 12 .75 0 9-4.78 9-12z"/></svg>
           <span class="badge-count" id="wishlist-count" aria-live="polite" aria-atomic="true">0</span>
         </button>
 
         <button class="icon-button" onclick="App.cart.toggle()" aria-label="Open shopping cart">
-          <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" />
-          </svg>
+          <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" /></svg>
           <span class="badge-count" id="cart-count" aria-live="polite" aria-atomic="true">0</span>
         </button>
 
@@ -382,16 +370,24 @@
   <div class="mobile-nav-overlay" onclick="App.ui.closeMobileMenu()"></div>
   <nav class="mobile-nav" aria-label="Mobile navigation">
     <button class="mobile-nav-close" onclick="App.ui.closeMobileMenu()" aria-label="Close menu">&times;</button>
+    <div style="padding-bottom:1rem">
+      <input id="site-search-mobile" class="search-input" type="search" placeholder="Search cookies…" autocomplete="off" aria-label="Search products">
+    </div>
     <a href="#home" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Home</a>
     <a href="#products" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Products</a>
     <a href="#videos" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Videos</a>
     <a href="#about" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">About</a>
+    <a href="#reviews" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Reviews</a>
     <a href="#contact" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Contact</a>
   </nav>
 
   <main id="main-content">
     <section id="home" class="hero" aria-labelledby="hero-title">
-      <img src="assets/page_images/hero.jpg" alt="Hero background" class="hero-background" fetchpriority="high" decoding="async">
+      <picture class="hero-background">
+        <source srcset="assets/page_images/hero.avif" type="image/avif">
+        <source srcset="assets/page_images/hero.webp" type="image/webp">
+        <img src="assets/page_images/hero.jpg" alt="Fresh, wholesome millet cookies by PiNa Bakes" class="hero-background" fetchpriority="high" decoding="async">
+      </picture>
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <div class="hero-badge">🌾 Healthy • Tasty • Wholesome</div>
@@ -399,9 +395,7 @@
         <p class="hero-description">Artisanal cookies made from finest millets in Delhi.<br>Gluten-friendly indulgence that's good for you and delicious too!</p>
         <a href="#products" class="hero-cta">
           <span>Explore Our Collection</span>
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
       </div>
     </section>
@@ -412,6 +406,32 @@
           <h2 class="section-title">Our Gourmet Collection</h2>
           <p class="section-description">Premium millet-based cookies, delivered fresh to your door with safe cardboard packaging. Each flavor crafted with authentic ingredients and love.</p>
         </div>
+
+        <div class="filters-bar" aria-label="Product filters">
+          <div class="filters-left">
+            <input id="filter-query" class="filter-chip" type="search" placeholder="Search flavors…" aria-label="Search flavors">
+            <select id="filter-diet" class="filter-chip" aria-label="Dietary filter">
+              <option value="">All</option>
+              <option value="gluten-friendly">Gluten-friendly</option>
+              <option value="high-protein">High protein</option>
+              <option value="no-added-sugar">No added sugar</option>
+            </select>
+            <div>
+              <input id="price-min" class="price-input" type="number" min="0" step="50" placeholder="Min ₹" aria-label="Min price">
+              <input id="price-max" class="price-input" type="number" min="0" step="50" placeholder="Max ₹" aria-label="Max price">
+            </div>
+          </div>
+          <div class="filters-right">
+            <select id="sort-order" class="sort-select" aria-label="Sort products">
+              <option value="">Sort</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="newest">Newest</option>
+              <option value="popular">Popularity</option>
+            </select>
+          </div>
+        </div>
+
         <div class="products-grid" id="products-grid" aria-live="polite"></div>
       </div>
     </section>
@@ -423,7 +443,7 @@
         </nav>
         <div class="product-detail-grid">
           <div class="product-gallery">
-            <img id="product-main-image" class="product-main-image" alt="Product image">
+            <img id="product-main-image" class="product-main-image" alt="Product image" data-zoom="1">
             <div class="product-thumbnails" id="product-thumbnails"></div>
           </div>
           <div class="product-info">
@@ -434,6 +454,11 @@
             <div class="product-actions">
               <button class="btn btn-primary" id="add-to-cart-detail">Add to Cart</button>
               <button class="btn btn-secondary" id="add-to-wishlist-detail">Add to Wishlist</button>
+            </div>
+            <div class="trust-signals detail-trust">
+              <span class="trust-badge">🌾 100% Natural Millets</span>
+              <span class="trust-badge">🏆 FSSAI Certified</span>
+              <span class="trust-badge">📦 Safe Packaging</span>
             </div>
             <div style="margin-top: 2rem;">
               <h3>Ingredients</h3>
@@ -519,6 +544,41 @@
       </div>
     </section>
 
+    <section id="reviews" class="section">
+      <div class="section-container">
+        <div class="section-header">
+          <h2 class="section-title">What Our Customers Say</h2>
+          <p class="section-description">Real feedback from cookie lovers across India.</p>
+        </div>
+        <div class="reviews-grid">
+          <div class="review-card">
+            <img class="review-avatar" src="assets/reviews/a1.jpg" alt="Customer avatar">
+            <div>
+              <div class="review-name">Aditi Sharma</div>
+              <div class="review-stars">★★★★★</div>
+              <p style="margin-top:.35rem;color:var(--text-secondary)">Perfect balance of taste and health. The millet crunch is amazing!</p>
+            </div>
+          </div>
+          <div class="review-card">
+            <img class="review-avatar" src="assets/reviews/a2.jpg" alt="Customer avatar">
+            <div>
+              <div class="review-name">Rahul Verma</div>
+              <div class="review-stars">★★★★★</div>
+              <p style="margin-top:.35rem;color:var(--text-secondary)">Loved the coconut flavor. Fresh, aromatic and not overly sweet.</p>
+            </div>
+          </div>
+          <div class="review-card">
+            <img class="review-avatar" src="assets/reviews/a3.jpg" alt="Customer avatar">
+            <div>
+              <div class="review-name">Nisha Kapoor</div>
+              <div class="review-stars">★★★★☆</div>
+              <p style="margin-top:.35rem;color:var(--text-secondary)">Packaging is sturdy and eco-friendly. Cookies arrived intact and delicious.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section id="contact" class="section">
       <div class="section-container">
         <div class="section-header">
@@ -528,10 +588,7 @@
         <div class="contact-info">
           <div class="contact-item">
             <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
             <div>
               <h3>Address</h3>
@@ -540,9 +597,7 @@
           </div>
           <div class="contact-item">
             <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-              </svg>
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
             </div>
             <div>
               <h3>Call/WhatsApp</h3>
@@ -551,9 +606,7 @@
           </div>
           <div class="contact-item">
             <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-              </svg>
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </div>
             <div>
               <h3>Email</h3>
@@ -562,10 +615,7 @@
           </div>
           <div class="contact-item">
             <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                <path d="m22 7-10 5L2 7"/>
-              </svg>
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="m22 7-10 5L2 7"/></svg>
             </div>
             <div>
               <h3>Instagram</h3>
@@ -599,23 +649,23 @@
         <h3>Delivery Information</h3>
         <div class="form-group">
           <label class="form-label" for="customer-name">Full Name</label>
-          <input type="text" id="customer-name" name="name" class="form-input" autocomplete="name">
+          <input type="text" id="customer-name" name="name" class="form-input" autocomplete="name" inputmode="text">
           <div class="form-error"></div>
         </div>
         <div class="form-group">
           <label class="form-label" for="customer-phone">Phone (WhatsApp)</label>
-          <input type="tel" id="customer-phone" name="phone" class="form-input" autocomplete="tel">
+          <input type="tel" id="customer-phone" name="phone" class="form-input" autocomplete="tel" inputmode="tel" pattern="[0-9]{10,12}">
           <div class="form-error"></div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="customer-pincode">Pincode</label>
-            <input type="text" id="customer-pincode" name="pincode" class="form-input">
+            <input type="text" id="customer-pincode" name="pincode" class="form-input" inputmode="numeric" pattern="[1-9][0-9]{5}">
             <div class="form-error"></div>
           </div>
           <div class="form-group">
             <label class="form-label" for="customer-city">City</label>
-            <input type="text" id="customer-city" name="city" class="form-input" autocomplete="address-level2">
+            <input type="text" id="customer-city" name="city" class="form-input" autocomplete="address-level2" inputmode="text">
           </div>
         </div>
         <div class="form-group">
@@ -673,5 +723,18 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="app.js"></script>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+  <script src="https://browser.sentry-cdn.com/7.116.0/bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    if (window.Sentry) {
+      Sentry.init({ dsn: "YOUR_SENTRY_DSN", environment: "production", tracesSampleRate: 0.1 });
+    }
+  </script>
 </body>
 </html>

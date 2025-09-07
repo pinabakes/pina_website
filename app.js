@@ -1,7 +1,14 @@
-// Simplified PiNa Bakes App - Bug-free version
+// Fixed PiNa Bakes App - Working version with embedded products
 class PinaBakesApp {
   constructor() {
-    // Embedded product data (no external JSON dependency)
+    this.config = {
+      whatsappNumber: "917678506669",
+      coupons: { PINA10: { type: "percent", value: 10 } },
+      shippingCharge: 60,
+      freeShippingThreshold: 999,
+    };
+
+    // EMBEDDED PRODUCTS DATA (no external JSON needed)
     this.products = [
       {
         slug: "nutty-coco",
@@ -307,9 +314,6 @@ class PinaBakesApp {
     this.currentProduct = null;
     this.currentImageIndex = 0;
     this.appliedCoupon = null;
-    this.coupons = { PINA10: { type: "percent", value: 10 } };
-    this.shippingCharge = 60;
-    this.freeShippingThreshold = 999;
 
     this.init();
   }
@@ -318,28 +322,25 @@ class PinaBakesApp {
     this.setupEventListeners();
     this.renderProducts();
     this.updateCurrentYear();
-    this.cart.render();
+    this.setupSearch();
+    this.renderCart();
   }
 
   setupEventListeners() {
-    // Navigation
+    // Smooth scrolling for navigation
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+        if (href.startsWith('#/product/')) return; // Let router handle product links
+        
         e.preventDefault();
-        const target = link.getAttribute('href').substring(1);
-        if (target) {
-          document.getElementById(target)?.scrollIntoView({ behavior: 'smooth' });
+        const target = href.substring(1);
+        const element = document.getElementById(target);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
         }
       });
     });
-
-    // Search
-    const searchInput = document.getElementById('site-search');
-    if (searchInput) {
-      searchInput.addEventListener('input', (e) => {
-        this.search(e.target.value);
-      });
-    }
 
     // Header scroll effect
     window.addEventListener('scroll', () => {
@@ -351,12 +352,71 @@ class PinaBakesApp {
       }
     });
 
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        this.closeAllModals();
-      }
+    // Hash change for routing
+    window.addEventListener('hashchange', () => {
+      this.handleRoute();
     });
+
+    // Initial route
+    this.handleRoute();
+  }
+
+  handleRoute() {
+    const hash = window.location.hash;
+    if (hash.startsWith('#/product/')) {
+      const slug = hash.replace('#/product/', '');
+      this.showProductDetail(slug);
+    } else {
+      this.hideProductDetail();
+    }
+  }
+
+  setupSearch() {
+    const searchInput = document.getElementById('site-search');
+    const suggestions = document.getElementById('search-suggestions');
+    
+    if (searchInput && suggestions) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (!query) {
+          suggestions.classList.remove('active');
+          return;
+        }
+
+        const results = this.products.filter(product => 
+          product.name.toLowerCase().includes(query) ||
+          product.tagline.toLowerCase().includes(query) ||
+          product.ingredients.some(ing => ing.toLowerCase().includes(query))
+        ).slice(0, 5);
+
+        if (results.length === 0) {
+          suggestions.classList.remove('active');
+          return;
+        }
+
+        suggestions.innerHTML = results.map(product => 
+          `<div class="search-suggestion" onclick="app.showProductDetail('${product.slug}'); app.closeSuggestions();">
+            ${product.name} · ${this.formatPrice(product.price)}
+          </div>`
+        ).join('');
+
+        suggestions.classList.add('active');
+      });
+
+      // Close suggestions when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !suggestions.contains(e.target)) {
+          suggestions.classList.remove('active');
+        }
+      });
+    }
+  }
+
+  closeSuggestions() {
+    const suggestions = document.getElementById('search-suggestions');
+    if (suggestions) {
+      suggestions.classList.remove('active');
+    }
   }
 
   renderProducts() {
@@ -374,7 +434,7 @@ class PinaBakesApp {
                  alt="${product.name} cookies by PiNa Bakes" 
                  class="product-image" 
                  loading="lazy" 
-                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNTAgMTIwQzE2NS4xIDEyMCAxNzcuNSAxMzIuNCAxNzcuNSAxNDcuNUMxNzcuNSAxNjIuNiAxNjUuMSAxNzUgMTUwIDE3NUMxMzQuOSAxNzUgMTIyLjUgMTYyLjYgMTIyLjUgMTQ3LjVDMTIyLjUgMTMyLjQgMTM0LjkgMTIwIDE1MCAxMjBaIiBmaWxsPSIjRDFENUQ5Ii8+CjwvU3ZnPgo='">
+                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNTAgMTIwQzE2NS4xIDEyMCAxNzcuNSAxMzIuNCAxNzcuNSAxNDcuNUMxNzcuNSAxNjIuNiAxNjUuMSAxNzUgMTUwIDE75XkMxMzQuOSAxNzUgMTIyLjUgMTYyLjYgMTIyLjUgMTQ3LjVDMTIyLjUgMTMyLjQgMTM0LjkgMTIwIDE1MCAxMjBaIiBmaWxsPSIjRDFENUQ5Ii8+Cjwvc3ZnPgo='">
             ${isNew ? '<span class="product-badge">New</span>' : ''}
             ${isPremium ? '<span class="product-badge" style="top: 3rem;">Premium</span>' : ''}
           </div>
@@ -383,8 +443,8 @@ class PinaBakesApp {
             <div class="product-price">${this.formatPrice(product.price)}</div>
             <p class="product-tagline">${product.tagline}</p>
             <div class="product-actions">
-              <button class="btn btn-secondary" onclick="app.router.showProduct('${product.slug}')">View Details</button>
-              <button class="btn btn-primary" onclick="app.cart.add('${product.slug}')" aria-label="Add ${product.name} to cart">Add to Cart</button>
+              <button class="btn btn-secondary" onclick="app.showProductDetail('${product.slug}')">View Details</button>
+              <button class="btn btn-primary" onclick="app.addToCart('${product.slug}')" aria-label="Add ${product.name} to cart">Add to Cart</button>
             </div>
           </div>
         </article>
@@ -394,132 +454,134 @@ class PinaBakesApp {
     grid.innerHTML = html;
   }
 
-  search(query) {
-    const suggestions = document.getElementById('search-suggestions');
-    if (!suggestions) return;
-
-    if (!query.trim()) {
-      suggestions.classList.remove('active');
+  showProductDetail(slug) {
+    const product = this.products.find(p => p.slug === slug);
+    if (!product) {
+      this.showToast('Product not found', 'error');
       return;
     }
 
-    const results = this.products.filter(product => 
-      product.name.toLowerCase().includes(query.toLowerCase()) ||
-      product.tagline.toLowerCase().includes(query.toLowerCase()) ||
-      product.ingredients.some(ing => ing.toLowerCase().includes(query.toLowerCase()))
-    ).slice(0, 5);
+    this.currentProduct = product;
+    this.currentImageIndex = 0;
 
-    if (results.length === 0) {
-      suggestions.classList.remove('active');
-      return;
+    // Update URL
+    window.location.hash = `#/product/${slug}`;
+
+    // Update product detail page
+    document.getElementById('product-title').textContent = product.name;
+    document.getElementById('product-price').textContent = this.formatPrice(product.price);
+    document.getElementById('product-tagline').textContent = product.tagline;
+
+    // Setup gallery
+    this.setupGallery(product);
+
+    // Features
+    const featuresEl = document.getElementById('product-features');
+    if (product.bullets && product.bullets.length > 0) {
+      featuresEl.innerHTML = `
+        <h3>Key Features</h3>
+        <ul>${product.bullets.map(bullet => `<li>${bullet}</li>`).join('')}</ul>
+      `;
+    } else {
+      featuresEl.innerHTML = '';
     }
 
-    suggestions.innerHTML = results.map(product => 
-      `<div class="search-suggestion" onclick="app.router.showProduct('${product.slug}'); app.closeSuggestions();">
-        ${product.name} · ${this.formatPrice(product.price)}
-      </div>`
-    ).join('');
+    // Ingredients
+    const ingredientsEl = document.getElementById('product-ingredients');
+    if (product.ingredients && product.ingredients.length > 0) {
+      ingredientsEl.innerHTML = product.ingredients.map(ing => `<li>${ing}</li>`).join('');
+    } else {
+      ingredientsEl.innerHTML = '';
+    }
 
-    suggestions.classList.add('active');
+    // Nutrition
+    this.renderNutritionTable(product);
+
+    // Setup buttons
+    document.getElementById('add-to-cart-detail').onclick = () => this.addToCart(product.slug);
+
+    // Show product detail
+    document.getElementById('products').style.display = 'none';
+    document.getElementById('product-detail').style.display = 'block';
+    window.scrollTo(0, 0);
   }
 
-  closeSuggestions() {
-    const suggestions = document.getElementById('search-suggestions');
-    if (suggestions) {
-      suggestions.classList.remove('active');
+  hideProductDetail() {
+    document.getElementById('product-detail').style.display = 'none';
+    document.getElementById('products').style.display = 'block';
+    this.currentProduct = null;
+  }
+
+  setupGallery(product) {
+    const images = product.images || [product.img];
+    const mainImage = document.getElementById('product-main-image');
+    const thumbnails = document.getElementById('product-thumbnails');
+
+    if (mainImage) {
+      mainImage.src = images[0];
+      mainImage.alt = `${product.name} - Main image`;
+      mainImage.onclick = () => this.openLightbox();
+    }
+
+    if (thumbnails) {
+      thumbnails.innerHTML = images.map((image, index) => 
+        `<img src="${image}" 
+              alt="${product.name} - Image ${index + 1}" 
+              class="product-thumbnail ${index === 0 ? 'active' : ''}"
+              onclick="app.selectImage(${index})"
+              onerror="this.style.display='none'">`
+      ).join('');
     }
   }
 
-  formatPrice(price) {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(price);
-  }
-
-  updateCurrentYear() {
-    const yearElement = document.getElementById('current-year');
-    if (yearElement) {
-      yearElement.textContent = new Date().getFullYear();
-    }
-  }
-
-  closeAllModals() {
-    this.cart.close();
-    this.gallery.closeLightbox();
-    this.closeSuggestions();
-  }
-
-  showToast(message, type = 'info', duration = 3000) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-
-    toast.textContent = message;
-    toast.className = `toast show ${type}`;
+  selectImage(index) {
+    if (!this.currentProduct) return;
     
-    setTimeout(() => {
-      toast.classList.remove('show');
-    }, duration);
+    const images = this.currentProduct.images || [this.currentProduct.img];
+    if (index >= 0 && index < images.length) {
+      this.currentImageIndex = index;
+      
+      const mainImage = document.getElementById('product-main-image');
+      if (mainImage) {
+        mainImage.src = images[index];
+      }
+
+      // Update active thumbnail
+      document.querySelectorAll('.product-thumbnail').forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === index);
+      });
+    }
   }
 
-  // Router object
-  router = {
-    showProduct: (slug) => {
-      const product = app.products.find(p => p.slug === slug);
-      if (!product) {
-        app.showToast('Product not found', 'error');
-        return;
-      }
-
-      app.currentProduct = product;
-      app.currentImageIndex = 0;
-
-      // Update product detail page
-      document.getElementById('product-title').textContent = product.name;
-      document.getElementById('product-price').textContent = app.formatPrice(product.price);
-      document.getElementById('product-tagline').textContent = product.tagline;
-
-      // Setup gallery
-      app.gallery.setup(product);
-
-      // Features
-      const featuresEl = document.getElementById('product-features');
-      if (product.bullets && product.bullets.length > 0) {
-        featuresEl.innerHTML = `
-          <h3>Key Features</h3>
-          <ul>${product.bullets.map(bullet => `<li>${bullet}</li>`).join('')}</ul>
-        `;
-      } else {
-        featuresEl.innerHTML = '';
-      }
-
-      // Ingredients
-      const ingredientsEl = document.getElementById('product-ingredients');
-      if (product.ingredients && product.ingredients.length > 0) {
-        ingredientsEl.innerHTML = product.ingredients.map(ing => `<li>${ing}</li>`).join('');
-      } else {
-        ingredientsEl.innerHTML = '';
-      }
-
-      // Nutrition
-      app.renderNutritionTable(product);
-
-      // Setup buttons
-      document.getElementById('add-to-cart-detail').onclick = () => app.cart.add(product.slug);
-
-      // Show product detail
-      document.getElementById('products').style.display = 'none';
-      document.getElementById('product-detail').style.display = 'block';
-      window.scrollTo(0, 0);
-    },
-
-    showProducts: () => {
-      document.getElementById('product-detail').style.display = 'none';
-      document.getElementById('products').style.display = 'block';
-      app.currentProduct = null;
+  openLightbox() {
+    if (!this.currentProduct) return;
+    
+    const images = this.currentProduct.images || [this.currentProduct.img];
+    const currentImage = images[this.currentImageIndex];
+    
+    // Create simple lightbox
+    const lightbox = document.getElementById('lightbox') || this.createLightbox();
+    const lightboxImage = document.getElementById('lightbox-image');
+    
+    if (lightboxImage) {
+      lightboxImage.src = currentImage;
+      lightbox.classList.add('active');
     }
-  };
+  }
+
+  createLightbox() {
+    const lightbox = document.createElement('div');
+    lightbox.id = 'lightbox';
+    lightbox.className = 'overlay';
+    lightbox.onclick = () => lightbox.classList.remove('active');
+    
+    lightbox.innerHTML = `
+      <img id="lightbox-image" style="max-width:90vw;max-height:85vh;border-radius:12px;" onclick="event.stopPropagation()">
+    `;
+    
+    document.body.appendChild(lightbox);
+    return lightbox;
+  }
 
   renderNutritionTable(product) {
     const table = document.getElementById('nutrition-table');
@@ -544,367 +606,308 @@ class PinaBakesApp {
     ).join('');
   }
 
-  // Gallery object
-  gallery = {
-    setup: (product) => {
-      const images = product.images || [product.img];
-      const mainImage = document.getElementById('product-main-image');
-      const thumbnails = document.getElementById('product-thumbnails');
-
-      if (mainImage) {
-        mainImage.src = images[0];
-        mainImage.alt = `${product.name} - Main image`;
-      }
-
-      if (thumbnails) {
-        thumbnails.innerHTML = images.map((image, index) => 
-          `<img src="${image}" 
-                alt="${product.name} - Image ${index + 1}" 
-                class="product-thumbnail ${index === 0 ? 'active' : ''}"
-                onclick="app.gallery.selectImage(${index})"
-                onerror="this.style.display='none'">`
-        ).join('');
-      }
-    },
-
-    selectImage: (index) => {
-      if (!app.currentProduct) return;
-      
-      const images = app.currentProduct.images || [app.currentProduct.img];
-      if (index >= 0 && index < images.length) {
-        app.currentImageIndex = index;
-        
-        const mainImage = document.getElementById('product-main-image');
-        if (mainImage) {
-          mainImage.src = images[index];
-        }
-
-        // Update active thumbnail
-        document.querySelectorAll('.product-thumbnail').forEach((thumb, i) => {
-          thumb.classList.toggle('active', i === index);
-        });
-      }
-    },
-
-    openLightbox: () => {
-      if (!app.currentProduct) return;
-      
-      const images = app.currentProduct.images || [app.currentProduct.img];
-      const currentImage = images[app.currentImageIndex];
-      
-      const lightbox = document.getElementById('lightbox');
-      const lightboxImage = document.getElementById('lightbox-image');
-      
-      if (lightbox && lightboxImage) {
-        lightboxImage.src = currentImage;
-        lightbox.classList.add('active');
-      }
-    },
-
-    closeLightbox: () => {
-      const lightbox = document.getElementById('lightbox');
-      if (lightbox) {
-        lightbox.classList.remove('active');
-      }
+  addToCart(productSlug, quantity = 1) {
+    const product = this.products.find(p => p.slug === productSlug);
+    if (!product) {
+      this.showToast('Product not found', 'error');
+      return;
     }
-  };
 
-  // Cart object  
-  cart = {
-    add: (productSlug, quantity = 1) => {
-      const product = app.products.find(p => p.slug === productSlug);
-      if (!product) {
-        app.showToast('Product not found', 'error');
-        return;
-      }
+    const existingItem = this.cart.find(item => item.slug === productSlug);
+    if (existingItem) {
+      existingItem.quantity += quantity;
+    } else {
+      this.cart.push({
+        ...product,
+        quantity
+      });
+    }
 
-      const existingItem = app.cart.find(item => item.slug === productSlug);
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        app.cart.push({
-          ...product,
-          quantity
-        });
-      }
+    this.renderCart();
+    this.showToast(`${product.name} added to cart!`, 'success');
+    
+    // Animate cart button
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+      cartCount.classList.add('bounce');
+      setTimeout(() => cartCount.classList.remove('bounce'), 300);
+    }
+  }
 
-      app.cart.render();
-      app.showToast(`${product.name} added to cart!`, 'success');
-      
-      // Animate cart button
-      const cartCount = document.getElementById('cart-count');
-      if (cartCount) {
-        cartCount.classList.add('bounce');
-        setTimeout(() => cartCount.classList.remove('bounce'), 300);
-      }
-    },
+  removeFromCart(slug) {
+    this.cart = this.cart.filter(item => item.slug !== slug);
+    this.renderCart();
+    this.showToast('Item removed from cart');
+  }
 
-    remove: (slug) => {
-      app.cart = app.cart.filter(item => item.slug !== slug);
-      app.cart.render();
-      app.showToast('Item removed from cart');
-    },
+  updateQuantity(slug, newQuantity) {
+    if (newQuantity <= 0) {
+      this.removeFromCart(slug);
+      return;
+    }
 
-    updateQuantity: (slug, newQuantity) => {
-      if (newQuantity <= 0) {
-        app.cart.remove(slug);
-        return;
-      }
+    const item = this.cart.find(item => item.slug === slug);
+    if (item) {
+      item.quantity = newQuantity;
+      this.renderCart();
+    }
+  }
 
-      const item = app.cart.find(item => item.slug === slug);
-      if (item) {
-        item.quantity = newQuantity;
-        app.cart.render();
-      }
-    },
+  renderCart() {
+    const itemCount = this.cart.reduce((count, item) => count + item.quantity, 0);
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+      cartCount.textContent = itemCount;
+      cartCount.style.display = itemCount > 0 ? 'flex' : 'none';
+    }
 
-    getSubtotal: () => {
-      return app.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-    },
+    const cartItems = document.getElementById('cart-items');
+    if (!cartItems) return;
 
-    getDiscount: (subtotal) => {
-      if (!app.appliedCoupon) return 0;
-      
-      if (app.appliedCoupon.type === 'percent') {
-        return Math.round((subtotal * app.appliedCoupon.value) / 100);
-      }
-      return 0;
-    },
-
-    getShipping: (subtotalAfterDiscount) => {
-      if (subtotalAfterDiscount >= app.freeShippingThreshold) return 0;
-      return app.cart.length > 0 ? app.shippingCharge : 0;
-    },
-
-    getTotal: () => {
-      const subtotal = app.cart.getSubtotal();
-      const discount = app.cart.getDiscount(subtotal);
-      const subtotalAfterDiscount = Math.max(0, subtotal - discount);
-      const shipping = app.cart.getShipping(subtotalAfterDiscount);
-      return subtotalAfterDiscount + shipping;
-    },
-
-    applyCoupon: () => {
-      const input = document.getElementById('coupon-code');
-      const code = (input?.value || '').trim().toUpperCase();
-      
-      if (!code) {
-        app.appliedCoupon = null;
-        app.cart.render();
-        return;
-      }
-
-      const coupon = app.coupons[code];
-      if (!coupon) {
-        app.showToast('Invalid coupon code', 'error');
-        document.getElementById('coupon-msg').textContent = 'Invalid coupon code';
-        return;
-      }
-
-      app.appliedCoupon = { code, ...coupon };
-      app.cart.render();
-      app.showToast(`Coupon applied: ${code} (${coupon.value}% off)`, 'success');
-      document.getElementById('coupon-msg').textContent = `Applied ${code}: ${coupon.value}% off`;
-    },
-
-    render: () => {
-      const itemCount = app.cart.reduce((count, item) => count + item.quantity, 0);
-      const cartCount = document.getElementById('cart-count');
-      if (cartCount) {
-        cartCount.textContent = itemCount;
-        cartCount.style.display = itemCount > 0 ? 'flex' : 'none';
-      }
-
-      const cartItems = document.getElementById('cart-items');
-      if (!cartItems) return;
-
-      if (app.cart.length === 0) {
-        cartItems.innerHTML = `
-          <div style="text-align:center; padding:3rem 1rem; color:var(--text-secondary);">
-            <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom:1rem; opacity:.5;">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01"/>
-            </svg>
-            <p>Your cart is empty</p>
-            <button class="btn btn-primary" onclick="app.cart.close(); document.getElementById('products').scrollIntoView({behavior:'smooth'});">Browse Products</button>
-          </div>
-        `;
-      } else {
-        cartItems.innerHTML = app.cart.map(item => `
-          <div class="cart-item">
-            <img src="${item.img}" alt="${item.name}" class="cart-item-image" onerror="this.style.display='none'">
-            <div class="cart-item-details" style="flex: 1;">
-              <div class="cart-item-title">${item.name}</div>
-              <div class="cart-item-price">${app.formatPrice(item.price)}</div>
-              <div class="cart-item-actions">
-                <button class="quantity-btn" onclick="app.cart.updateQuantity('${item.slug}', ${item.quantity - 1})" aria-label="Decrease quantity">-</button>
-                <span style="min-width:2rem; text-align:center;">${item.quantity}</span>
-                <button class="quantity-btn" onclick="app.cart.updateQuantity('${item.slug}', ${item.quantity + 1})" aria-label="Increase quantity">+</button>
-              </div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-weight:600;">${app.formatPrice(item.price * item.quantity)}</div>
-              <button onclick="app.cart.remove('${item.slug}')" style="color:#dc2626; background:none; border:none; cursor:pointer; margin-top:.5rem; font-size:.875rem;" aria-label="Remove ${item.name} from cart">Remove</button>
+    if (this.cart.length === 0) {
+      cartItems.innerHTML = `
+        <div style="text-align:center; padding:3rem 1rem; color:var(--text-secondary);">
+          <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom:1rem; opacity:.5;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01"/>
+          </svg>
+          <p>Your cart is empty</p>
+          <button class="btn btn-primary" onclick="app.closeCart(); document.getElementById('products').scrollIntoView({behavior:'smooth'});">Browse Products</button>
+        </div>
+      `;
+    } else {
+      cartItems.innerHTML = this.cart.map(item => `
+        <div class="cart-item">
+          <img src="${item.img}" alt="${item.name}" class="cart-item-image" onerror="this.style.display='none'">
+          <div class="cart-item-details" style="flex: 1;">
+            <div class="cart-item-title">${item.name}</div>
+            <div class="cart-item-price">${this.formatPrice(item.price)}</div>
+            <div class="cart-item-actions">
+              <button class="quantity-btn" onclick="app.updateQuantity('${item.slug}', ${item.quantity - 1})" aria-label="Decrease quantity">-</button>
+              <span style="min-width:2rem; text-align:center;">${item.quantity}</span>
+              <button class="quantity-btn" onclick="app.updateQuantity('${item.slug}', ${item.quantity + 1})" aria-label="Increase quantity">+</button>
             </div>
           </div>
-        `).join('');
-      }
-
-      // Update totals
-      const subtotal = app.cart.getSubtotal();
-      const discount = app.cart.getDiscount(subtotal);
-      const subtotalAfterDiscount = Math.max(0, subtotal - discount);
-      const shipping = app.cart.getShipping(subtotalAfterDiscount);
-      const total = subtotalAfterDiscount + shipping;
-
-      document.getElementById('cart-subtotal').textContent = app.formatPrice(subtotal);
-      document.getElementById('cart-discount').textContent = discount > 0 ? `- ${app.formatPrice(discount)}` : app.formatPrice(0);
-      document.getElementById('cart-shipping').textContent = app.formatPrice(shipping);
-      document.getElementById('cart-total').textContent = app.formatPrice(total);
-
-      // Show/hide checkout form
-      const checkoutForm = document.getElementById('checkout-form');
-      if (checkoutForm) {
-        checkoutForm.style.display = app.cart.length > 0 ? 'block' : 'none';
-      }
-    },
-
-    toggle: () => {
-      const modal = document.getElementById('cart-modal');
-      const overlay = document.getElementById('cart-overlay');
-      
-      if (modal.classList.contains('active')) {
-        app.cart.close();
-      } else {
-        app.cart.open();
-      }
-    },
-
-    open: () => {
-      const modal = document.getElementById('cart-modal');
-      const overlay = document.getElementById('cart-overlay');
-      
-      modal.classList.add('active');
-      overlay.classList.add('active');
-    },
-
-    close: () => {
-      const modal = document.getElementById('cart-modal');
-      const overlay = document.getElementById('cart-overlay');
-      
-      modal.classList.remove('active');
-      overlay.classList.remove('active');
+          <div style="text-align:right;">
+            <div style="font-weight:600;">${this.formatPrice(item.price * item.quantity)}</div>
+            <button onclick="app.removeFromCart('${item.slug}')" style="color:#dc2626; background:none; border:none; cursor:pointer; margin-top:.5rem; font-size:.875rem;" aria-label="Remove ${item.name} from cart">Remove</button>
+          </div>
+        </div>
+      `).join('');
     }
-  };
 
-  // Checkout object
-  checkout = {
-    proceed: () => {
-      if (app.cart.length === 0) {
-        app.showToast('Your cart is empty!', 'error');
-        return;
-      }
+    // Update totals
+    const subtotal = this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const discount = this.getDiscount(subtotal);
+    const shipping = this.getShipping(subtotal - discount);
+    const total = Math.max(0, subtotal - discount + shipping);
 
-      // Get form data
-      const formData = {
-        name: document.getElementById('customer-name')?.value?.trim() || '',
-        phone: document.getElementById('customer-phone')?.value?.trim() || '',
-        pincode: document.getElementById('customer-pincode')?.value?.trim() || '',
-        city: document.getElementById('customer-city')?.value?.trim() || '',
-        address: document.getElementById('customer-address')?.value?.trim() || ''
-      };
+    document.getElementById('cart-subtotal').textContent = this.formatPrice(subtotal);
+    document.getElementById('cart-discount').textContent = discount > 0 ? `- ${this.formatPrice(discount)}` : this.formatPrice(0);
+    document.getElementById('cart-shipping').textContent = this.formatPrice(shipping);
+    document.getElementById('cart-total').textContent = this.formatPrice(total);
 
-      // Basic validation
-      if (!formData.name || !formData.phone || !formData.address) {
-        app.showToast('Please fill in all required fields', 'error');
-        return;
-      }
-
-      const subtotal = app.cart.getSubtotal();
-      const discount = app.cart.getDiscount(subtotal);
-      const subtotalAfterDiscount = Math.max(0, subtotal - discount);
-      const shipping = app.cart.getShipping(subtotalAfterDiscount);
-      const total = subtotalAfterDiscount + shipping;
-
-      const itemsList = app.cart
-        .map(item => `• ${item.name} (×${item.quantity}) - ${app.formatPrice(item.price * item.quantity)}`)
-        .join('\n');
-
-      const order = {
-        id: `PIN${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        coupon: app.appliedCoupon?.code || '',
-        subtotal,
-        discount,
-        shipping,
-        total,
-        customer: formData,
-        items: app.cart.map(item => ({
-          slug: item.slug,
-          name: item.name,
-          qty: item.quantity,
-          price: item.price
-        }))
-      };
-
-      // Generate WhatsApp message
-      const message = app.checkout.generateWhatsAppMessage(order, itemsList);
-      const whatsappUrl = `https://wa.me/917678506669?text=${encodeURIComponent(message)}`;
-      
-      window.open(whatsappUrl, '_blank');
-      app.showToast('Redirecting to WhatsApp...', 'success');
-    },
-
-    generateWhatsAppMessage: (order, itemsList) => {
-      const lines = [
-        '🍪 *PiNa Bakes Order Request*',
-        '',
-        '*Items Ordered:*',
-        itemsList,
-        '',
-        `*Subtotal:* ${app.formatPrice(order.subtotal)}`
-      ];
-
-      if (order.discount > 0) {
-        lines.push(`*Discount${order.coupon ? ` (${order.coupon})` : ''}:* -${app.formatPrice(order.discount)}`);
-      }
-
-      if (order.shipping > 0) {
-        lines.push(`*Shipping:* ${app.formatPrice(order.shipping)}`);
-      } else {
-        lines.push('*Shipping:* Free');
-      }
-
-      lines.push(`*Total Amount:* ${app.formatPrice(order.total)}`, '');
-
-      const c = order.customer;
-      lines.push(
-        '*Customer Details:*',
-        `👤 Name: ${c.name || '—'}`,
-        `📱 Phone: ${c.phone || '—'}`,
-        `📮 Pincode: ${c.pincode || '—'}`,
-        `🏙️ City: ${c.city || '—'}`,
-        `🏠 Address: ${c.address || '—'}`,
-        '',
-        'Thank you for choosing PiNa Bakes! 🙏',
-        'Please confirm the order and let me know the delivery timeline.'
-      );
-
-      return lines.join('\n');
+    // Show/hide checkout form
+    const checkoutForm = document.getElementById('checkout-form');
+    if (checkoutForm) {
+      checkoutForm.style.display = this.cart.length > 0 ? 'block' : 'none';
     }
-  };
+  }
 
-  // UI object
-  ui = {
-    toggleMobileMenu: () => {
-      // Mobile menu toggle logic would go here
-      // For simplicity, we'll just show a toast
-      app.showToast('Mobile menu feature coming soon!');
+  getDiscount(subtotal) {
+    if (!this.appliedCoupon) return 0;
+    if (this.appliedCoupon.type === 'percent') {
+      return Math.round((subtotal * this.appliedCoupon.value) / 100);
     }
-  };
+    return 0;
+  }
+
+  getShipping(subtotalAfterDiscount) {
+    if (subtotalAfterDiscount >= this.config.freeShippingThreshold) return 0;
+    return this.cart.length > 0 ? this.config.shippingCharge : 0;
+  }
+
+  applyCoupon() {
+    const input = document.getElementById('coupon-code');
+    const code = (input?.value || '').trim().toUpperCase();
+    
+    if (!code) {
+      this.appliedCoupon = null;
+      this.renderCart();
+      return;
+    }
+
+    const coupon = this.config.coupons[code];
+    if (!coupon) {
+      this.showToast('Invalid coupon code', 'error');
+      document.getElementById('coupon-msg').textContent = 'Invalid coupon code';
+      return;
+    }
+
+    this.appliedCoupon = { code, ...coupon };
+    this.renderCart();
+    this.showToast(`Coupon applied: ${code} (${coupon.value}% off)`, 'success');
+    document.getElementById('coupon-msg').textContent = `Applied ${code}: ${coupon.value}% off`;
+  }
+
+  toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    const overlay = document.getElementById('cart-overlay');
+    
+    if (modal.classList.contains('active')) {
+      this.closeCart();
+    } else {
+      this.openCart();
+    }
+  }
+
+  openCart() {
+    const modal = document.getElementById('cart-modal');
+    const overlay = document.getElementById('cart-overlay');
+    
+    modal.classList.add('active');
+    overlay.classList.add('active');
+  }
+
+  closeCart() {
+    const modal = document.getElementById('cart-modal');
+    const overlay = document.getElementById('cart-overlay');
+    
+    modal.classList.remove('active');
+    overlay.classList.remove('active');
+  }
+
+  proceedToCheckout() {
+    if (this.cart.length === 0) {
+      this.showToast('Your cart is empty!', 'error');
+      return;
+    }
+
+    // Get form data
+    const formData = {
+      name: document.getElementById('customer-name')?.value?.trim() || '',
+      phone: document.getElementById('customer-phone')?.value?.trim() || '',
+      pincode: document.getElementById('customer-pincode')?.value?.trim() || '',
+      city: document.getElementById('customer-city')?.value?.trim() || '',
+      address: document.getElementById('customer-address')?.value?.trim() || '',
+      notes: document.getElementById('customer-notes')?.value?.trim() || ''
+    };
+
+    // Basic validation
+    if (!formData.name || !formData.phone || !formData.address) {
+      this.showToast('Please fill in all required fields', 'error');
+      return;
+    }
+
+    const subtotal = this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const discount = this.getDiscount(subtotal);
+    const shipping = this.getShipping(subtotal - discount);
+    const total = Math.max(0, subtotal - discount + shipping);
+
+    const itemsList = this.cart
+      .map(item => `• ${item.name} (×${item.quantity}) - ${this.formatPrice(item.price * item.quantity)}`)
+      .join('\n');
+
+    const order = {
+      id: `PIN${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      coupon: this.appliedCoupon?.code || '',
+      subtotal,
+      discount,
+      shipping,
+      total,
+      customer: formData,
+      items: this.cart.map(item => ({
+        slug: item.slug,
+        name: item.name,
+        qty: item.quantity,
+        price: item.price
+      }))
+    };
+
+    // Generate WhatsApp message
+    const message = this.generateWhatsAppMessage(order, itemsList);
+    const whatsappUrl = `https://wa.me/${this.config.whatsappNumber}?text=${encodeURIComponent(message)}`;
+    
+    window.open(whatsappUrl, '_blank');
+    this.showToast('Redirecting to WhatsApp...', 'success');
+  }
+
+  generateWhatsAppMessage(order, itemsList) {
+    const lines = [
+      '🍪 *PiNa Bakes Order Request*',
+      '',
+      '*Items Ordered:*',
+      itemsList,
+      '',
+      `*Subtotal:* ${this.formatPrice(order.subtotal)}`
+    ];
+
+    if (order.discount > 0) {
+      lines.push(`*Discount${order.coupon ? ` (${order.coupon})` : ''}:* -${this.formatPrice(order.discount)}`);
+    }
+
+    if (order.shipping > 0) {
+      lines.push(`*Shipping:* ${this.formatPrice(order.shipping)}`);
+    } else {
+      lines.push('*Shipping:* Free');
+    }
+
+    lines.push(`*Total Amount:* ${this.formatPrice(order.total)}`, '');
+
+    const c = order.customer;
+    lines.push(
+      '*Customer Details:*',
+      `👤 Name: ${c.name || '—'}`,
+      `📱 Phone: ${c.phone || '—'}`,
+      `📮 Pincode: ${c.pincode || '—'}`,
+      `🏙️ City: ${c.city || '—'}`,
+      `🏠 Address: ${c.address || '—'}`,
+      `📝 Notes: ${c.notes || '—'}`,
+      '',
+      'Thank you for choosing PiNa Bakes! 🙏',
+      'Please confirm the order and let me know the delivery timeline.'
+    );
+
+    return lines.join('\n');
+  }
+
+  formatPrice(price) {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
+  }
+
+  showToast(message, type = 'info', duration = 3000) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+
+    toast.textContent = message;
+    toast.className = `toast show ${type}`;
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, duration);
+  }
+
+  updateCurrentYear() {
+    const yearElement = document.getElementById('current-year');
+    if (yearElement) {
+      yearElement.textContent = new Date().getFullYear();
+    }
+  }
+
+  toggleMobileMenu() {
+    this.showToast('Mobile menu feature coming soon!');
+  }
+
+  toggleWishlist() {
+    this.showToast('Wishlist feature coming soon!');
+  }
 }
 
-// Initialize the app
+// Initialize the app and make it globally accessible
 const app = new PinaBakesApp();
-
-// Make app globally accessible for onclick handlers
 window.app = app;
+window.App = app; // Also expose as App for compatibility

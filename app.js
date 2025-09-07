@@ -362,7 +362,7 @@ class PinaBakesApp {
       this.wishlist.load();
 
       this.ui.renderSkeletonProducts();
-      await this.loadProductsFromJson('assets/products.json'); // or 'products.json' based on where you put it
+      await this.loadProductsFromJson('assets/products.json');
 
       this.search.init();
       this.router.handleRoute();
@@ -673,49 +673,45 @@ class PinaBakesApp {
 
     renderProducts: () => {
       if (!this.elements.productsGrid) return;
-      const list =
-        Array.isArray(this.state.filteredProducts) && this.state.filteredProducts.length >= 0
-          ? this.state.filteredProducts
-          : this.state.products;
+
+      const usingFilter = this.state.filteredProducts !== null; // sentinel
+      const list = usingFilter ? this.state.filteredProducts : this.state.products;
 
       if (!Array.isArray(list) || list.length === 0) {
-        this.elements.productsGrid.innerHTML =
-          `<div style="padding:1rem;border:1px dashed var(--border-medium);border-radius:12px;text-align:center;color:var(--text-secondary)">No products found.</div>`;
+        this.elements.productsGrid.innerHTML = usingFilter
+          ? `<div style="padding:1rem;border:1px dashed var(--border-medium);border-radius:12px;text-align:center;color:var(--text-secondary)">No products match your search.</div>`
+          : `<div style="padding:1rem;border:1px dashed var(--border-medium);border-radius:12px;text-align:center;color:var(--text-secondary)">No products to show (failed to load).</div>`;
         return;
       }
 
-      const html = list
-        .map((p) => {
-          const images = this.normalizeImages(p);
-          const cover = images[0] || p.img;
-          const isNew = this.isNewProduct(p);
-          const isPremium = p.price >= 300;
-          return `
-          <article class="product-card" data-product-id="${p.slug}">
+      const productsHTML = list.map((product) => {
+        const images = this.normalizeImages(product);
+        const coverImage = images[0] || product.img;
+        const isNew = this.isNewProduct(product);
+        const isPremium = product.price >= 300;
+        return `
+          <article class="product-card" data-product-id="${product.slug}">
             <div class="product-image-container">
-              <img src="${cover}" alt="${p.name} cookies by PiNa Bakes" class="product-image" loading="lazy" decoding="async"
-                   onerror="this.onerror=null;this.src='data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-                     `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><rect width="100%" height="100%" fill="#F3F4F6"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="16" fill="#9CA3AF">Image not found</text></svg>`
-                   )}'">
+              <img src="${coverImage}" alt="${product.name} cookies by PiNa Bakes" class="product-image" loading="lazy" decoding="async">
               ${isNew ? '<span class="product-badge">New</span>' : ""}
               ${isPremium ? '<span class="product-badge" style="top:3rem;">Premium</span>' : ""}
             </div>
             <div class="product-content">
-              <h3 class="product-title">${p.name}</h3>
-              <div class="product-price">${this.formatPrice(p.price)}</div>
-              <p class="product-tagline">${p.tagline}</p>
+              <h3 class="product-title">${product.name}</h3>
+              <div class="product-price">${this.formatPrice(product.price)}</div>
+              <p class="product-tagline">${product.tagline}</p>
               <div class="product-actions" style="margin-top:.75rem;">
-                <a href="#/product/${p.slug}" class="btn btn-secondary">View Details</a>
-                <button class="btn btn-primary" onclick="app.cart.add('${p.slug}')" aria-label="Add ${p.name} to cart">Add to Cart</button>
-                <button class="btn btn-outline" onclick="app.wishlist.add('${p.slug}')" aria-label="Add ${p.name} to wishlist">Wishlist</button>
+                <a href="#/product/${product.slug}" class="btn btn-secondary">View Details</a>
+                <button class="btn btn-primary" onclick="App.cart.add('${product.slug}')" aria-label="Add ${product.name} to cart">Add to Cart</button>
+                <button class="btn btn-outline" onclick="App.wishlist.add('${product.slug}')" aria-label="Add ${product.name} to wishlist">Wishlist</button>
               </div>
             </div>
           </article>`;
-        })
-        .join("");
+      }).join("");
 
-      this.elements.productsGrid.innerHTML = html;
+      this.elements.productsGrid.innerHTML = productsHTML;
     },
+
 
     renderProductDetail: (product) => {
       if (!product || !this.elements.productDetail) return;

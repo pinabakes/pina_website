@@ -362,7 +362,7 @@ class PinaBakesApp {
       this.wishlist.load();
 
       this.ui.renderSkeletonProducts();
-      this.loadEmbeddedProducts();
+      await this.loadProductsFromJson('assets/products.json'); // or 'products.json' based on where you put it
 
       this.search.init();
       this.router.handleRoute();

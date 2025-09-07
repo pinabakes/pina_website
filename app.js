@@ -898,62 +898,92 @@ class PinaBakesApp {
   // === Gallery & Lightbox ===
   gallery = {
     setup: (product) => {
-      const images = app.normalizeImages(product);
-      if (app.elements.productMainImage) {
-        app.elements.productMainImage.src = images[0] || product.img;
-        app.elements.productMainImage.alt = product.name;
-      }
-      app.state.currentImageIndex = 0;
+      if (!product || !this.elements.productMainImage) return;
+      const imgs = this.normalizeImages(product);
+      this.state.currentImageIndex = 0;
 
-      if (app.elements.productThumbnails) {
-        app.elements.productThumbnails.innerHTML = images
-          .map(
-            (src, i) => `
-          <img src="${src}" class="product-thumbnail ${i === 0 ? "active" : ""}" alt="${product.name} ${i + 1}"
-               onclick="app.gallery.showImage(${i})">`
-          )
-          .join("");
+      // main image
+      this.elements.productMainImage.src = imgs[0] || product.img || "";
+      this.elements.productMainImage.alt = product.name || "Product image";
+
+      // thumbnails
+      if (this.elements.productThumbnails) {
+        this.elements.productThumbnails.innerHTML = imgs.map((src, i) => `
+          <img class="product-thumbnail ${i === 0 ? "active" : ""}"
+              src="${src}" alt="${product.name} ${i+1}">
+        `).join("");
+
+        this.elements.productThumbnails
+          .querySelectorAll(".product-thumbnail")
+          .forEach((el, i) => {
+            el.addEventListener("click", () => {
+              this.state.currentImageIndex = i;
+              this.elements.productMainImage.src = imgs[i];
+              this.gallery._updateThumbHighlight();
+            });
+          });
       }
     },
 
-    showImage: (index) => {
-      const product = app.state.currentProduct;
-      if (!product) return;
-      const images = app.normalizeImages(product);
-      const i = Math.max(0, Math.min(index, images.length - 1));
-      app.state.currentImageIndex = i;
-      if (app.elements.productMainImage) app.elements.productMainImage.src = images[i];
-      document.querySelectorAll(".product-thumbnail").forEach((t, idx) =>
-        t.classList.toggle("active", idx === i)
-      );
+    _updateThumbHighlight: () => {
+      if (!this.elements.productThumbnails) return;
+      const thumbs = this.elements.productThumbnails.querySelectorAll(".product-thumbnail");
+      thumbs.forEach((t, i) => t.classList.toggle("active", i === this.state.currentImageIndex));
     },
 
-    previousImage: () => {
-      const product = app.state.currentProduct;
-      if (!product) return;
-      const images = app.normalizeImages(product);
-      const i = (app.state.currentImageIndex - 1 + images.length) % images.length;
-      app.gallery.showImage(i);
+    // simple swipe handlers (no-ops if you don’t swipe)
+    onPointerDown: (e) => {
+      this.state.isDragging = true;
+      this.state.dragStartX = (e.clientX ?? (e.touches?.[0]?.clientX ?? 0));
+      this.state.dragDeltaX = 0;
+    },
+    onPointerMove: (e) => {
+      if (!this.state.isDragging) return;
+      const x = (e.clientX ?? (e.touches?.[0]?.clientX ?? 0));
+      this.state.dragDeltaX = x - this.state.dragStartX;
+    },
+    onPointerUp: () => {
+      if (!this.state.isDragging) return;
+      const dx = this.state.dragDeltaX || 0;
+      this.state.isDragging = false;
+      this.state.dragDeltaX = 0;
+      if (Math.abs(dx) > 50) {
+        dx < 0 ? this.gallery.nextImage() : this.gallery.previousImage();
+      }
     },
 
     nextImage: () => {
-      const product = app.state.currentProduct;
-      if (!product) return;
-      const images = app.normalizeImages(product);
-      const i = (app.state.currentImageIndex + 1) % images.length;
-      app.gallery.showImage(i);
+      const p = this.state.currentProduct;
+      if (!p) return;
+      const imgs = this.normalizeImages(p);
+      if (!imgs.length) return;
+      this.state.currentImageIndex = (this.state.currentImageIndex + 1) % imgs.length;
+      this.elements.productMainImage.src = imgs[this.state.currentImageIndex];
+      this.gallery._updateThumbHighlight();
+    },
+
+    previousImage: () => {
+      const p = this.state.currentProduct;
+      if (!p) return;
+      const imgs = this.normalizeImages(p);
+      if (!imgs.length) return;
+      this.state.currentImageIndex =
+        (this.state.currentImageIndex - 1 + imgs.length) % imgs.length;
+      this.elements.productMainImage.src = imgs[this.state.currentImageIndex];
+      this.gallery._updateThumbHighlight();
     },
 
     openLightbox: () => {
-      const product = app.state.currentProduct;
-      if (!product || !app.elements.lightbox || !app.elements.lightboxImage) return;
-      const images = app.normalizeImages(product);
-      app.elements.lightboxImage.src = images[app.state.currentImageIndex] || product.img;
-      app.elements.lightbox.classList.add("active");
+      const overlay = document.getElementById("lightbox");
+      const img = document.getElementById("lightbox-image");
+      if (!overlay || !img || !this.elements.productMainImage?.src) return;
+      img.src = this.elements.productMainImage.src;
+      overlay.classList.add("active");
     },
 
     closeLightbox: () => {
-      app.elements.lightbox?.classList.remove("active");
+      const overlay = document.getElementById("lightbox");
+      if (overlay) overlay.classList.remove("active");
     },
   };
 

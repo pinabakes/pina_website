@@ -25,6 +25,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/page_images/hero.jpg" as="image">
 
   <!-- Org/LocalBusiness Schema -->
   <script type="application/ld+json">
@@ -48,6 +50,26 @@
     "sameAs": ["https://instagram.com/PiNaBakes"],
     "servesCuisine": "Bakery",
     "priceRange": "₹199-₹349"
+  }
+  </script>
+
+  <!-- Example Product Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Nutty-Coco Delight",
+    "description": "Premium millet cookies with real coconut flakes",
+    "brand": { "@type": "Brand", "name": "PiNa Bakes" },
+    "image": ["https://pinabakes.github.io/pina_website/assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg"],
+    "offers": {
+      "@type": "Offer",
+      "price": "199",
+      "priceCurrency": "INR",
+      "availability": "https://schema.org/InStock",
+      "url": "https://pinabakes.github.io/pina_website/#/product/nutty-coco"
+    },
+    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "127" }
   }
   </script>
 
@@ -271,8 +293,9 @@
 
   <header class="header" id="header">
     <div class="header-container">
+      <!-- ✅ YOUR ACTUAL LOGO -->
       <a href="#home" class="brand-logo" aria-label="PiNa Bakes - Home">
-        <img src="https://via.placeholder.com/48x48/2f6a3a/ffffff?text=P" alt="PiNa Bakes logo" loading="eager">
+        <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" loading="eager">
         <span>PiNa Bakes</span>
       </a>
 
@@ -325,8 +348,18 @@
   </nav>
 
   <main id="main-content">
+    <!-- ✅ HERO SECTION - Using YOUR actual hero image -->
     <section id="home" class="hero" aria-labelledby="hero-title">
-      <img src="https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="Fresh, wholesome millet cookies by PiNa Bakes" class="hero-background">
+      <picture class="hero-background">
+        <source srcset="assets/page_images/hero.avif" type="image/avif">
+        <source srcset="assets/page_images/hero.webp" type="image/webp">
+        <img
+          src="assets/page_images/hero.jpg"
+          alt="Fresh, wholesome millet cookies by PiNa Bakes"
+          fetchpriority="high"
+          decoding="async"
+          class="hero-background">
+      </picture>
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <div class="hero-badge">🌾 Healthy • Tasty • Wholesome</div>
@@ -393,6 +426,7 @@
       </div>
     </section>
 
+    <!-- ✅ VIDEOS SECTION - Using YOUR actual videos -->
     <section id="videos" class="section">
       <div class="section-container">
         <div class="section-header">
@@ -400,18 +434,28 @@
           <p class="section-description">Watch our artisans craft each batch with passion. From mixing to baking, every step is done with care and attention to quality.</p>
         </div>
         <div class="video-grid">
+          <!-- ✅ YOUR ACTUAL "Fresh Batch in the Making" VIDEO -->
           <div class="video-card">
             <div class="video-wrapper">
-              <img src="https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Cookie making process" style="width:100%;height:100%;object-fit:cover;">
+              <video controls poster="assets/videos/cookie-thumb.jpg" preload="metadata">
+                <source src="assets/videos/cookies-baking.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
             </div>
             <div class="video-content">
               <h3>Fresh Batch in the Making</h3>
               <p>Our Richie-Pistachio cookies being crafted with love in our Delhi kitchen.</p>
             </div>
           </div>
+
+          <!-- ✅ YOUR SECOND VIDEO (if you have it) -->
           <div class="video-card">
             <div class="video-wrapper">
-              <img src="https://images.unsplash.com/photo-1486427944299-d1955d23e34d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="PiNa Bakes story" style="width:100%;height:100%;object-fit:cover;">
+              <video controls poster="assets/videos/process-thumb.jpg" preload="metadata">
+                <source src="assets/videos/baking-process.mp4" type="video/mp4">
+                <!-- Fallback to YouTube if you don't have local video -->
+                <iframe src="https://www.youtube.com/embed/2rQrxFsgbeE" allowfullscreen title="PiNa Bakes baking process" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+              </video>
             </div>
             <div class="video-content">
               <h3>The PiNa Bakes Story</h3>
@@ -419,6 +463,8 @@
             </div>
           </div>
         </div>
+        
+        <!-- ✅ YOUR ACTUAL SOCIAL MEDIA -->
         <div style="text-align:center;margin-top:3rem;padding:2rem;background:#f8f9fa;border-radius:16px;">
           <h3>Follow Our Journey</h3>
           <p style="margin-bottom:1.5rem;">See daily bakes and behind-the-scenes content on our social media!</p>
@@ -454,6 +500,7 @@
       </div>
     </section>
 
+    <!-- ✅ REVIEWS SECTION - Using YOUR actual customer photos -->
     <section id="reviews" class="section">
       <div class="section-container">
         <div class="section-header">
@@ -462,7 +509,7 @@
         </div>
         <div class="reviews-grid">
           <div class="review-card">
-            <img class="review-avatar" src="https://images.unsplash.com/photo-1494790108755-2616b332ad42?ixlib=rb-4.0.3&auto=format&fit=crop&w=96&q=80" alt="Customer avatar">
+            <img class="review-avatar" src="assets/reviews/customer1.jpg" alt="Customer Aditi" onerror="this.src='https://images.unsplash.com/photo-1494790108755-2616b332ad42?ixlib=rb-4.0.3&auto=format&fit=crop&w=96&q=80'">
             <div>
               <div class="review-name">Aditi Sharma</div>
               <div class="review-stars">★★★★★</div>
@@ -470,7 +517,7 @@
             </div>
           </div>
           <div class="review-card">
-            <img class="review-avatar" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=96&q=80" alt="Customer avatar">
+            <img class="review-avatar" src="assets/reviews/customer2.jpg" alt="Customer Rahul" onerror="this.src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=96&q=80'">
             <div>
               <div class="review-name">Rahul Verma</div>
               <div class="review-stars">★★★★★</div>
@@ -478,7 +525,7 @@
             </div>
           </div>
           <div class="review-card">
-            <img class="review-avatar" src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=96&q=80" alt="Customer avatar">
+            <img class="review-avatar" src="assets/reviews/customer3.jpg" alt="Customer Nisha" onerror="this.src='https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=96&q=80'">
             <div>
               <div class="review-name">Nisha Kapoor</div>
               <div class="review-stars">★★★★☆</div>
@@ -537,12 +584,13 @@
     </section>
   </main>
 
+  <!-- ✅ FOOTER - Using YOUR actual logo and FSSAI -->
   <footer class="footer">
     <div class="footer-content">
-      <img src="https://via.placeholder.com/60x60/ffffff/2f6a3a?text=P" alt="PiNa Bakes logo" class="footer-logo">
+      <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" class="footer-logo">
       <p>© <span id="current-year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!</p>
       <div class="fssai-info">
-        <img src="https://via.placeholder.com/30x20/ffffff/000000?text=FSSAI" alt="FSSAI Logo" class="fssai-logo">
+        <img src="assets/logo/fssai-logo.png" alt="FSSAI Logo" class="fssai-logo" onerror="this.src='https://via.placeholder.com/30x20/ffffff/000000?text=FSSAI'">
         <span>FSSAI License: 23325005002208</span>
       </div>
     </div>

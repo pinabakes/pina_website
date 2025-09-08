@@ -471,8 +471,6 @@ class PinaBakesApp {
       this.state.isMobileMenuOpen ? this.ui.closeMobileMenu() : this.ui.openMobileMenu(),
 
     openMobileMenu: () => {
-      const { mobileNav, mobileNavOverlay, mobileMenuToggle } = this.elements;
-      if (!mobileNav || !mobileNavOverlay || !mobileMenuToggle) return;
       this.state.isMobileMenuOpen = true;
       this.elements.mobileNav.classList.add("active");
       this.elements.mobileNavOverlay.classList.add("active");
@@ -481,8 +479,6 @@ class PinaBakesApp {
     },
 
     closeMobileMenu: () => {
-      const { mobileNav, mobileNavOverlay, mobileMenuToggle } = this.elements;
-      if (!mobileNav || !mobileNavOverlay || !mobileMenuToggle) return;
       this.state.isMobileMenuOpen = false;
       this.elements.mobileNav.classList.remove("active");
       this.elements.mobileNavOverlay.classList.remove("active");
@@ -506,9 +502,9 @@ class PinaBakesApp {
 
     renderProducts: () => {
       if (!this.elements.productsGrid) return;
-      const list = Array.isArray(this.state.filteredProducts) && this.state.filteredProducts.length > 0
-        ? this.state.filteredProducts
-        : this.state.products;
+      const list = this.state.filteredProducts && this.state.filteredProducts.length >= 0
+        ? this.state.filteredProducts : this.state.products;
+
       console.log("Rendering products:", list.length);
 
       if (!Array.isArray(list) || list.length === 0) {

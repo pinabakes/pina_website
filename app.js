@@ -1,7 +1,8 @@
-// PiNa Bakes - Complete Working App
+// PiNa Bakes - CORRECTED VERSION - Reads from products.json
 class PinaBakesApp {
   constructor() {
     this.config = {
+      orderWebhook: "https://script.google.com/macros/s/AKfycbwR_3cz5m-FOJertmmRos7-Zc7nundBbNTJ0HuZoLPZ9gHuDwxNO9Th4ThXIru_Kztc/exec",
       whatsappNumber: "917678506669",
       storageKeys: {
         cart: "pinabakes_cart",
@@ -9,208 +10,14 @@ class PinaBakesApp {
         wishlist: "pinabakes_wishlist",
         orders: "pinabakes_orders",
       },
+      // ✅ RESTORED - Reading from your JSON file
+      apiEndpoints: {
+        products: "products.json",
+      },
       coupons: { PINA10: { type: "percent", value: 10 } },
       shippingCharge: 60,
       freeShippingThreshold: 999,
     };
-
-    // ✅ EMBEDDED PRODUCTS DATA
-    this.embeddedProducts = [
-      {
-        slug: "nutty-coco",
-        name: "Nutty-Coco Delight",
-        price: 199,
-        tagline: "Real coconut flakes meet wholesome jowar",
-        img: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        images: [
-          "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        ],
-        bullets: [
-          "Crisp edges with soft, chewy center",
-          "Made with authentic coconut flakes", 
-          "Rich in dietary fiber from jowar",
-          "No artificial coconut flavoring"
-        ],
-        ingredients: [
-          "Jowar (sorghum) flour", "Oats flour", "Fresh coconut flakes",
-          "Pure butter", "Natural jaggery", "Baking powder", "Pure vanilla extract"
-        ],
-        nutrition: {
-          energy: "445 kcal", protein: "8.2 g", fat: "18.5 g",
-          carbs: "62.3 g", sugar: "22.1 g", fibre: "4.8 g", sodium: "156 mg"
-        },
-        tags: ["gluten-friendly", "high-fiber", "natural-sweetener"]
-      },
-      {
-        slug: "jowar-peanut-butter",
-        name: "Jowar Peanut Butter Cookies", 
-        price: 209,
-        tagline: "Protein-rich jowar meets creamy peanut butter",
-        img: "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        images: [
-          "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        ],
-        bullets: [
-          "High in plant-based protein", "Made with pure peanut butter",
-          "Zero refined flour (maida-free)", "Perfect post-workout snack"
-        ],
-        ingredients: [
-          "Jowar (sorghum) flour", "Natural peanut butter", "Organic jaggery",
-          "Pure butter", "Aluminum-free baking powder"
-        ],
-        nutrition: {
-          energy: "468 kcal", protein: "12.4 g", fat: "22.8 g",
-          carbs: "54.7 g", sugar: "18.9 g", fibre: "5.2 g", sodium: "142 mg"
-        },
-        tags: ["high-protein", "maida-free", "post-workout"]
-      },
-      {
-        slug: "lemon-blueberry",
-        name: "Lemon-Blueberry Burst",
-        price: 289,
-        tagline: "Zesty lemon meets antioxidant-rich blueberries",
-        img: "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        images: [
-          "https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          "https://images.unsplash.com/photo-1584521913730-0ad4a6a6723b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        ],
-        bullets: [
-          "Fresh lemon zest for natural tanginess", "Real blueberry pieces (not artificial)",
-          "Antioxidant-rich superfruit combination", "Refreshing citrus aroma"
-        ],
-        ingredients: [
-          "Bajra (pearl millet) flour", "Rolled oats flour", "Fresh blueberries",
-          "Pure butter", "Organic sugar", "Fresh lemon zest", "Natural lemon extract"
-        ],
-        nutrition: {
-          energy: "421 kcal", protein: "7.8 g", fat: "16.2 g",
-          carbs: "65.4 g", sugar: "26.8 g", fibre: "4.1 g", sodium: "128 mg"
-        },
-        tags: ["antioxidant-rich", "citrusy", "superfruit"]
-      },
-      {
-        slug: "quinoa-walnut",
-        name: "Quinoa-Walnut Crunch",
-        price: 279,
-        tagline: "Superfood quinoa with premium walnuts",
-        img: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        images: [
-          "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          "https://images.unsplash.com/photo-1605644406208-80e7b2fb6a8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        ],
-        bullets: [
-          "Quinoa - complete protein superfood", "Premium California walnuts",
-          "Satisfying nutty crunch texture", "Rich in omega-3 fatty acids"
-        ],
-        ingredients: [
-          "Quinoa flour", "Jowar (sorghum) flour", "Premium walnut pieces",
-          "Pure butter", "Natural jaggery"
-        ],
-        nutrition: {
-          energy: "486 kcal", protein: "11.6 g", fat: "26.4 g",
-          carbs: "52.8 g", sugar: "19.3 g", fibre: "6.8 g", sodium: "98 mg"
-        },
-        tags: ["superfood", "complete-protein", "omega-3", "premium"]
-      },
-      {
-        slug: "richie-pistachio",
-        name: "Richie-Pistachio Premium",
-        price: 349,
-        tagline: "Luxuriously loaded with premium pistachios",
-        img: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        images: [
-          "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          "https://images.unsplash.com/photo-1571115764595-644a1f56a55c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        ],
-        bullets: [
-          "Generously loaded with pistachios", "Premium Iranian pistachios",
-          "Signature PiNa Bakes recipe", "Luxury treat for special occasions"
-        ],
-        ingredients: [
-          "Premium pistachio kernels", "Bajra (pearl millet) flour",
-          "Pure butter", "Fine sugar", "Natural cardamom"
-        ],
-        nutrition: {
-          energy: "524 kcal", protein: "14.2 g", fat: "32.6 g",
-          carbs: "48.1 g", sugar: "21.4 g", fibre: "7.2 g", sodium: "106 mg"
-        },
-        tags: ["premium", "luxury", "pistachio-loaded", "signature"]
-      },
-      {
-        slug: "foxtail-true-chocolate",
-        name: "Foxtail True-Chocolate",
-        price: 349,
-        tagline: "Pure Belgian cocoa with ancient foxtail millet",
-        img: "https://images.unsplash.com/photo-1558312657-b4dade818de0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        images: [
-          "https://images.unsplash.com/photo-1558312657-b4dade818de0?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          "https://images.unsplash.com/photo-1621303837174-89787a7d4729?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        ],
-        bullets: [
-          "Belgian cocoa for deep chocolate flavor", "Foxtail millet - ancient superfood grain",
-          "Rich, fudgy texture", "No artificial chocolate flavoring"
-        ],
-        ingredients: [
-          "Foxtail millet flour", "Premium Belgian cocoa powder",
-          "Pure butter", "Organic sugar", "Aluminum-free baking powder"
-        ],
-        nutrition: {
-          energy: "456 kcal", protein: "9.8 g", fat: "19.4 g",
-          carbs: "63.2 g", sugar: "28.6 g", fibre: "8.4 g", sodium: "164 mg"
-        },
-        tags: ["premium", "belgian-cocoa", "ancient-grain", "fudgy"]
-      },
-      {
-        slug: "ragi-millet",
-        name: "Ragi Millet Classic",
-        price: 229,
-        tagline: "Calcium-rich ragi in a wholesome cookie",
-        img: "https://images.unsplash.com/photo-1592417817098-8fd3d9eb14a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        images: [
-          "https://images.unsplash.com/photo-1592417817098-8fd3d9eb14a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        ],
-        bullets: [
-          "High in natural calcium from ragi", "Perfect with tea or coffee",
-          "Naturally gluten-free", "Traditional South Indian superfood"
-        ],
-        ingredients: [
-          "Ragi (finger millet) flour", "Rolled oats flour",
-          "Pure butter", "Natural jaggery"
-        ],
-        nutrition: {
-          energy: "412 kcal", protein: "9.4 g", fat: "15.8 g",
-          carbs: "58.2 g", sugar: "20.6 g", fibre: "6.2 g", sodium: "118 mg"
-        },
-        tags: ["high-calcium", "gluten-free", "traditional"]
-      },
-      {
-        slug: "bajra-almond",
-        name: "Bajra Millet with Almond",
-        price: 199,
-        tagline: "Bajra base enriched with crunchy almonds",
-        img: "https://images.unsplash.com/photo-1550948537-6f9d72973da9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-        images: [
-          "https://images.unsplash.com/photo-1550948537-6f9d72973da9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-        ],
-        bullets: [
-          "Crunchy almond pieces in every bite", "Hearty bajra millet base",
-          "Rich in healthy fats", "Perfect energy snack"
-        ],
-        ingredients: [
-          "Bajra (pearl millet) flour", "Roasted almond pieces",
-          "Pure butter", "Organic sugar"
-        ],
-        nutrition: {
-          energy: "458 kcal", protein: "10.8 g", fat: "21.4 g",
-          carbs: "56.8 g", sugar: "24.2 g", fibre: "5.4 g", sodium: "134 mg"
-        },
-        tags: ["almond-rich", "energy-boost", "healthy-fats"]
-      }
-    ];
 
     this.state = {
       products: [],
@@ -243,8 +50,8 @@ class PinaBakesApp {
       // Show skeleton loading
       this.ui.renderSkeletonProducts();
 
-      // Load embedded products immediately
-      this.loadEmbeddedProducts();
+      // ✅ RESTORED - Load from your products.json file
+      await this.loadProducts();
 
       this.search.init();
       this.router.handleRoute();
@@ -259,18 +66,95 @@ class PinaBakesApp {
     }
   }
 
-  loadEmbeddedProducts() {
-    console.log("Loading embedded products...");
-    this.state.products = this.embeddedProducts.map(product => ({
-      ...product,
-      images: this.normalizeImages(product)
-    }));
+  // ✅ RESTORED - Original method to load from products.json
+  async loadProducts() {
+    if (this.state.products.length > 0) {
+      this.search.setupSearchIndex();
+      this.ui.renderProducts();
+      return;
+    }
     
-    this.search.setupSearchIndex();
-    this.ui.renderProducts();
-    console.log(`✅ Loaded ${this.state.products.length} products successfully!`);
+    this.state.isLoading = true;
+    try {
+      console.log("Loading products from products.json...");
+      
+      const url = this.config.apiEndpoints.products;
+      const res = await fetch(url, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      console.log("Raw JSON data:", data);
+      
+      // Handle different JSON structures
+      const arr = Array.isArray(data)
+        ? data
+        : Array.isArray(data.products)
+        ? data.products
+        : [];
+        
+      if (!arr.length) {
+        throw new Error('No products found in JSON. Expected an array or { "products": [...] }.');
+      }
+
+      // Normalize + enrich products from YOUR JSON data
+      this.state.products = arr.map((p, idx) => {
+        const name = p.name ?? `Product ${idx + 1}`;
+        const slug = p.slug ?? 
+          (name ? name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "") : `p-${idx}`);
+        const tags = Array.isArray(p.tags) ? p.tags : [];
+        const images = this.normalizeImages(p);
+        
+        return {
+          name,
+          price: Number(p.price ?? 0),
+          tagline: p.tagline ?? "",
+          img: images[0] || p.img || p.image || "",
+          images,
+          slug,
+          bullets: p.bullets ?? [],
+          ingredients: Array.isArray(p.ingredients) ? p.ingredients : [],
+          nutrition: p.nutrition ?? undefined,
+          tags, // used by search/filters/recommendations
+        };
+      });
+
+      this.state.filteredProducts = null;
+      this.search.setupSearchIndex();
+      this.ui.renderProducts();
+      
+      console.log(`✅ Loaded ${this.state.products.length} products from products.json!`);
+      
+    } catch (error) {
+      console.error("Failed to load products:", error);
+      this.ui.showError(`Could not load products: ${error.message}`);
+      
+      if (this.elements.productsGrid) {
+        this.elements.productsGrid.innerHTML = `
+          <div style="padding:1rem;color:#b91c1c;background:#fee2e2;border:1px solid #fecaca;border-radius:8px;">
+            <h3>Could not load products</h3>
+            <p><strong>Error:</strong> ${error.message}</p>
+            <p><strong>Make sure:</strong></p>
+            <ul style="margin-top:.5rem;">
+              <li>• products.json file exists in the same folder as index.html</li>
+              <li>• JSON file is valid and not corrupted</li>
+              <li>• Images paths in JSON are correct</li>
+            </ul>
+          </div>
+        `;
+      }
+    } finally {
+      this.state.isLoading = false;
+      this.ui.hideLoader();
+    }
   }
 
+  // Rest of the methods stay exactly the same...
   cacheElements() {
     this.elements = {
       header: document.getElementById("header"),
@@ -278,13 +162,9 @@ class PinaBakesApp {
       mobileNav: document.querySelector(".mobile-nav"),
       mobileNavOverlay: document.querySelector(".mobile-nav-overlay"),
       navLinks: document.querySelectorAll(".nav-link"),
-
-      // Search
       searchInput: document.getElementById("site-search"),
       searchSuggest: document.getElementById("search-suggestions"),
       searchInputMobile: document.getElementById("site-search-mobile"),
-
-      // Cart
       cartModal: document.getElementById("cart-modal"),
       cartOverlay: document.getElementById("cart-overlay"),
       cartCount: document.getElementById("cart-count"),
@@ -297,11 +177,7 @@ class PinaBakesApp {
       cartDiscount: document.getElementById("cart-discount"),
       cartShipping: document.getElementById("cart-shipping"),
       shippingNote: document.getElementById("shipping-note"),
-
-      // Products
       productsGrid: document.getElementById("products-grid"),
-
-      // Product detail
       productDetail: document.getElementById("product-detail"),
       productMainImage: document.getElementById("product-main-image"),
       productThumbnails: document.getElementById("product-thumbnails"),
@@ -313,11 +189,8 @@ class PinaBakesApp {
       nutritionTable: document.getElementById("nutrition-table"),
       addToCartDetail: document.getElementById("add-to-cart-detail"),
       addToWishlistDetail: document.getElementById("add-to-wishlist-detail"),
-
       toast: document.getElementById("toast"),
       currentYear: document.getElementById("current-year"),
-
-      // Wishlist
       wishlistModal: document.getElementById("wishlist-modal"),
       wishlistOverlay: document.getElementById("wishlist-overlay"),
       wishlistCount: document.getElementById("wishlist-count"),
@@ -325,19 +198,19 @@ class PinaBakesApp {
     };
   }
 
+  // Include all the rest of your methods exactly as they were...
+  // (setupEventListeners, ui, cart, wishlist, checkout, router, etc.)
+  
   setupEventListeners() {
-    // Navigation
     window.addEventListener("hashchange", () => this.router.handleRoute());
     window.addEventListener("popstate", () => this.router.handleRoute());
     document.addEventListener("keydown", this.handleKeyboardShortcuts.bind(this));
     window.addEventListener("resize", this.debounce(this.handleResize.bind(this), 250));
 
-    // Form submission
     if (this.elements.checkoutForm) {
       this.elements.checkoutForm.addEventListener("submit", this.checkout.handleFormSubmit.bind(this));
     }
 
-    // Product grid clicks
     if (this.elements.productsGrid) {
       this.elements.productsGrid.addEventListener("click", (e) => {
         const link = e.target.closest('a[href^="#/product/"]');
@@ -348,7 +221,6 @@ class PinaBakesApp {
       });
     }
 
-    // Coupon code
     if (this.elements.couponCode) {
       this.elements.couponCode.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
@@ -358,7 +230,7 @@ class PinaBakesApp {
       });
     }
   }
-
+  
   setupHeaderScrollEffect() {
     window.addEventListener("scroll", this.throttle(() => {
       const y = window.scrollY;
@@ -448,7 +320,9 @@ class PinaBakesApp {
            product.tagline?.toLowerCase().includes("new");
   }
 
-  // ========== UI METHODS ==========
+  // All your UI, cart, wishlist, checkout, router methods stay the same...
+  // (I'm keeping them as they were to maintain functionality)
+  
   ui = {
     showToast: (message, type = "info", duration = 3000) => {
       const toast = this.elements.toast;
@@ -614,7 +488,9 @@ class PinaBakesApp {
     },
   };
 
-  // ========== GALLERY METHODS ==========
+  // Include ALL other methods (gallery, cart, wishlist, checkout, router, search)
+  // ... (same as in previous complete version)
+
   gallery = {
     setup: (product) => {
       const images = this.normalizeImages(product);
@@ -658,7 +534,6 @@ class PinaBakesApp {
     },
   };
 
-  // ========== CART METHODS ==========
   cart = {
     load: () => {
       try {
@@ -840,7 +715,6 @@ class PinaBakesApp {
     },
   };
 
-  // ========== WISHLIST METHODS ==========
   wishlist = {
     load: () => {
       try {
@@ -961,7 +835,6 @@ class PinaBakesApp {
     },
   };
 
-  // ========== CHECKOUT METHODS ==========
   checkout = {
     populateForm: () => {
       if (!this.state.user || !this.elements.checkoutForm) return;
@@ -990,7 +863,6 @@ class PinaBakesApp {
         notes: (document.getElementById("customer-notes")?.value || "").trim(),
       };
 
-      // Basic validation
       if (!formData.name || !formData.phone || !formData.address) {
         return this.ui.showToast("Please fill in required fields", "error");
       }
@@ -1024,7 +896,6 @@ class PinaBakesApp {
         })),
       };
 
-      // Store order locally
       try {
         const key = this.config.storageKeys.orders;
         const prev = JSON.parse(localStorage.getItem(key) || "[]");
@@ -1034,11 +905,9 @@ class PinaBakesApp {
         console.warn("Could not persist orders locally:", e);
       }
 
-      // Generate WhatsApp message
       const message = this.checkout.generateWhatsAppMessage(order, itemsList);
       const whatsappUrl = `https://wa.me/${this.config.whatsappNumber}?text=${encodeURIComponent(message)}`;
       
-      // Clear cart after order
       this.state.cart = [];
       this.cart.save();
       this.cart.render();
@@ -1081,7 +950,6 @@ class PinaBakesApp {
     },
   };
 
-  // ========== ROUTER METHODS ==========
   router = {
     handleRoute: () => {
       const hash = window.location.hash || "#home";
@@ -1124,7 +992,6 @@ class PinaBakesApp {
     },
   };
 
-  // ========== SEARCH METHODS ==========
   search = {
     init: () => {
       const searchInput = this.elements.searchInput;
@@ -1158,7 +1025,6 @@ class PinaBakesApp {
           suggestions.classList.add('active');
         });
 
-        // Close suggestions when clicking outside
         document.addEventListener('click', (e) => {
           if (!searchInput.contains(e.target) && !suggestions.contains(e.target)) {
             suggestions.classList.remove('active');
@@ -1168,7 +1034,6 @@ class PinaBakesApp {
     },
 
     setupSearchIndex: () => {
-      // Search index already built into products
       console.log("Search index ready");
     },
 
@@ -1185,4 +1050,4 @@ class PinaBakesApp {
 const App = new PinaBakesApp();
 window.App = App;
 
-console.log("🚀 PiNa Bakes website loaded successfully!");
+console.log("🚀 PiNa Bakes website loaded - reading from products.json!");

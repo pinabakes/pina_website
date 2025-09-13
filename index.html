@@ -28,7 +28,6 @@
   <link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/page_images/hero.jpg" as="image">
 
-  <!-- Schema -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -117,15 +116,17 @@
     .search-suggestion:last-child{border-bottom:none}
     .search-suggestion:hover{background:var(--brand-light)}
 
-    .hero {
-      background: linear-gradient(135deg, #2f6a3a 0%, #6b4226 100%);
-      min-height: 80vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: #fff;
-      position: relative;
+    /* ✅ FIXED HERO SECTION WITH GRADIENT FALLBACK */
+    .hero{
+      position:relative;
+      min-height:80vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      color:#fff;
+      overflow:hidden;
+      background:linear-gradient(135deg,#2f6a3a 0%,#6b4226 100%);
     }
     .hero-background{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0}
     .hero-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(47,106,58,.8) 0%,rgba(107,66,38,.6) 100%);z-index:1}
@@ -273,7 +274,6 @@
     @media (max-width:1024px){.search-input{width:200px}}
     @media (max-width:900px){.header-container{grid-template-columns:auto auto auto}}
 
-    /* ✅ MOBILE RESPONSIVE */
     @media (max-width:768px){
       .nav-desktop{display:none}
       .mobile-menu-toggle{display:flex}
@@ -287,7 +287,6 @@
       .contact-info{grid-template-columns:1fr}
       .form-row{grid-template-columns:1fr}
       
-      /* ✅ MOBILE CART FIX */
       .cart-modal,.wishlist-modal{
         width:100vw;
         max-width:none;
@@ -358,7 +357,6 @@
     </div>
   </header>
 
-  <!-- ✅ SINGLE OVERLAY FOR ALL MODALS -->
   <div class="modal-overlay" id="modal-overlay" onclick="App.ui.closeAllModals()"></div>
   
   <nav class="mobile-nav" aria-label="Mobile navigation">
@@ -375,7 +373,20 @@
   </nav>
 
   <main id="main-content">
+    <!-- ✅ HERO SECTION WITH WORKING IMAGE AND FALLBACK -->
     <section id="home" class="hero" aria-labelledby="hero-title">
+      <picture class="hero-background">
+        <source srcset="assets/page_images/hero.avif" type="image/avif">
+        <source srcset="assets/page_images/hero.webp" type="image/webp">
+        <img
+          src="assets/page_images/hero.jpg"
+          alt="Fresh, wholesome millet cookies by PiNa Bakes"
+          fetchpriority="high"
+          decoding="async"
+          class="hero-background"
+          onload="console.log('✅ Hero image loaded successfully!')"
+          onerror="console.log('❌ Hero image failed, hiding'); this.style.display='none';">
+      </picture>
       <div class="hero-overlay"></div>
       <div class="hero-content">
         <div class="hero-badge">🌾 Healthy • Tasty • Wholesome</div>
@@ -605,7 +616,7 @@
     </div>
   </footer>
 
-  <!-- ✅ CART MODAL -->
+  <!-- CART MODAL -->
   <div class="cart-modal" id="cart-modal" role="dialog" aria-modal="true" aria-labelledby="cart-title">
     <div class="cart-header">
       <h2 id="cart-title">Your Cart</h2>
@@ -668,7 +679,7 @@
     </div>
   </div>
 
-<!-- ✅ COMPLETE WISHLIST MODAL -->
+  <!-- WISHLIST MODAL -->
   <div class="wishlist-modal" id="wishlist-modal" role="dialog" aria-modal="true" aria-labelledby="wishlist-title">
     <div class="wishlist-header">
       <h2 id="wishlist-title">Your Wishlist</h2>
@@ -683,6 +694,18 @@
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ✅ FORCE LOADER STOP SCRIPT -->
+  <script>
+    // Prevent infinite loading - force hide loaders after 5 seconds
+    setTimeout(() => {
+      document.querySelectorAll('.skeleton, .skeleton-product').forEach(el => {
+        el.style.display = 'none';
+      });
+      document.body.style.opacity = '1';
+      console.log('🔧 Emergency loader removal after 5 seconds');
+    }, 5000);
+  </script>
 
   <script src="app.js"></script>
 </body>

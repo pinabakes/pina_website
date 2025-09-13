@@ -1,4 +1,4 @@
-// PiNa Bakes - COMPLETE & FINAL app.js - Ready to use with your products.json
+// PiNa Bakes - COMPLETE FIXED VERSION WITH ALL UPDATES
 class PinaBakesApp {
   constructor() {
     this.config = {
@@ -39,7 +39,7 @@ class PinaBakesApp {
 
   async init() {
     try {
-      console.log("🚀 Initializing PiNa Bakes app...");
+      console.log("Loading PiNa Bakes app...");
       
       this.cacheElements();
       this.setupEventListeners();
@@ -62,9 +62,9 @@ class PinaBakesApp {
       this.setupHeaderScrollEffect();
       this.ui.hideLoader();
 
-      console.log("✅ PiNa Bakes app initialized successfully!");
+      console.log("PiNa Bakes app initialized successfully!");
     } catch (error) {
-      console.error("❌ App initialization failed:", error);
+      console.error("App initialization failed:", error);
       this.ui.showToast("Failed to load application. Please refresh the page.", "error");
       this.ui.hideLoader();
     }
@@ -80,7 +80,7 @@ class PinaBakesApp {
     
     this.state.isLoading = true;
     try {
-      console.log("📦 Loading products from products.json...");
+      console.log("Loading products from products.json...");
       
       const response = await fetch("products.json", {
         cache: "no-store",
@@ -107,10 +107,10 @@ class PinaBakesApp {
       this.search.setupSearchIndex();
       this.ui.renderProducts();
       
-      console.log(`✅ Loaded ${this.state.products.length} products successfully!`);
+      console.log(`Loaded ${this.state.products.length} products successfully!`);
       
     } catch (error) {
-      console.error("❌ Failed to load products:", error);
+      console.error("Failed to load products:", error);
       this.ui.showError(`Could not load products: ${error.message}`);
       this.ui.renderProductError(error.message);
     } finally {
@@ -203,6 +203,7 @@ class PinaBakesApp {
     hideLoader: () => {
       document.querySelectorAll(".skeleton, .skeleton-product").forEach(el => {
         el.classList.remove("skeleton", "skeleton-product");
+        el.style.display = "none";
       });
     },
 
@@ -246,7 +247,7 @@ class PinaBakesApp {
       if (!this.elements.productsGrid) return;
       this.elements.productsGrid.innerHTML = `
         <div style="grid-column:1/-1;padding:2rem;text-align:center;border:1px solid #fecaca;background:#fee2e2;border-radius:12px;color:#b91c1c;">
-          <h3>❌ Could not load products</h3>
+          <h3>Could not load products</h3>
           <p><strong>Error:</strong> ${errorMessage}</p>
           <p style="margin-top:1rem;"><strong>Please check:</strong></p>
           <ul style="text-align:left;max-width:400px;margin:1rem auto 0;">
@@ -1002,4 +1003,4 @@ class PinaBakesApp {
 const App = new PinaBakesApp();
 window.App = App;
 
-console.log("🚀 PiNa Bakes app loaded - ready to rock!");
+console.log("PiNa Bakes app loaded successfully!");

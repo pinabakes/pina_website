@@ -1,4 +1,4 @@
-// PiNa Bakes - CORRECTED VERSION - Reads from products.json
+// PiNa Bakes - COMPLETE & FINAL app.js - Ready to use with your products.json
 class PinaBakesApp {
   constructor() {
     this.config = {
@@ -10,7 +10,6 @@ class PinaBakesApp {
         wishlist: "pinabakes_wishlist",
         orders: "pinabakes_orders",
       },
-      // ✅ RESTORED - Reading from your JSON file
       apiEndpoints: {
         products: "products.json",
       },
@@ -32,7 +31,6 @@ class PinaBakesApp {
       isWishlistOpen: false,
       currentImageIndex: 0,
       appliedCoupon: null,
-      discountDetails: "",
     };
 
     this.elements = {};
@@ -41,17 +39,22 @@ class PinaBakesApp {
 
   async init() {
     try {
+      console.log("🚀 Initializing PiNa Bakes app...");
+      
       this.cacheElements();
       this.setupEventListeners();
       this.loadUserData();
       this.cart.load();
       this.wishlist.load();
 
-      // Show skeleton loading
       this.ui.renderSkeletonProducts();
 
-      // ✅ RESTORED - Load from your products.json file
-      await this.loadProducts();
+      await Promise.race([
+        this.loadProducts(),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Loading timeout after 10 seconds')), 10000)
+        )
+      ]);
 
       this.search.init();
       this.router.handleRoute();
@@ -61,14 +64,15 @@ class PinaBakesApp {
 
       console.log("✅ PiNa Bakes app initialized successfully!");
     } catch (error) {
-      console.error("App initialization failed:", error);
+      console.error("❌ App initialization failed:", error);
       this.ui.showToast("Failed to load application. Please refresh the page.", "error");
+      this.ui.hideLoader();
     }
   }
 
-  // ✅ RESTORED - Original method to load from products.json
   async loadProducts() {
     if (this.state.products.length > 0) {
+      console.log("Products already loaded, skipping...");
       this.search.setupSearchIndex();
       this.ui.renderProducts();
       return;
@@ -76,97 +80,56 @@ class PinaBakesApp {
     
     this.state.isLoading = true;
     try {
-      console.log("Loading products from products.json...");
+      console.log("📦 Loading products from products.json...");
       
-      const url = this.config.apiEndpoints.products;
-      const res = await fetch(url, {
+      const response = await fetch("products.json", {
         cache: "no-store",
         headers: { "Cache-Control": "no-cache" },
       });
       
-      if (!res.ok) {
-        throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data = await res.json();
-      console.log("Raw JSON data:", data);
+      const products = await response.json();
+      console.log("Raw JSON data:", products);
       
-      // Handle different JSON structures
-      const arr = Array.isArray(data)
-        ? data
-        : Array.isArray(data.products)
-        ? data.products
-        : [];
-        
-      if (!arr.length) {
-        throw new Error('No products found in JSON. Expected an array or { "products": [...] }.');
+      if (!Array.isArray(products) || !products.length) {
+        throw new Error('Invalid products.json format');
       }
 
-      // Normalize + enrich products from YOUR JSON data
-      this.state.products = arr.map((p, idx) => {
-        const name = p.name ?? `Product ${idx + 1}`;
-        const slug = p.slug ?? 
-          (name ? name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "") : `p-${idx}`);
-        const tags = Array.isArray(p.tags) ? p.tags : [];
-        const images = this.normalizeImages(p);
-        
-        return {
-          name,
-          price: Number(p.price ?? 0),
-          tagline: p.tagline ?? "",
-          img: images[0] || p.img || p.image || "",
-          images,
-          slug,
-          bullets: p.bullets ?? [],
-          ingredients: Array.isArray(p.ingredients) ? p.ingredients : [],
-          nutrition: p.nutrition ?? undefined,
-          tags, // used by search/filters/recommendations
-        };
-      });
+      this.state.products = products.map(p => ({
+        ...p,
+        images: this.normalizeImages(p)
+      }));
 
       this.state.filteredProducts = null;
       this.search.setupSearchIndex();
       this.ui.renderProducts();
       
-      console.log(`✅ Loaded ${this.state.products.length} products from products.json!`);
+      console.log(`✅ Loaded ${this.state.products.length} products successfully!`);
       
     } catch (error) {
-      console.error("Failed to load products:", error);
+      console.error("❌ Failed to load products:", error);
       this.ui.showError(`Could not load products: ${error.message}`);
-      
-      if (this.elements.productsGrid) {
-        this.elements.productsGrid.innerHTML = `
-          <div style="padding:1rem;color:#b91c1c;background:#fee2e2;border:1px solid #fecaca;border-radius:8px;">
-            <h3>Could not load products</h3>
-            <p><strong>Error:</strong> ${error.message}</p>
-            <p><strong>Make sure:</strong></p>
-            <ul style="margin-top:.5rem;">
-              <li>• products.json file exists in the same folder as index.html</li>
-              <li>• JSON file is valid and not corrupted</li>
-              <li>• Images paths in JSON are correct</li>
-            </ul>
-          </div>
-        `;
-      }
+      this.ui.renderProductError(error.message);
     } finally {
       this.state.isLoading = false;
       this.ui.hideLoader();
     }
   }
 
-  // Rest of the methods stay exactly the same...
   cacheElements() {
     this.elements = {
       header: document.getElementById("header"),
       mobileMenuToggle: document.querySelector(".mobile-menu-toggle"),
       mobileNav: document.querySelector(".mobile-nav"),
-      mobileNavOverlay: document.querySelector(".mobile-nav-overlay"),
+      modalOverlay: document.getElementById("modal-overlay"),
       navLinks: document.querySelectorAll(".nav-link"),
       searchInput: document.getElementById("site-search"),
       searchSuggest: document.getElementById("search-suggestions"),
       searchInputMobile: document.getElementById("site-search-mobile"),
       cartModal: document.getElementById("cart-modal"),
-      cartOverlay: document.getElementById("cart-overlay"),
       cartCount: document.getElementById("cart-count"),
       cartItems: document.getElementById("cart-items"),
       cartTotal: document.getElementById("cart-total"),
@@ -192,15 +155,11 @@ class PinaBakesApp {
       toast: document.getElementById("toast"),
       currentYear: document.getElementById("current-year"),
       wishlistModal: document.getElementById("wishlist-modal"),
-      wishlistOverlay: document.getElementById("wishlist-overlay"),
       wishlistCount: document.getElementById("wishlist-count"),
       wishlistItems: document.getElementById("wishlist-items"),
     };
   }
 
-  // Include all the rest of your methods exactly as they were...
-  // (setupEventListeners, ui, cart, wishlist, checkout, router, etc.)
-  
   setupEventListeners() {
     window.addEventListener("hashchange", () => this.router.handleRoute());
     window.addEventListener("popstate", () => this.router.handleRoute());
@@ -230,99 +189,7 @@ class PinaBakesApp {
       });
     }
   }
-  
-  setupHeaderScrollEffect() {
-    window.addEventListener("scroll", this.throttle(() => {
-      const y = window.scrollY;
-      if (y > 100) this.elements.header.classList.add("scrolled");
-      else this.elements.header.classList.remove("scrolled");
-    }, 10));
-  }
 
-  handleKeyboardShortcuts(e) {
-    if (e.key === "Escape") this.ui.closeAllModals();
-  }
-
-  handleResize() {
-    if (window.innerWidth > 768 && this.state.isMobileMenuOpen) this.ui.closeMobileMenu();
-  }
-
-  updateCurrentYear() {
-    if (this.elements.currentYear) {
-      this.elements.currentYear.textContent = new Date().getFullYear();
-    }
-  }
-
-  debounce(func, wait) {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  }
-
-  throttle(func, limit) {
-    let inThrottle;
-    return (...args) => {
-      if (!inThrottle) {
-        func(...args);
-        inThrottle = true;
-        setTimeout(() => (inThrottle = false), limit);
-      }
-    };
-  }
-
-  formatPrice(price) {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(price);
-  }
-
-  normalizeImages(product) {
-    const out = [];
-    if (Array.isArray(product.images)) out.push(...product.images.filter(Boolean));
-    if (typeof product.images === "string") {
-      out.push(...product.images.split(",").map((s) => s.trim()).filter(Boolean));
-    }
-    ["img", "image", "image1", "image2", "image3", "image4", "image5", "image6"].forEach((k) => {
-      const v = product[k];
-      if (v && !out.includes(v)) out.push(v);
-    });
-    return out.length ? out : [product.img].filter(Boolean);
-  }
-
-  loadUserData() {
-    try {
-      const userData = localStorage.getItem(this.config.storageKeys.user);
-      if (userData) {
-        this.state.user = JSON.parse(userData);
-        this.checkout.populateForm();
-      }
-    } catch (error) {
-      console.error("Failed to load user data:", error);
-    }
-  }
-
-  saveUserData(userData) {
-    try {
-      this.state.user = userData;
-      localStorage.setItem(this.config.storageKeys.user, JSON.stringify(userData));
-    } catch (error) {
-      console.error("Failed to save user data:", error);
-    }
-  }
-
-  isNewProduct(product) {
-    return product.price >= 300 || 
-           product.name?.toLowerCase().includes("new") || 
-           product.tagline?.toLowerCase().includes("new");
-  }
-
-  // All your UI, cart, wishlist, checkout, router methods stay the same...
-  // (I'm keeping them as they were to maintain functionality)
-  
   ui = {
     showToast: (message, type = "info", duration = 3000) => {
       const toast = this.elements.toast;
@@ -334,30 +201,33 @@ class PinaBakesApp {
     },
 
     hideLoader: () => {
-      document.querySelectorAll(".skeleton, .skeleton-product").forEach((n) =>
-        n.classList.remove("skeleton", "skeleton-product")
-      );
+      document.querySelectorAll(".skeleton, .skeleton-product").forEach(el => {
+        el.classList.remove("skeleton", "skeleton-product");
+      });
     },
 
-    showError: (m) => this.ui.showToast(m, "error", 5000),
+    showError: (message) => this.ui.showToast(message, "error", 5000),
 
-    toggleMobileMenu: () =>
-      this.state.isMobileMenuOpen ? this.ui.closeMobileMenu() : this.ui.openMobileMenu(),
+    toggleMobileMenu: () => {
+      this.state.isMobileMenuOpen ? this.ui.closeMobileMenu() : this.ui.openMobileMenu();
+    },
 
     openMobileMenu: () => {
       this.state.isMobileMenuOpen = true;
       this.elements.mobileNav.classList.add("active");
-      this.elements.mobileNavOverlay.classList.add("active");
-      this.elements.mobileMenuToggle.classList.add("active");
+      this.elements.modalOverlay.classList.add("active");
       this.elements.mobileMenuToggle.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
     },
 
     closeMobileMenu: () => {
       this.state.isMobileMenuOpen = false;
       this.elements.mobileNav.classList.remove("active");
-      this.elements.mobileNavOverlay.classList.remove("active");
-      this.elements.mobileMenuToggle.classList.remove("active");
+      if (!this.state.isCartOpen && !this.state.isWishlistOpen) {
+        this.elements.modalOverlay.classList.remove("active");
+      }
       this.elements.mobileMenuToggle.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
     },
 
     closeAllModals: () => {
@@ -368,58 +238,63 @@ class PinaBakesApp {
 
     renderSkeletonProducts: () => {
       if (!this.elements.productsGrid) return;
-      const count = 8;
-      this.elements.productsGrid.innerHTML = Array.from({ length: count })
-        .map(() => `<div class="skeleton-product"></div>`)
-        .join("");
+      const skeletons = Array(6).fill().map(() => '<div class="skeleton-product"></div>').join('');
+      this.elements.productsGrid.innerHTML = skeletons;
+    },
+
+    renderProductError: (errorMessage) => {
+      if (!this.elements.productsGrid) return;
+      this.elements.productsGrid.innerHTML = `
+        <div style="grid-column:1/-1;padding:2rem;text-align:center;border:1px solid #fecaca;background:#fee2e2;border-radius:12px;color:#b91c1c;">
+          <h3>❌ Could not load products</h3>
+          <p><strong>Error:</strong> ${errorMessage}</p>
+          <p style="margin-top:1rem;"><strong>Please check:</strong></p>
+          <ul style="text-align:left;max-width:400px;margin:1rem auto 0;">
+            <li>• products.json file exists in same folder as index.html</li>
+            <li>• JSON file is valid and not corrupted</li>
+            <li>• You're running on a web server (not file://)</li>
+          </ul>
+          <button onclick="location.reload()" class="btn btn-primary" style="margin-top:1rem;">Reload Page</button>
+        </div>
+      `;
     },
 
     renderProducts: () => {
       if (!this.elements.productsGrid) return;
-      const list = this.state.filteredProducts && this.state.filteredProducts.length >= 0
-        ? this.state.filteredProducts : this.state.products;
+      const products = this.state.filteredProducts || this.state.products;
 
-      console.log("Rendering products:", list.length);
-
-      if (!Array.isArray(list) || list.length === 0) {
-        this.elements.productsGrid.innerHTML = 
-          `<div style="padding:1rem; border: 1px dashed var(--border-medium); border-radius:12px; text-align:center; color:var(--text-secondary)">No products found.</div>`;
+      if (!products.length) {
+        this.elements.productsGrid.innerHTML = `
+          <div style="grid-column:1/-1;padding:2rem;text-align:center;color:var(--text-secondary);">
+            <p>No products found.</p>
+          </div>`;
         return;
       }
 
-      const productsHTML = list.map((product) => {
-        const images = this.normalizeImages(product);
-        const coverImage = images[0] || product.img;
-        const isNew = this.isNewProduct(product);
-        const isPremium = product.price >= 300;
-        
-        return `
-          <article class="product-card" data-product-id="${product.slug}">
-            <div class="product-image-container">
-              <img src="${coverImage}" 
-                   alt="${product.name} cookies by PiNa Bakes" 
-                   class="product-image" 
-                   loading="lazy" 
-                   decoding="async"
-                   onerror="this.src='https://via.placeholder.com/400x400/f3f4f6/9ca3af?text=Image+Not+Found';">
-              ${isNew ? '<span class="product-badge">New</span>' : ""}
-              ${isPremium ? '<span class="product-badge" style="top: 3rem;">Premium</span>' : ""}
+      const html = products.map(product => `
+        <article class="product-card" data-product-id="${product.slug}">
+          <div class="product-image-container">
+            <img src="${product.img}" 
+                 alt="${product.name} cookies by PiNa Bakes" 
+                 class="product-image" 
+                 loading="lazy" 
+                 onerror="this.src='https://via.placeholder.com/400x400/f3f4f6/9ca3af?text=No+Image';">
+            ${product.price >= 300 ? '<span class="product-badge">Premium</span>' : ''}
+          </div>
+          <div class="product-content">
+            <h3 class="product-title">${product.name}</h3>
+            <div class="product-price">${this.formatPrice(product.price)}</div>
+            <p class="product-tagline">${product.tagline}</p>
+            <div class="product-actions">
+              <a href="#/product/${product.slug}" class="btn btn-secondary">View Details</a>
+              <button class="btn btn-primary" onclick="App.cart.add('${product.slug}')">Add to Cart</button>
+              <button class="btn btn-outline" onclick="App.wishlist.add('${product.slug}')">♡</button>
             </div>
-            <div class="product-content">
-              <h3 class="product-title">${product.name}</h3>
-              <div class="product-price">${this.formatPrice(product.price)}</div>
-              <p class="product-tagline">${product.tagline}</p>
-              <div class="product-actions">
-                <a href="#/product/${product.slug}" class="btn btn-secondary">View Details</a>
-                <button class="btn btn-primary" onclick="App.cart.add('${product.slug}')" aria-label="Add ${product.name} to cart">Add to Cart</button>
-                <button class="btn btn-outline" onclick="App.wishlist.add('${product.slug}')" aria-label="Add ${product.name} to wishlist">Wishlist</button>
-              </div>
-            </div>
-          </article>
-        `;
-      }).join("");
+          </div>
+        </article>
+      `).join('');
       
-      this.elements.productsGrid.innerHTML = productsHTML;
+      this.elements.productsGrid.innerHTML = html;
     },
 
     renderProductDetail: (product) => {
@@ -488,9 +363,6 @@ class PinaBakesApp {
     },
   };
 
-  // Include ALL other methods (gallery, cart, wishlist, checkout, router, search)
-  // ... (same as in previous complete version)
-
   gallery = {
     setup: (product) => {
       const images = this.normalizeImages(product);
@@ -537,8 +409,8 @@ class PinaBakesApp {
   cart = {
     load: () => {
       try {
-        const savedCart = localStorage.getItem(this.config.storageKeys.cart);
-        this.state.cart = savedCart ? JSON.parse(savedCart) : [];
+        const saved = localStorage.getItem(this.config.storageKeys.cart);
+        this.state.cart = saved ? JSON.parse(saved) : [];
         this.cart.render();
       } catch (error) {
         console.error("Failed to load cart:", error);
@@ -555,37 +427,45 @@ class PinaBakesApp {
     },
 
     add: (productSlug, quantity = 1) => {
-      const product = this.state.products.find((p) => p.slug === productSlug);
-      if (!product) return this.ui.showError("Product not found");
+      const product = this.state.products.find(p => p.slug === productSlug);
+      if (!product) {
+        this.ui.showError("Product not found");
+        return;
+      }
       
-      const existing = this.state.cart.find((i) => i.slug === productSlug);
-      if (existing) existing.quantity += quantity;
-      else this.state.cart.push({ ...product, quantity });
+      const existing = this.state.cart.find(item => item.slug === productSlug);
+      if (existing) {
+        existing.quantity += quantity;
+      } else {
+        this.state.cart.push({ ...product, quantity });
+      }
 
       this.cart.save();
       this.cart.render();
-      this.ui.showToast(`${product.name} added to cart!`);
-      this.cart.animateCartButton();
+      this.ui.showToast(`${product.name} added to cart!`, "success");
     },
 
     remove: (slug) => {
-      this.state.cart = this.state.cart.filter((i) => i.slug !== slug);
+      this.state.cart = this.state.cart.filter(item => item.slug !== slug);
       this.cart.save();
       this.cart.render();
       this.ui.showToast("Item removed from cart");
     },
 
-    updateQuantity: (slug, qty) => {
-      if (qty <= 0) return this.cart.remove(slug);
-      const item = this.state.cart.find((i) => i.slug === slug);
+    updateQuantity: (slug, newQuantity) => {
+      if (newQuantity <= 0) {
+        return this.cart.remove(slug);
+      }
+      
+      const item = this.state.cart.find(item => item.slug === slug);
       if (item) {
-        item.quantity = qty;
+        item.quantity = newQuantity;
         this.cart.save();
         this.cart.render();
       }
     },
 
-    getSubtotal: () => this.state.cart.reduce((t, i) => t + i.price * i.quantity, 0),
+    getSubtotal: () => this.state.cart.reduce((total, item) => total + (item.price * item.quantity), 0),
 
     getDiscount: (subtotal) => {
       const c = this.state.appliedCoupon;
@@ -632,17 +512,17 @@ class PinaBakesApp {
     },
 
     render: () => {
-      const itemCount = this.state.cart.reduce((c, i) => c + i.quantity, 0);
+      const totalItems = this.state.cart.reduce((count, item) => count + item.quantity, 0);
       if (this.elements.cartCount) {
-        this.elements.cartCount.textContent = itemCount;
-        this.elements.cartCount.style.display = itemCount > 0 ? "flex" : "none";
+        this.elements.cartCount.textContent = totalItems;
+        this.elements.cartCount.style.display = totalItems > 0 ? "flex" : "none";
       }
 
       if (this.elements.cartItems) {
         if (this.state.cart.length === 0) {
           this.elements.cartItems.innerHTML = `
-            <div style="text-align:center; padding:3rem 1rem; color:var(--text-secondary);">
-              <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom:1rem; opacity:.5;">
+            <div style="text-align:center;padding:3rem 1rem;color:var(--text-secondary);">
+              <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom:1rem;opacity:.5;">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01"/>
               </svg>
               <p>Your cart is empty</p>
@@ -696,22 +576,17 @@ class PinaBakesApp {
     open: () => {
       this.state.isCartOpen = true;
       this.elements.cartModal.classList.add("active");
-      this.elements.cartOverlay.classList.add("active");
+      this.elements.modalOverlay.classList.add("active");
+      document.body.style.overflow = "hidden";
     },
 
     close: () => {
       this.state.isCartOpen = false;
       this.elements.cartModal.classList.remove("active");
-      this.elements.cartOverlay.classList.remove("active");
-    },
-
-    animateCartButton: () => {
-      if (this.elements.cartCount) {
-        this.elements.cartCount.style.animation = "none";
-        setTimeout(() => {
-          this.elements.cartCount.style.animation = "cartBounce 0.3s ease";
-        }, 10);
+      if (!this.state.isMobileMenuOpen && !this.state.isWishlistOpen) {
+        this.elements.modalOverlay.classList.remove("active");
       }
+      document.body.style.overflow = "";
     },
   };
 
@@ -749,7 +624,6 @@ class PinaBakesApp {
       this.wishlist.save();
       this.wishlist.render();
       this.ui.showToast(`${product.name} added to wishlist`);
-      this.wishlist.animateWishlistButton();
     },
 
     remove: (slug) => {
@@ -816,22 +690,17 @@ class PinaBakesApp {
     open: () => {
       this.state.isWishlistOpen = true;
       this.elements.wishlistModal.classList.add("active");
-      this.elements.wishlistOverlay.classList.add("active");
+      this.elements.modalOverlay.classList.add("active");
+      document.body.style.overflow = "hidden";
     },
 
     close: () => {
       this.state.isWishlistOpen = false;
       this.elements.wishlistModal.classList.remove("active");
-      this.elements.wishlistOverlay.classList.remove("active");
-    },
-
-    animateWishlistButton: () => {
-      if (this.elements.wishlistCount) {
-        this.elements.wishlistCount.style.animation = "none";
-        setTimeout(() => {
-          this.elements.wishlistCount.style.animation = "cartBounce 0.3s ease";
-        }, 10);
+      if (!this.state.isMobileMenuOpen && !this.state.isCartOpen) {
+        this.elements.modalOverlay.classList.remove("active");
       }
+      document.body.style.overflow = "";
     },
   };
 
@@ -1044,10 +913,93 @@ class PinaBakesApp {
       }
     },
   };
+
+  formatPrice(price) {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(price);
+  }
+
+  normalizeImages(product) {
+    const out = [];
+    if (Array.isArray(product.images)) out.push(...product.images.filter(Boolean));
+    if (typeof product.images === "string") {
+      out.push(...product.images.split(",").map((s) => s.trim()).filter(Boolean));
+    }
+    ["img", "image", "image1", "image2", "image3", "image4", "image5", "image6"].forEach((k) => {
+      const v = product[k];
+      if (v && !out.includes(v)) out.push(v);
+    });
+    return out.length ? out : [product.img].filter(Boolean);
+  }
+
+  loadUserData() {
+    try {
+      const userData = localStorage.getItem(this.config.storageKeys.user);
+      if (userData) {
+        this.state.user = JSON.parse(userData);
+        this.checkout.populateForm();
+      }
+    } catch (error) {
+      console.error("Failed to load user data:", error);
+    }
+  }
+
+  saveUserData(userData) {
+    try {
+      this.state.user = userData;
+      localStorage.setItem(this.config.storageKeys.user, JSON.stringify(userData));
+    } catch (error) {
+      console.error("Failed to save user data:", error);
+    }
+  }
+
+  updateCurrentYear() {
+    if (this.elements.currentYear) {
+      this.elements.currentYear.textContent = new Date().getFullYear();
+    }
+  }
+
+  setupHeaderScrollEffect() {
+    window.addEventListener("scroll", this.throttle(() => {
+      const y = window.scrollY;
+      if (y > 100) this.elements.header.classList.add("scrolled");
+      else this.elements.header.classList.remove("scrolled");
+    }, 10));
+  }
+
+  handleKeyboardShortcuts(e) {
+    if (e.key === "Escape") this.ui.closeAllModals();
+  }
+
+  handleResize() {
+    if (window.innerWidth > 768 && this.state.isMobileMenuOpen) this.ui.closeMobileMenu();
+  }
+
+  debounce(func, wait) {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  }
+
+  throttle(func, limit) {
+    let inThrottle;
+    return (...args) => {
+      if (!inThrottle) {
+        func(...args);
+        inThrottle = true;
+        setTimeout(() => (inThrottle = false), limit);
+      }
+    };
+  }
 }
 
-// ✅ INITIALIZE THE APP
+// Initialize the app
 const App = new PinaBakesApp();
 window.App = App;
 
-console.log("🚀 PiNa Bakes website loaded - reading from products.json!");
+console.log("🚀 PiNa Bakes app loaded - ready to rock!");

@@ -192,11 +192,29 @@
     .product-features li{padding:.25rem 0;position:relative;padding-left:1.5rem}
     .product-features li::before{content:'✓';position:absolute;left:0;color:var(--brand-primary);font-weight:bold}
 
-    .cart-modal,.wishlist-modal{position:fixed;top:0;right:-100%;width:90vw;max-width:400px;height:100vh;background:var(--bg-card);box-shadow:var(--shadow-xl);z-index:300;transition:var(--transition-normal);display:flex;flex-direction:column}
+    /* ✅ FIXED CART MODAL - Better mobile handling */
+    .cart-modal,.wishlist-modal{
+      position:fixed;
+      top:0;
+      right:-100%;
+      width:90vw;
+      max-width:400px;
+      height:100vh;
+      background:var(--bg-card);
+      box-shadow:var(--shadow-xl);
+      z-index:300;
+      transition:right 0.3s ease;
+      display:flex;
+      flex-direction:column;
+    }
     .cart-modal.active,.wishlist-modal.active{right:0}
+    
     .cart-header,.wishlist-header{display:flex;align-items:center;justify-content:space-between;padding:1.5rem;border-bottom:1px solid var(--border-light)}
     .cart-header h2,.wishlist-header h2{font-size:1.5rem;color:var(--brand-primary)}
-    .cart-body,.wishlist-body{flex:1;overflow-y:auto;padding:1.5rem;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+    .cart-close,.wishlist-close{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text-secondary);padding:.5rem}
+    .cart-close:hover,.wishlist-close:hover{color:var(--text-primary)}
+    
+    .cart-body,.wishlist-body{flex:1;overflow-y:auto;padding:1.5rem;-webkit-overflow-scrolling:touch}
     .cart-item,.wishlist-item{display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border-light)}
     .cart-item-image,.wishlist-item-image{width:60px;height:60px;object-fit:cover;border-radius:10px}
     .cart-item-title,.wishlist-item-title{font-weight:600;margin-bottom:.25rem}
@@ -205,6 +223,21 @@
     .quantity-btn{width:32px;height:32px;border:1px solid var(--border-medium);border-radius:50%;background:var(--bg-card);font-weight:600}
     .quantity-btn:hover{background:var(--brand-primary);color:#fff;border-color:var(--brand-primary)}
     .cart-footer,.wishlist-footer{padding:1.5rem;border-top:1px solid var(--border-light);background:var(--bg-secondary)}
+
+    /* ✅ FIXED OVERLAY SYSTEM */
+    .modal-overlay{
+      position:fixed;
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      background:rgba(0,0,0,.5);
+      z-index:250;
+      opacity:0;
+      visibility:hidden;
+      transition:all 0.3s ease;
+    }
+    .modal-overlay.active{opacity:1;visibility:visible}
 
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
     .form-group{margin-top:1rem}
@@ -254,6 +287,7 @@
     @media (max-width:1024px){.search-input{width:200px}}
     @media (max-width:900px){.header-container{grid-template-columns:auto auto auto}}
 
+    /* ✅ IMPROVED MOBILE STYLES */
     @media (max-width:768px){
       .nav-desktop{display:none}
       .mobile-menu-toggle{display:flex}
@@ -266,17 +300,23 @@
       .video-grid,.about-grid{grid-template-columns:1fr}
       .contact-info{grid-template-columns:1fr}
       .form-row{grid-template-columns:1fr}
-      .cart-modal{
-        position:fixed;top:0;right:0;left:0;
-        width:100vw;max-width:none;height:100dvh;
-        overflow-y:auto;display:block;border-radius:0 !important;transform:none !important;
+      
+      /* ✅ FIXED MOBILE CART */
+      .cart-modal,.wishlist-modal{
+        width:100vw;
+        max-width:none;
+        height:100vh;
+        right:-100vw;
+        border-radius:0;
       }
-      .cart-modal.active{right:0}
-      .cart-body{overflow:visible;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
-      .cart-footer{position:static;background:var(--bg-secondary);border-top:1px solid var(--border-light);margin-top:.75rem}
+      .cart-modal.active,.wishlist-modal.active{right:0}
     }
 
-    @media (max-width:480px){.hero-title{font-size:2rem}.section-title{font-size:1.75rem}.mobile-nav{width:100vw}}
+    @media (max-width:480px){
+      .hero-title{font-size:2rem}
+      .section-title{font-size:1.75rem}
+      .mobile-nav{width:100vw}
+    }
 
     @media (prefers-color-scheme:dark){
       :root{--bg-primary:#1a1a1a;--bg-secondary:#2a2a2a;--bg-card:#2d2d2d;--text-primary:#ffffff;--text-secondary:#b0b0b0;--text-muted:#808080;--border-light:rgba(255,255,255,.1);--border-medium:rgba(255,255,255,.2)}
@@ -293,7 +333,6 @@
 
   <header class="header" id="header">
     <div class="header-container">
-      <!-- ✅ YOUR ACTUAL LOGO -->
       <a href="#home" class="brand-logo" aria-label="PiNa Bakes - Home">
         <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" loading="eager">
         <span>PiNa Bakes</span>
@@ -333,7 +372,9 @@
     </div>
   </header>
 
-  <div class="mobile-nav-overlay" onclick="App.ui.closeMobileMenu()"></div>
+  <!-- ✅ SINGLE OVERLAY FOR ALL MODALS -->
+  <div class="modal-overlay" id="modal-overlay" onclick="App.ui.closeAllModals()"></div>
+  
   <nav class="mobile-nav" aria-label="Mobile navigation">
     <button class="mobile-nav-close" onclick="App.ui.closeMobileMenu()" aria-label="Close menu">&times;</button>
     <div style="padding-bottom:1rem">
@@ -348,7 +389,6 @@
   </nav>
 
   <main id="main-content">
-    <!-- ✅ HERO SECTION - Using YOUR actual hero image -->
     <section id="home" class="hero" aria-labelledby="hero-title">
       <picture class="hero-background">
         <source srcset="assets/page_images/hero.avif" type="image/avif">
@@ -426,7 +466,6 @@
       </div>
     </section>
 
-    <!-- ✅ VIDEOS SECTION - Using YOUR actual videos -->
     <section id="videos" class="section">
       <div class="section-container">
         <div class="section-header">
@@ -434,7 +473,6 @@
           <p class="section-description">Watch our artisans craft each batch with passion. From mixing to baking, every step is done with care and attention to quality.</p>
         </div>
         <div class="video-grid">
-          <!-- ✅ YOUR ACTUAL "Fresh Batch in the Making" VIDEO -->
           <div class="video-card">
             <div class="video-wrapper">
               <video controls poster="assets/videos/cookie-thumb.jpg" preload="metadata">
@@ -448,12 +486,10 @@
             </div>
           </div>
 
-          <!-- ✅ YOUR SECOND VIDEO (if you have it) -->
           <div class="video-card">
             <div class="video-wrapper">
               <video controls poster="assets/videos/process-thumb.jpg" preload="metadata">
                 <source src="assets/videos/baking-process.mp4" type="video/mp4">
-                <!-- Fallback to YouTube if you don't have local video -->
                 <iframe src="https://www.youtube.com/embed/2rQrxFsgbeE" allowfullscreen title="PiNa Bakes baking process" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
               </video>
             </div>
@@ -464,7 +500,6 @@
           </div>
         </div>
         
-        <!-- ✅ YOUR ACTUAL SOCIAL MEDIA -->
         <div style="text-align:center;margin-top:3rem;padding:2rem;background:#f8f9fa;border-radius:16px;">
           <h3>Follow Our Journey</h3>
           <p style="margin-bottom:1.5rem;">See daily bakes and behind-the-scenes content on our social media!</p>
@@ -500,7 +535,6 @@
       </div>
     </section>
 
-    <!-- ✅ REVIEWS SECTION - Using YOUR actual customer photos -->
     <section id="reviews" class="section">
       <div class="section-container">
         <div class="section-header">
@@ -549,135 +583,4 @@
             </div>
             <div>
               <h3>Address</h3>
-              <p>3684, DaribaPan, Paharganj<br>New Delhi – 110055</p>
-            </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-            </div>
-            <div>
-              <h3>Call/WhatsApp</h3>
-              <a href="https://wa.me/917678506669" target="_blank" rel="noopener">+91 7678506669</a>
-            </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </div>
-            <div>
-              <h3>Email</h3>
-              <a href="mailto:pinabakes@gmail.com?subject=PiNa%20Bakes%20Enquiry">pinabakes@gmail.com</a>
-            </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="m22 7-10 5L2 7"/></svg>
-            </div>
-            <div>
-              <h3>Instagram</h3>
-              <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- ✅ FOOTER - Using YOUR actual logo and FSSAI -->
-  <footer class="footer">
-    <div class="footer-content">
-      <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" class="footer-logo">
-      <p>© <span id="current-year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!</p>
-      <div class="fssai-info">
-        <img src="assets/logo/fssai-logo.png" alt="FSSAI Logo" class="fssai-logo" onerror="this.src='https://via.placeholder.com/30x20/ffffff/000000?text=FSSAI'">
-        <span>FSSAI License: 23325005002208</span>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Cart Modal -->
-  <div class="cart-modal" id="cart-modal" role="dialog" aria-modal="true" aria-labelledby="cart-title">
-    <div class="cart-header">
-      <h2 id="cart-title">Your Cart</h2>
-      <button class="cart-close" onclick="App.cart.close()" aria-label="Close cart">&times;</button>
-    </div>
-    <div class="cart-body">
-      <div id="cart-items"></div>
-      <form class="checkout-form" id="checkout-form" style="display:none;">
-        <h3>Delivery Information</h3>
-        <div class="form-group">
-          <label class="form-label" for="customer-name">Full Name</label>
-          <input type="text" id="customer-name" name="name" class="form-input" autocomplete="name" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="customer-phone">Phone (WhatsApp)</label>
-          <input type="tel" id="customer-phone" name="phone" class="form-input" autocomplete="tel" pattern="[0-9]{10,12}" required>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="customer-pincode">Pincode</label>
-            <input type="text" id="customer-pincode" name="pincode" class="form-input" pattern="[1-9][0-9]{5}" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="customer-city">City</label>
-            <input type="text" id="customer-city" name="city" class="form-input" autocomplete="address-level2" required>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="customer-address">Full Address</label>
-          <textarea id="customer-address" name="address" class="form-textarea" rows="3" autocomplete="street-address" placeholder="House no., street, area, landmark" required></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="customer-notes">Special Instructions</label>
-          <textarea id="customer-notes" name="notes" class="form-textarea" rows="2" placeholder="Any special delivery instructions or preferences"></textarea>
-        </div>
-      </form>
-    </div>
-    <div class="cart-footer">
-      <div style="display:flex;gap:.5rem;margin-bottom:.75rem;">
-        <input id="coupon-code" class="form-input" placeholder="Enter Coupon code:" style="flex:1;">
-        <button class="btn btn-outline" onclick="App.cart.applyCoupon()">Apply</button>
-      </div>
-      <div id="coupon-msg" style="font-size:.9rem;color:var(--text-secondary);margin-bottom:.5rem;"></div>
-      <div class="cart-total">
-        <div style="display:flex;justify-content:space-between;margin-bottom:.25rem;">
-          <span>Subtotal</span><span id="cart-subtotal">₹0</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:.25rem;">
-          <span>Discount</span><span id="cart-discount">₹0</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:.25rem;">
-          <span>Shipping</span><span id="cart-shipping">₹0</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:1.25rem;font-weight:700;margin-top:.5rem;">
-          <span>Total</span><span id="cart-total">₹0</span>
-        </div>
-        <div id="shipping-note" style="font-size:.85rem;color:var(--text-secondary);margin-top:.25rem;"></div>
-      </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:.75rem;" onclick="App.checkout.proceed()">Proceed to Checkout</button>
-    </div>
-  </div>
-
-  <!-- Wishlist Modal -->
-  <div class="wishlist-modal" id="wishlist-modal" role="dialog" aria-modal="true" aria-labelledby="wishlist-title">
-    <div class="wishlist-header">
-      <h2 id="wishlist-title">Your Wishlist</h2>
-      <button class="wishlist-close" onclick="App.wishlist.close()" aria-label="Close wishlist">&times;</button>
-    </div>
-    <div class="wishlist-body">
-      <div id="wishlist-items"></div>
-    </div>
-    <div class="wishlist-footer">
-      <button class="btn btn-primary" style="width:100%" onclick="App.wishlist.moveAllToCart()">Move All To Cart</button>
-    </div>
-  </div>
-
-  <div class="mobile-nav-overlay" id="cart-overlay" onclick="App.cart.close()"></div>
-  <div class="mobile-nav-overlay" id="wishlist-overlay" onclick="App.wishlist.close()"></div>
-
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-  <script src="app.js"></script>
-</body>
-</html>
+              <p>3684, DaribaPan

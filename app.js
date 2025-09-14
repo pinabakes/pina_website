@@ -275,11 +275,12 @@ class PinaBakesApp {
       const html = products.map(product => `
         <article class="product-card" data-product-id="${product.slug}">
           <div class="product-image-container">
-            <img src="${product.img}" 
-                 alt="${product.name} cookies by PiNa Bakes" 
-                 class="product-image" 
-                 loading="lazy" 
-                 onerror="this.src='https://via.placeholder.com/400x400/f3f4f6/9ca3af?text=No+Image';">
+            <img src="${product.img}"
+                alt="${product.name} cookies by PiNa Bakes"
+                class="product-image"
+                loading="lazy"
+                width="600" height="600"
+                onerror="this.src='https://via.placeholder.com/600x600/f3f4f6/9ca3af?text=No+Image';">
             ${product.price >= 300 ? '<span class="product-badge">Premium</span>' : ''}
           </div>
           <div class="product-content">
@@ -387,6 +388,7 @@ class PinaBakesApp {
                 alt="${productName} - Thumbnail ${index + 1}"
                 class="product-thumbnail ${index === 0 ? "active" : ""}"
                 loading="lazy"
+                width="80" height="80"
                 onclick="App.gallery.selectImage(${index})">`
         ).join("");
     },

@@ -1,14 +1,12 @@
-/* sw.js — PiNa Bakes
- * Cache-first for static assets, network-first for products.json
- * No Background Sync (per request)
- */
-const VERSION = "v1.2.0";
+// sw.js — PiNa Bakes
+const VERSION = "v1.2.1";               // ← bump this
 const CACHE_NAME = `pinabakes-${VERSION}`;
 
 // Resolve paths correctly on GitHub Pages subfolder
 const BASE = self.registration.scope;
 const toURL = (p) => new URL(p, BASE).toString();
 
+// Only cache files that exist in your repo
 const STATIC_ASSETS_REL = [
   "./",
   "./index.html",
@@ -16,21 +14,22 @@ const STATIC_ASSETS_REL = [
   "./products.json",
   "./assets/site.webmanifest",
   "./assets/logo/pina-bakes-logo.png",
-  "./assets/page_images/hero.jpg",
-  "./assets/page_images/hero.webp",
-  "./assets/page_images/hero.avif",
-  "./assets/fonts/inter.woff2"
+  "./assets/page_images/hero.jpg"       // keep jpg (works everywhere)
+  // Remove hero.webp / hero.avif here unless those files really exist
+  // Remove ./assets/fonts/inter.woff2 (doesn't exist)
 ];
 const STATIC_ASSETS = STATIC_ASSETS_REL.map(toURL);
 const STATIC_SET = new Set(STATIC_ASSETS);
 
-// Install: warm cache
+// Install: warm cache (tolerant to one-off misses)
 self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
-  );
+  e.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.allSettled(STATIC_ASSETS.map((u) => cache.add(u)));
+  })());
   self.skipWaiting();
 });
+
 
 // Activate: cleanup old caches
 self.addEventListener("activate", (e) => {

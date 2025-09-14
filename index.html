@@ -328,7 +328,6 @@
           <li><a href="#products" class="nav-link">Products</a></li>
           <li><a href="#videos" class="nav-link">Videos</a></li>
           <li><a href="#about" class="nav-link">About</a></li>
-          <li><a href="#reviews" class="nav-link">Reviews</a></li>
           <li><a href="#contact" class="nav-link">Contact</a></li>
         </ul>
       </nav>
@@ -367,26 +366,20 @@
     <a href="#products" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Products</a>
     <a href="#videos" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Videos</a>
     <a href="#about" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">About</a>
-    <a href="#reviews" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Reviews</a>
     <a href="#contact" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Contact</a>
   </nav>
 
   <main id="main-content">
     <!-- ✅ HERO SECTION WITH WORKING IMAGE AND FALLBACK -->
     <section id="home" class="hero" aria-labelledby="hero-title">
-      <picture class="hero-picture">  <!-- was: class="hero-background" -->
-        <source srcset="assets/page_images/hero.avif" type="image/avif">
-        <source srcset="assets/page_images/hero.webp" type="image/webp">
+      <picture class="hero-picture">
         <img
           src="assets/page_images/hero.jpg"
           alt="Fresh, wholesome millet cookies by PiNa Bakes"
           fetchpriority="high"
           decoding="async"
           class="hero-background"
-          onload="console.log('✅ Hero image loaded successfully!')"
-          onerror="console.log('❌ Hero image failed, hiding'); this.closest('picture').style.display='none';"
-          width="1920" height="1080"
-        >
+          width="1920" height="1080">
       </picture>
       <div class="hero-overlay"></div>
       <div class="hero-content">
@@ -520,34 +513,6 @@
         </div>
       </div>
     </section>
-
-    <section id="reviews" class="section">
-      <div class="section-container">
-        <div class="section-header">
-          <h2 class="section-title">What Our Customers Say</h2>
-          <p class="section-description">Real feedback from cookie lovers across India.</p>
-        </div>
-        <div class="reviews-grid">
-          <div class="review-card">
-            <img class="review-avatar" src="assets/reviews/customer2.jpg" alt="Customer Rahul" onerror="this.src='https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=96&q=80'">
-            <div>
-              <div class="review-name">Rahul Verma</div>
-              <div class="review-stars">★★★★★</div>
-              <p style="margin-top:.35rem;color:var(--text-secondary)">Loved the coconut flavor. Fresh, aromatic and not overly sweet.</p>
-            </div>
-          </div>
-          <div class="review-card">
-            <img class="review-avatar" src="assets/reviews/customer3.jpg" alt="Customer Nisha" onerror="this.src='https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=96&q=80'">
-            <div>
-              <div class="review-name">Nisha Kapoor</div>
-              <div class="review-stars">★★★★☆</div>
-              <p style="margin-top:.35rem;color:var(--text-secondary)">Packaging is sturdy and eco-friendly. Cookies arrived intact and delicious.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section id="contact" class="section">
       <div class="section-container">
         <div class="section-header">

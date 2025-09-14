@@ -357,7 +357,7 @@ class PinaBakesApp {
 
     hideProductDetail: () => {
       document.querySelectorAll("main > section").forEach((s) => {
-        if (s.id !== "product-detail") s.style.display = "block";
+        if (s.id !== "product-detail") s.style.display = ""; // ← revert to CSS default
       });
       if (this.elements.productDetail) this.elements.productDetail.style.display = "none";
       this.state.currentProduct = null;

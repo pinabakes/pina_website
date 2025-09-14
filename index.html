@@ -375,7 +375,7 @@
   <main id="main-content">
     <!-- ✅ HERO SECTION WITH WORKING IMAGE AND FALLBACK -->
     <section id="home" class="hero" aria-labelledby="hero-title">
-      <picture class="hero-background">
+      <picture class="hero-picture">  <!-- was: class="hero-background" -->
         <source srcset="assets/page_images/hero.avif" type="image/avif">
         <source srcset="assets/page_images/hero.webp" type="image/webp">
         <img
@@ -385,7 +385,9 @@
           decoding="async"
           class="hero-background"
           onload="console.log('✅ Hero image loaded successfully!')"
-          onerror="console.log('❌ Hero image failed, hiding'); this.style.display='none';">
+          onerror="console.log('❌ Hero image failed, hiding'); this.closest('picture').style.display='none';"
+          width="1920" height="1080"
+        >
       </picture>
       <div class="hero-overlay"></div>
       <div class="hero-content">
@@ -477,7 +479,7 @@
             <div class="video-wrapper">
               <video controls poster="assets/videos/process-thumb.jpg" preload="metadata">
                 <source src="assets/videos/baking-process.mp4" type="video/mp4">
-                <iframe src="https://www.youtube.com/embed/2rQrxFsgbeE" allowfullscreen title="PiNa Bakes baking process" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                Your browser does not support the video tag.
               </video>
             </div>
             <div class="video-content">
@@ -485,8 +487,6 @@
               <p>Discover the passion and process behind our premium millet cookies.</p>
             </div>
           </div>
-        </div>
-        
         <div style="text-align:center;margin-top:3rem;padding:2rem;background:#f8f9fa;border-radius:16px;">
           <h3>Follow Our Journey</h3>
           <p style="margin-bottom:1.5rem;">See daily bakes and behind-the-scenes content on our social media!</p>
@@ -708,5 +708,16 @@
   </script>
 
   <script src="app.js"></script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(reg => console.log('SW registered:', reg.scope))
+        .catch(err => console.warn('SW registration failed:', err));
+    });
+  }
+  </script>
+
 </body>
 </html>

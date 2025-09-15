@@ -1,19 +1,49 @@
-// PiNa Bakes - COMPLETE FIXED VERSION WITH ALL UPDATES
+// PiNa Bakes - ENHANCED VERSION WITH ALL IMPROVEMENTS
 class PinaBakesApp {
+  // Constants for magic numbers and configuration
+  static CONSTANTS = {
+    TIMEOUTS: {
+      LOAD_PRODUCTS: 10000,
+      TOAST_DEFAULT: 3000,
+      TOAST_ERROR: 5000,
+      DEBOUNCE_RESIZE: 250,
+      NETWORK_REQUEST: 8000,
+      CHECKOUT_SUBMIT: 15000
+    },
+    LIMITS: {
+      MAX_CART_ITEMS: 50,
+      MAX_SEARCH_RESULTS: 20,
+      MIN_SEARCH_LENGTH: 2,
+      MAX_RETRY_ATTEMPTS: 3
+    },
+    STORAGE: {
+      VERSION: '2.0',
+      PREFIX: 'pinabakes_v2_'
+    },
+    VALIDATION: {
+      MIN_NAME_LENGTH: 2,
+      PHONE_PATTERN: /^[0-9]{10}$/,
+      EMAIL_PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      MIN_ADDRESS_LENGTH: 10
+    }
+  };
+
   constructor() {
     this.config = {
       orderWebhook: "https://script.google.com/macros/s/AKfycbwR_3cz5m-FOJertmmRos7-Zc7nundBbNTJ0HuZoLPZ9gHuDwxNO9Th4ThXIru_Kztc/exec",
       whatsappNumber: "917678506669",
       storageKeys: {
-        cart: "pinabakes_cart",
-        user: "pinabakes_user",
-        wishlist: "pinabakes_wishlist",
-        orders: "pinabakes_orders",
+        cart: PinaBakesApp.CONSTANTS.STORAGE.PREFIX + "cart",
+        user: PinaBakesApp.CONSTANTS.STORAGE.PREFIX + "user",
+        wishlist: PinaBakesApp.CONSTANTS.STORAGE.PREFIX + "wishlist",
+        orders: PinaBakesApp.CONSTANTS.STORAGE.PREFIX + "orders",
       },
       apiEndpoints: {
         products: "products.json",
       },
-      coupons: { PINA10: { type: "percent", value: 10 } },
+      coupons: {
+        PINA10: { type: "percent", value: 10 }
+      },
       shippingCharge: 60,
       freeShippingThreshold: 999,
     };
@@ -31,43 +61,86 @@ class PinaBakesApp {
       isWishlistOpen: false,
       currentImageIndex: 0,
       appliedCoupon: null,
+      searchIndex: null,
+      retryCount: 0,
+      lastError: null
     };
 
     this.elements = {};
+    this.eventListeners = new Map();
+    this.abortController = null;
+    this.searchTimeout = null;
+
+    // Bind methods for proper cleanup and context
+    this.boundHandlers = {
+      hashchange: this.router.handleRoute.bind(this),
+      popstate: this.router.handleRoute.bind(this),
+      keydown: this.handleKeyboardShortcuts.bind(this),
+      resize: this.debounce(this.handleResize.bind(this), PinaBakesApp.CONSTANTS.TIMEOUTS.DEBOUNCE_RESIZE),
+      visibilitychange: this.handleVisibilityChange.bind(this)
+    };
+
     this.init();
   }
 
   async init() {
     try {
       console.log("Loading PiNa Bakes app...");
+      this.ui.showLoader();
       
       this.cacheElements();
       this.setupEventListeners();
       this.loadUserData();
       this.cart.load();
       this.wishlist.load();
-
       this.ui.renderSkeletonProducts();
 
-      await Promise.race([
-        this.loadProducts(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Loading timeout after 10 seconds')), 10000)
-        )
-      ]);
-
+      await this.loadProductsWithTimeout();
+      
       this.search.init();
       this.router.handleRoute();
       this.updateCurrentYear();
       this.setupHeaderScrollEffect();
       this.ui.hideLoader();
-
+      
       console.log("PiNa Bakes app initialized successfully!");
+      this.ui.showToast("Welcome to PiNa Bakes!", "success");
+      
     } catch (error) {
-      console.error("App initialization failed:", error);
-      this.ui.showToast("Failed to load application. Please refresh the page.", "error");
+      this.handleError(error, "App initialization failed");
       this.ui.hideLoader();
+      this.ui.showRetryOption();
     }
+  }
+
+  async loadProductsWithTimeout() {
+    this.abortController = new AbortController();
+    
+    try {
+      await Promise.race([
+        this.loadProducts(),
+        this.createTimeoutPromise(PinaBakesApp.CONSTANTS.TIMEOUTS.LOAD_PRODUCTS)
+      ]);
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Loading was cancelled');
+      }
+      throw error;
+    } finally {
+      this.abortController = null;
+    }
+  }
+
+  createTimeoutPromise(ms) {
+    return new Promise((_, reject) => {
+      const timeout = setTimeout(() => reject(new Error(`Loading timeout after ${ms / 1000} seconds`)), ms);
+      if (this.abortController) {
+        this.abortController.signal.addEventListener('abort', () => {
+          clearTimeout(timeout);
+          reject(new Error('AbortError'));
+        });
+      }
+    });
   }
 
   async loadProducts() {
@@ -77,101 +150,157 @@ class PinaBakesApp {
       this.ui.renderProducts();
       return;
     }
-    
+
     this.state.isLoading = true;
+
     try {
       console.log("Loading products from products.json...");
-      
-      const response = await fetch("products.json", {
+      const response = await this.fetchWithTimeout("products.json", {
         cache: "no-store",
         headers: { "Cache-Control": "no-cache" },
+        signal: this.abortController?.signal
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
       const products = await response.json();
-      console.log("Raw JSON data:", products);
       
-      if (!Array.isArray(products) || !products.length) {
+      if (!this.validateProductsData(products)) {
         throw new Error('Invalid products.json format');
       }
 
       this.state.products = products.map(p => ({
         ...p,
-        images: this.normalizeImages(p)
+        images: this.normalizeImages(p),
+        sanitizedName: this.sanitizeInput(p.name),
+        sanitizedTagline: this.sanitizeInput(p.tagline),
+        priceFormatted: this.formatPrice(p.price)
       }));
-
+      
       this.state.filteredProducts = null;
       this.search.setupSearchIndex();
       this.ui.renderProducts();
-      
+      this.state.retryCount = 0;
+
       console.log(`Loaded ${this.state.products.length} products successfully!`);
-      
     } catch (error) {
-      console.error("Failed to load products:", error);
-      this.ui.showError(`Could not load products: ${error.message}`);
+      this.handleError(error, "Failed to load products");
       this.ui.renderProductError(error.message);
+      
+      // Retry logic
+      if (this.state.retryCount < PinaBakesApp.CONSTANTS.LIMITS.MAX_RETRY_ATTEMPTS) {
+        this.state.retryCount++;
+        console.log(`Retrying product load (${this.state.retryCount}/${PinaBakesApp.CONSTANTS.LIMITS.MAX_RETRY_ATTEMPTS})`);
+        setTimeout(() => this.loadProducts(), 2000 * this.state.retryCount);
+      }
     } finally {
       this.state.isLoading = false;
-      this.ui.hideLoader();
     }
+  }
+
+  async fetchWithTimeout(url, options = {}) {
+    const timeout = PinaBakesApp.CONSTANTS.TIMEOUTS.NETWORK_REQUEST;
+    const controller = new AbortController();
+    
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
+  }
+
+  validateProductsData(products) {
+    if (!Array.isArray(products) || products.length === 0) {
+      return false;
+    }
+
+    return products.every(p => 
+      p.slug && 
+      p.name && 
+      typeof p.price === 'number' && 
+      p.price > 0 &&
+      p.tagline &&
+      Array.isArray(p.ingredients) &&
+      Array.isArray(p.bullets)
+    );
+  }
+
+  sanitizeInput(input) {
+    if (typeof input !== 'string') return '';
+    return input
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/javascript:/gi, '')
+      .replace(/on\w+\s*=/gi, '')
+      .replace(/[<>]/g, '');
+  }
+
+  formatPrice(price) {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0
+    }).format(price);
+  }
+
+  normalizeImages(product) {
+    if (product.images && Array.isArray(product.images)) {
+      return product.images;
+    }
+    return product.img ? [product.img] : [];
   }
 
   cacheElements() {
-    this.elements = {
-      header: document.getElementById("header"),
-      mobileMenuToggle: document.querySelector(".mobile-menu-toggle"),
-      mobileNav: document.querySelector(".mobile-nav"),
-      modalOverlay: document.getElementById("modal-overlay"),
-      navLinks: document.querySelectorAll(".nav-link"),
-      searchInput: document.getElementById("site-search"),
-      searchSuggest: document.getElementById("search-suggestions"),
-      searchInputMobile: document.getElementById("site-search-mobile"),
-      cartModal: document.getElementById("cart-modal"),
-      cartCount: document.getElementById("cart-count"),
-      cartItems: document.getElementById("cart-items"),
-      cartTotal: document.getElementById("cart-total"),
-      checkoutForm: document.getElementById("checkout-form"),
-      couponCode: document.getElementById("coupon-code"),
-      couponMsg: document.getElementById("coupon-msg"),
-      cartSubtotal: document.getElementById("cart-subtotal"),
-      cartDiscount: document.getElementById("cart-discount"),
-      cartShipping: document.getElementById("cart-shipping"),
-      shippingNote: document.getElementById("shipping-note"),
-      productsGrid: document.getElementById("products-grid"),
-      productDetail: document.getElementById("product-detail"),
-      productMainImage: document.getElementById("product-main-image"),
-      productThumbnails: document.getElementById("product-thumbnails"),
-      productTitle: document.getElementById("product-title"),
-      productPrice: document.getElementById("product-price"),
-      productTagline: document.getElementById("product-tagline"),
-      productFeatures: document.getElementById("product-features"),
-      productIngredients: document.getElementById("product-ingredients"),
-      nutritionTable: document.getElementById("nutrition-table"),
-      addToCartDetail: document.getElementById("add-to-cart-detail"),
-      addToWishlistDetail: document.getElementById("add-to-wishlist-detail"),
-      toast: document.getElementById("toast"),
-      currentYear: document.getElementById("current-year"),
-      wishlistModal: document.getElementById("wishlist-modal"),
-      wishlistCount: document.getElementById("wishlist-count"),
-      wishlistItems: document.getElementById("wishlist-items"),
-    };
+    const elementIds = [
+      'header', 'modal-overlay', 'site-search', 'search-suggestions', 'site-search-mobile',
+      'cart-modal', 'cart-count', 'cart-items', 'cart-total', 'checkout-form',
+      'coupon-code', 'coupon-msg', 'cart-subtotal', 'cart-discount', 'cart-shipping',
+      'shipping-note', 'products-grid', 'product-detail', 'product-main-image',
+      'product-thumbnails', 'product-title', 'product-price', 'product-tagline',
+      'product-features', 'product-ingredients', 'nutrition-table',
+      'add-to-cart-detail', 'add-to-wishlist-detail', 'toast', 'current-year',
+      'wishlist-modal', 'wishlist-count', 'wishlist-items'
+    ];
+
+    this.elements = {};
+    elementIds.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) {
+        this.elements[id.replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = element;
+      }
+    });
+
+    // Cache commonly used selectors with null checks
+    this.elements.mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
+    this.elements.mobileNav = document.querySelector(".mobile-nav");
+    this.elements.navLinks = document.querySelectorAll(".nav-link");
   }
 
   setupEventListeners() {
-    window.addEventListener("hashchange", () => this.router.handleRoute());
-    window.addEventListener("popstate", () => this.router.handleRoute());
-    document.addEventListener("keydown", this.handleKeyboardShortcuts.bind(this));
-    window.addEventListener("resize", this.debounce(this.handleResize.bind(this), 250));
+    // Global event listeners with cleanup tracking
+    this.addEventListener(window, "hashchange", this.boundHandlers.hashchange);
+    this.addEventListener(window, "popstate", this.boundHandlers.popstate);
+    this.addEventListener(document, "keydown", this.boundHandlers.keydown);
+    this.addEventListener(window, "resize", this.boundHandlers.resize);
+    this.addEventListener(document, "visibilitychange", this.boundHandlers.visibilitychange);
 
+    // Form event listeners
     if (this.elements.checkoutForm) {
-      this.elements.checkoutForm.addEventListener("submit", this.checkout.handleFormSubmit.bind(this));
+      this.addEventListener(this.elements.checkoutForm, "submit", this.checkout.handleFormSubmit.bind(this));
     }
 
+    // Product grid navigation
     if (this.elements.productsGrid) {
-      this.elements.productsGrid.addEventListener("click", (e) => {
+      this.addEventListener(this.elements.productsGrid, "click", (e) => {
         const link = e.target.closest('a[href^="#/product/"]');
         if (!link) return;
         e.preventDefault();
@@ -180,34 +309,236 @@ class PinaBakesApp {
       });
     }
 
+    // Search functionality
+    if (this.elements.searchInput) {
+      this.addEventListener(this.elements.searchInput, "input", this.debounce(this.search.handleInput.bind(this), 300));
+      this.addEventListener(this.elements.searchInput, "focus", this.search.handleFocus.bind(this));
+      this.addEventListener(this.elements.searchInput, "blur", this.search.handleBlur.bind(this));
+    }
+
+    // Coupon code handling
     if (this.elements.couponCode) {
-      this.elements.couponCode.addEventListener("keydown", (e) => {
+      this.addEventListener(this.elements.couponCode, "keydown", (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
           this.cart.applyCoupon();
         }
       });
     }
+
+    // Mobile menu toggle
+    if (this.elements.mobileMenuToggle) {
+      this.addEventListener(this.elements.mobileMenuToggle, "click", this.ui.toggleMobileMenu.bind(this));
+    }
+
+    // Modal overlay
+    if (this.elements.modalOverlay) {
+      this.addEventListener(this.elements.modalOverlay, "click", (e) => {
+        if (e.target === this.elements.modalOverlay) {
+          this.ui.closeAllModals();
+        }
+      });
+    }
+
+    // Cart and wishlist buttons
+    this.setupCartWishlistListeners();
   }
 
+  setupCartWishlistListeners() {
+    // Cart toggle button
+    const cartToggle = document.querySelector('[data-action="toggle-cart"]');
+    if (cartToggle) {
+      this.addEventListener(cartToggle, "click", this.cart.toggle.bind(this));
+    }
+
+    // Wishlist toggle button
+    const wishlistToggle = document.querySelector('[data-action="toggle-wishlist"]');
+    if (wishlistToggle) {
+      this.addEventListener(wishlistToggle, "click", this.wishlist.toggle.bind(this));
+    }
+  }
+
+  addEventListener(element, event, handler) {
+    if (!element) return;
+    
+    element.addEventListener(event, handler);
+    
+    // Track for cleanup
+    const key = `${element.constructor.name}-${event}`;
+    if (!this.eventListeners.has(key)) {
+      this.eventListeners.set(key, []);
+    }
+    this.eventListeners.get(key).push({ element, event, handler });
+  }
+
+  removeAllEventListeners() {
+    this.eventListeners.forEach(listeners => {
+      listeners.forEach(({ element, event, handler }) => {
+        element.removeEventListener(event, handler);
+      });
+    });
+    this.eventListeners.clear();
+  }
+
+  handleError(error, context = '') {
+    console.error(`${context}:`, error);
+    this.state.lastError = { error, context, timestamp: Date.now() };
+    
+    // Error categorization for better handling
+    let message = 'An unexpected error occurred';
+    let isRetryable = false;
+
+    if (error.name === 'NetworkError' || error.message.includes('fetch')) {
+      message = 'Network connection failed. Please check your internet connection.';
+      isRetryable = true;
+    } else if (error.message.includes('timeout')) {
+      message = 'Request timed out. Please try again.';
+      isRetryable = true;
+    } else if (error.message.includes('Invalid')) {
+      message = 'Invalid data format. Please refresh the page.';
+      isRetryable = false;
+    } else if (error.message.includes('AbortError')) {
+      message = 'Request was cancelled.';
+      isRetryable = true;
+    }
+
+    this.ui.showToast(message, "error");
+    
+    if (isRetryable) {
+      this.ui.showRetryOption();
+    }
+  }
+
+  handleKeyboardShortcuts(e) {
+    // Accessibility: ESC to close modals
+    if (e.key === 'Escape') {
+      this.ui.closeAllModals();
+    }
+    
+    // Accessibility: Ctrl+/ to focus search
+    if (e.ctrlKey && e.key === '/') {
+      e.preventDefault();
+      if (this.elements.searchInput) {
+        this.elements.searchInput.focus();
+      }
+    }
+
+    // Accessibility: Enter to activate buttons/links with focus
+    if (e.key === 'Enter' && e.target.matches('button, a, [role="button"]')) {
+      e.target.click();
+    }
+  }
+
+  handleResize() {
+    // Close mobile menu on desktop resize
+    if (window.innerWidth > 768 && this.state.isMobileMenuOpen) {
+      this.ui.closeMobileMenu();
+    }
+
+    // Recalculate product grid if needed
+    if (this.elements.productsGrid) {
+      this.ui.adjustProductGrid();
+    }
+  }
+
+  handleVisibilityChange() {
+    if (document.hidden) {
+      // Page is hidden - cleanup any ongoing operations
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+    } else {
+      // Page is visible - refresh data if stale
+      this.refreshDataIfStale();
+    }
+  }
+
+  refreshDataIfStale() {
+    const now = Date.now();
+    const lastUpdate = localStorage.getItem(this.config.storageKeys.cart + '_timestamp');
+    const staleThreshold = 5 * 60 * 1000; // 5 minutes
+
+    if (!lastUpdate || now - parseInt(lastUpdate) > staleThreshold) {
+      console.log('Data is stale, refreshing...');
+      this.cart.load();
+      this.wishlist.load();
+    }
+  }
+
+  debounce(func, wait) {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
+  // UI Management
   ui = {
-    showToast: (message, type = "info", duration = 3000) => {
+    showToast: (message, type = "info", duration = PinaBakesApp.CONSTANTS.TIMEOUTS.TOAST_DEFAULT) => {
       const toast = this.elements.toast;
       if (!toast) return;
-      toast.textContent = message;
+      
+      // Sanitize message for XSS protection
+      toast.textContent = this.sanitizeInput(message);
       toast.className = `toast show ${type}`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'polite');
+      
       clearTimeout(this.toastTimeout);
-      this.toastTimeout = setTimeout(() => toast.classList.remove("show"), duration);
+      this.toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+        toast.removeAttribute('role');
+        toast.removeAttribute('aria-live');
+      }, duration);
+    },
+
+    showError: (message) => {
+      this.ui.showToast(message, "error", PinaBakesApp.CONSTANTS.TIMEOUTS.TOAST_ERROR);
+    },
+
+    showLoader: () => {
+      document.body.classList.add('loading');
+      document.body.setAttribute('aria-busy', 'true');
+      
+      const loader = document.querySelector('.loader');
+      if (loader) {
+        loader.setAttribute('aria-hidden', 'false');
+        loader.setAttribute('aria-label', 'Loading content...');
+      }
     },
 
     hideLoader: () => {
+      document.body.classList.remove('loading');
+      document.body.setAttribute('aria-busy', 'false');
+      
+      const loader = document.querySelector('.loader');
+      if (loader) {
+        loader.setAttribute('aria-hidden', 'true');
+        loader.removeAttribute('aria-label');
+      }
+      
       document.querySelectorAll(".skeleton, .skeleton-product").forEach(el => {
         el.classList.remove("skeleton", "skeleton-product");
         el.style.display = "none";
+        el.setAttribute('aria-hidden', 'true');
       });
     },
 
-    showError: (message) => this.ui.showToast(message, "error", 5000),
+    showRetryOption: () => {
+      const retryHtml = `
+        <div class="retry-container" role="alert">
+          <p>Something went wrong. Would you like to try again?</p>
+          <button class="retry-btn" onclick="location.reload()" aria-label="Retry loading page">
+            Retry
+          </button>
+        </div>
+      `;
+      
+      if (this.elements.productsGrid) {
+        this.elements.productsGrid.innerHTML = retryHtml;
+      }
+    },
 
     toggleMobileMenu: () => {
       this.state.isMobileMenuOpen ? this.ui.closeMobileMenu() : this.ui.openMobileMenu();
@@ -215,20 +546,37 @@ class PinaBakesApp {
 
     openMobileMenu: () => {
       this.state.isMobileMenuOpen = true;
-      this.elements.mobileNav.classList.add("active");
-      this.elements.modalOverlay.classList.add("active");
-      this.elements.mobileMenuToggle.setAttribute("aria-expanded", "true");
+      this.elements.mobileNav?.classList.add("active");
+      this.elements.modalOverlay?.classList.add("active");
+      this.elements.mobileMenuToggle?.setAttribute("aria-expanded", "true");
       document.body.style.overflow = "hidden";
+      
+      // Focus management for accessibility
+      const firstFocusable = this.elements.mobileNav?.querySelector('a, button');
+      if (firstFocusable) {
+        setTimeout(() => firstFocusable.focus(), 100);
+      }
+
+      // Announce to screen readers
+      this.ui.announceToScreenReader("Mobile menu opened");
     },
 
     closeMobileMenu: () => {
       this.state.isMobileMenuOpen = false;
-      this.elements.mobileNav.classList.remove("active");
+      this.elements.mobileNav?.classList.remove("active");
       if (!this.state.isCartOpen && !this.state.isWishlistOpen) {
-        this.elements.modalOverlay.classList.remove("active");
+        this.elements.modalOverlay?.classList.remove("active");
       }
-      this.elements.mobileMenuToggle.setAttribute("aria-expanded", "false");
+      this.elements.mobileMenuToggle?.setAttribute("aria-expanded", "false");
       document.body.style.overflow = "";
+      
+      // Return focus to menu toggle
+      if (this.elements.mobileMenuToggle) {
+        this.elements.mobileMenuToggle.focus();
+      }
+
+      // Announce to screen readers
+      this.ui.announceToScreenReader("Mobile menu closed");
     },
 
     closeAllModals: () => {
@@ -237,772 +585,1053 @@ class PinaBakesApp {
       this.wishlist.close();
     },
 
+    announceToScreenReader: (message) => {
+      const announcement = document.createElement('div');
+      announcement.setAttribute('aria-live', 'polite');
+      announcement.setAttribute('aria-atomic', 'true');
+      announcement.className = 'sr-only';
+      announcement.textContent = message;
+      
+      document.body.appendChild(announcement);
+      
+      setTimeout(() => {
+        document.body.removeChild(announcement);
+      }, 1000);
+    },
+
     renderSkeletonProducts: () => {
       if (!this.elements.productsGrid) return;
-      const skeletons = Array(6).fill().map(() => '<div class="skeleton-product"></div>').join('');
+      
+      const skeletons = Array(6).fill().map((_, index) => `
+        <div class="skeleton-product" aria-hidden="true" role="presentation">
+          <div class="skeleton-img" aria-label="Loading product image"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-text skeleton-title"></div>
+            <div class="skeleton-text skeleton-price"></div>
+            <div class="skeleton-text skeleton-tagline"></div>
+          </div>
+        </div>
+      `).join('');
+      
       this.elements.productsGrid.innerHTML = skeletons;
     },
 
     renderProductError: (errorMessage) => {
       if (!this.elements.productsGrid) return;
+      
       this.elements.productsGrid.innerHTML = `
-        <div style="grid-column:1/-1;padding:2rem;text-align:center;border:1px solid #fecaca;background:#fee2e2;border-radius:12px;color:#b91c1c;">
-          <h3>Could not load products</h3>
-          <p><strong>Error:</strong> ${errorMessage}</p>
-          <p style="margin-top:1rem;"><strong>Please check:</strong></p>
-          <ul style="text-align:left;max-width:400px;margin:1rem auto 0;">
-            <li>• products.json file exists in same folder as index.html</li>
-            <li>• JSON file is valid and not corrupted</li>
-            <li>• You're running on a web server (not file://)</li>
-          </ul>
-          <button onclick="location.reload()" class="btn btn-primary" style="margin-top:1rem;">Reload Page</button>
+        <div class="product-error" role="alert">
+          <div class="error-icon" aria-hidden="true">⚠️</div>
+          <h3>Unable to Load Products</h3>
+          <p>${this.sanitizeInput(errorMessage)}</p>
+          <div class="error-actions">
+            <button onclick="window.location.reload()" class="retry-btn" aria-label="Refresh page to retry">
+              Refresh Page
+            </button>
+            <button onclick="window.pinaBakesApp.loadProducts()" class="retry-btn secondary" aria-label="Retry loading products">
+              Try Again
+            </button>
+          </div>
         </div>
       `;
     },
 
     renderProducts: () => {
-      if (!this.elements.productsGrid) return;
-      const products = this.state.filteredProducts || this.state.products;
+      if (!this.elements.productsGrid || !this.state.products.length) return;
 
-      if (!products.length) {
-        this.elements.productsGrid.innerHTML = `
-          <div style="grid-column:1/-1;padding:2rem;text-align:center;color:var(--text-secondary);">
-            <p>No products found.</p>
-          </div>`;
+      const products = this.state.filteredProducts || this.state.products;
+      
+      const productsHtml = products.map(product => `
+        <div class="product-card" data-slug="${product.slug}">
+          <a href="#/product/${product.slug}" class="product-link" aria-label="View ${product.sanitizedName}">
+            <div class="product-image-container">
+              <img 
+                src="${product.images[0]}" 
+                alt="${product.sanitizedName}"
+                loading="lazy"
+                onerror="this.src='assets/images/placeholder.jpg'"
+                class="product-image"
+              />
+              <div class="product-tags" aria-label="Product tags">
+                ${product.tags ? product.tags.slice(0, 2).map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
+              </div>
+            </div>
+            <div class="product-info">
+              <h3 class="product-name">${product.sanitizedName}</h3>
+              <p class="product-tagline">${product.sanitizedTagline}</p>
+              <div class="product-price-container">
+                <span class="product-price" aria-label="Price ${product.priceFormatted}">${product.priceFormatted}</span>
+              </div>
+            </div>
+          </a>
+          <div class="product-actions">
+            <button 
+              class="btn btn-cart" 
+              data-action="add-to-cart" 
+              data-slug="${product.slug}"
+              aria-label="Add ${product.sanitizedName} to cart"
+            >
+              Add to Cart
+            </button>
+            <button 
+              class="btn btn-wishlist" 
+              data-action="add-to-wishlist" 
+              data-slug="${product.slug}"
+              aria-label="Add ${product.sanitizedName} to wishlist"
+            >
+              ♡
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      this.elements.productsGrid.innerHTML = productsHtml;
+      
+      // Setup product action listeners
+      this.setupProductActionListeners();
+    },
+
+    adjustProductGrid: () => {
+      // Responsive grid adjustments
+      if (!this.elements.productsGrid) return;
+      
+      const containerWidth = this.elements.productsGrid.offsetWidth;
+      const cardWidth = 280; // Base card width
+      const gap = 20; // Gap between cards
+      
+      const columns = Math.floor((containerWidth + gap) / (cardWidth + gap));
+      this.elements.productsGrid.style.setProperty('--grid-columns', Math.max(1, columns));
+    }
+  };
+
+  setupProductActionListeners() {
+    // Add to cart buttons
+    document.querySelectorAll('[data-action="add-to-cart"]').forEach(button => {
+      this.addEventListener(button, 'click', (e) => {
+        e.preventDefault();
+        const slug = button.dataset.slug;
+        this.cart.addItem(slug);
+      });
+    });
+
+    // Add to wishlist buttons
+    document.querySelectorAll('[data-action="add-to-wishlist"]').forEach(button => {
+      this.addEventListener(button, 'click', (e) => {
+        e.preventDefault();
+        const slug = button.dataset.slug;
+        this.wishlist.addItem(slug);
+      });
+    });
+  }
+
+  // Form Validation
+  validation = {
+    validateCheckoutForm: () => {
+      const form = this.elements.checkoutForm;
+      if (!form) return false;
+
+      let isValid = true;
+      const fields = {
+        name: { 
+          required: true, 
+          minLength: PinaBakesApp.CONSTANTS.VALIDATION.MIN_NAME_LENGTH,
+          label: 'Full Name'
+        },
+        email: { 
+          required: true, 
+          pattern: PinaBakesApp.CONSTANTS.VALIDATION.EMAIL_PATTERN,
+          label: 'Email Address'
+        },
+        phone: { 
+          required: true, 
+          pattern: PinaBakesApp.CONSTANTS.VALIDATION.PHONE_PATTERN,
+          label: 'Phone Number'
+        },
+        address: { 
+          required: true, 
+          minLength: PinaBakesApp.CONSTANTS.VALIDATION.MIN_ADDRESS_LENGTH,
+          label: 'Delivery Address'
+        }
+      };
+
+      // Clear previous errors
+      form.querySelectorAll('.error-message').forEach(el => el.remove());
+      form.querySelectorAll('.field-error').forEach(el => {
+        el.classList.remove('field-error');
+        el.removeAttribute('aria-invalid');
+        el.removeAttribute('aria-describedby');
+      });
+
+      Object.entries(fields).forEach(([fieldName, rules]) => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (!field) return;
+
+        const value = field.value.trim();
+        let errorMessage = '';
+
+        if (rules.required && !value) {
+          errorMessage = `${rules.label} is required`;
+        } else if (rules.minLength && value.length < rules.minLength) {
+          errorMessage = `${rules.label} must be at least ${rules.minLength} characters`;
+        } else if (rules.pattern && !rules.pattern.test(value)) {
+          if (fieldName === 'email') {
+            errorMessage = 'Please enter a valid email address';
+          } else if (fieldName === 'phone') {
+            errorMessage = 'Please enter a valid 10-digit phone number';
+          } else {
+            errorMessage = `Please enter a valid ${rules.label.toLowerCase()}`;
+          }
+        }
+
+        if (errorMessage) {
+          this.validation.showFieldError(field, errorMessage);
+          isValid = false;
+        }
+      });
+
+      // Validate cart is not empty
+      if (this.state.cart.length === 0) {
+        this.ui.showError('Your cart is empty. Please add items before checkout.');
+        isValid = false;
+      }
+
+      return isValid;
+    },
+
+    showFieldError: (field, message) => {
+      field.classList.add('field-error');
+      field.setAttribute('aria-invalid', 'true');
+      
+      const errorEl = document.createElement('div');
+      errorEl.className = 'error-message';
+      errorEl.textContent = message;
+      errorEl.setAttribute('role', 'alert');
+      
+      // Insert error message after the field
+      field.parentElement.appendChild(errorEl);
+      
+      // Associate error with field for screen readers
+      const errorId = `error-${field.name}-${Date.now()}`;
+      errorEl.id = errorId;
+      field.setAttribute('aria-describedby', errorId);
+      
+      // Focus the first invalid field
+      if (!document.querySelector('.field-error:focus')) {
+        field.focus();
+      }
+    }
+  };
+
+  // Enhanced Storage Management
+  storage = {
+    save: (key, data) => {
+      try {
+        const payload = {
+          version: PinaBakesApp.CONSTANTS.STORAGE.VERSION,
+          timestamp: Date.now(),
+          data: data
+        };
+        
+        localStorage.setItem(key, JSON.stringify(payload));
+        localStorage.setItem(key + '_timestamp', Date.now().toString());
+        
+      } catch (error) {
+        console.error('Storage save failed:', error);
+        
+        if (error.name === 'QuotaExceededError') {
+          this.storage.cleanup();
+          this.ui.showToast('Storage limit reached. Some data has been cleared.', 'warning');
+        } else {
+          this.ui.showToast('Unable to save data locally', 'warning');
+        }
+      }
+    },
+
+    load: (key) => {
+      try {
+        const item = localStorage.getItem(key);
+        if (!item) return null;
+
+        const parsed = JSON.parse(item);
+        
+        // Check version compatibility
+        if (parsed.version !== PinaBakesApp.CONSTANTS.STORAGE.VERSION) {
+          console.warn('Storage version mismatch, clearing data');
+          localStorage.removeItem(key);
+          localStorage.removeItem(key + '_timestamp');
+          return null;
+        }
+
+        // Check if data is too old (30 days)
+        const age = Date.now() - parsed.timestamp;
+        const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days
+        
+        if (age > maxAge) {
+          console.warn('Data is too old, clearing');
+          localStorage.removeItem(key);
+          localStorage.removeItem(key + '_timestamp');
+          return null;
+        }
+
+        return parsed.data;
+        
+      } catch (error) {
+        console.error('Storage load failed:', error);
+        localStorage.removeItem(key);
+        localStorage.removeItem(key + '_timestamp');
+        return null;
+      }
+    },
+
+    remove: (key) => {
+      try {
+        localStorage.removeItem(key);
+        localStorage.removeItem(key + '_timestamp');
+      } catch (error) {
+        console.error('Storage remove failed:', error);
+      }
+    },
+
+    cleanup: () => {
+      try {
+        // Remove old PiNa Bakes data
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+          if (key.startsWith('pinabakes_') && !key.startsWith(PinaBakesApp.CONSTANTS.STORAGE.PREFIX)) {
+            localStorage.removeItem(key);
+          }
+        });
+        console.log('Storage cleanup completed');
+      } catch (error) {
+        console.error('Storage cleanup failed:', error);
+      }
+    }
+  };
+
+  // Search functionality
+  search = {
+    init: () => {
+      this.search.setupSearchIndex();
+    },
+
+    setupSearchIndex: () => {
+      if (!this.state.products.length) return;
+      
+      this.state.searchIndex = this.state.products.map(product => ({
+        slug: product.slug,
+        searchText: [
+          product.name,
+          product.tagline,
+          ...product.ingredients,
+          ...product.bullets,
+          ...product.tags
+        ].join(' ').toLowerCase()
+      }));
+    },
+
+    handleInput: (e) => {
+      const query = e.target.value.trim();
+      
+      if (query.length < PinaBakesApp.CONSTANTS.LIMITS.MIN_SEARCH_LENGTH) {
+        this.search.clearResults();
+        this.state.filteredProducts = null;
+        this.ui.renderProducts();
         return;
       }
 
-      const html = products.map(product => `
-        <article class="product-card" data-product-id="${product.slug}">
-          <div class="product-image-container">
-            <img src="${product.img}"
-                alt="${product.name} cookies by PiNa Bakes"
-                class="product-image"
-                loading="lazy"
-                width="600" height="600"
-                onerror="this.src='https://via.placeholder.com/600x600/f3f4f6/9ca3af?text=No+Image';">
-            ${product.price >= 300 ? '<span class="product-badge">Premium</span>' : ''}
-          </div>
-          <div class="product-content">
-            <h3 class="product-title">${product.name}</h3>
-            <div class="product-price">${this.formatPrice(product.price)}</div>
-            <p class="product-tagline">${product.tagline}</p>
-            <div class="product-actions">
-              <a href="#/product/${product.slug}" class="btn btn-secondary">View Details</a>
-              <button class="btn btn-primary" onclick="App.cart.add('${product.slug}')">Add to Cart</button>
-              <button class="btn btn-outline" onclick="App.wishlist.add('${product.slug}')">♡</button>
+      const results = this.search.performSearch(query);
+      this.search.showSuggestions(results);
+      
+      // Filter products
+      this.state.filteredProducts = this.state.products.filter(p => 
+        results.some(r => r.slug === p.slug)
+      );
+      
+      this.ui.renderProducts();
+    },
+
+    performSearch: (query) => {
+      if (!this.state.searchIndex || !query) return [];
+      
+      const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 1);
+      
+      return this.state.searchIndex
+        .filter(item => 
+          searchTerms.some(term => item.searchText.includes(term))
+        )
+        .slice(0, PinaBakesApp.CONSTANTS.LIMITS.MAX_SEARCH_RESULTS);
+    },
+
+    showSuggestions: (results) => {
+      if (!this.elements.searchSuggest) return;
+      
+      if (results.length === 0) {
+        this.search.clearResults();
+        return;
+      }
+
+      const suggestions = results.map(result => {
+        const product = this.state.products.find(p => p.slug === result.slug);
+        return `
+          <div class="search-suggestion" data-slug="${product.slug}">
+            <img src="${product.images[0]}" alt="${product.name}" class="suggestion-image" loading="lazy">
+            <div class="suggestion-content">
+              <div class="suggestion-name">${product.name}</div>
+              <div class="suggestion-price">${product.priceFormatted}</div>
             </div>
           </div>
-        </article>
-      `).join('');
+        `;
+      }).join('');
+
+      this.elements.searchSuggest.innerHTML = suggestions;
+      this.elements.searchSuggest.classList.add('active');
       
-      this.elements.productsGrid.innerHTML = html;
+      // Add click listeners to suggestions
+      this.elements.searchSuggest.querySelectorAll('.search-suggestion').forEach(suggestion => {
+        this.addEventListener(suggestion, 'click', (e) => {
+          const slug = suggestion.dataset.slug;
+          this.router.navigate(`#/product/${slug}`);
+          this.search.clearResults();
+        });
+      });
     },
 
-    renderProductDetail: (product) => {
-      if (!product || !this.elements.productDetail) return;
+    clearResults: () => {
+      if (this.elements.searchSuggest) {
+        this.elements.searchSuggest.innerHTML = '';
+        this.elements.searchSuggest.classList.remove('active');
+      }
+    },
+
+    handleFocus: () => {
+      if (this.elements.searchInput.value.trim().length >= PinaBakesApp.CONSTANTS.LIMITS.MIN_SEARCH_LENGTH) {
+        this.elements.searchSuggest?.classList.add('active');
+      }
+    },
+
+    handleBlur: () => {
+      // Delay clearing to allow click on suggestions
+      setTimeout(() => {
+        this.elements.searchSuggest?.classList.remove('active');
+      }, 200);
+    }
+  };
+
+  // Router functionality
+  router = {
+    handleRoute: () => {
+      const hash = window.location.hash;
+      const route = hash.replace('#/', '');
+      
+      if (!route || route === '') {
+        this.router.showHome();
+      } else if (route.startsWith('product/')) {
+        const slug = route.replace('product/', '');
+        this.router.showProduct(slug);
+      } else if (route === 'cart') {
+        this.cart.open();
+      } else if (route === 'wishlist') {
+        this.wishlist.open();
+      } else {
+        this.router.show404();
+      }
+    },
+
+    navigate: (route) => {
+      window.location.hash = route;
+    },
+
+    showHome: () => {
+      this.state.filteredProducts = null;
+      this.ui.renderProducts();
+      this.ui.closeAllModals();
+      
+      // Update page title
+      document.title = 'PiNa Bakes - Premium Millet Cookies';
+    },
+
+    showProduct: (slug) => {
+      const product = this.state.products.find(p => p.slug === slug);
+      
+      if (!product) {
+        this.router.show404();
+        return;
+      }
+
       this.state.currentProduct = product;
+      this.ui.renderProductDetail(product);
+      
+      // Update page title
+      document.title = `${product.name} - PiNa Bakes`;
+    },
 
-      this.elements.productTitle.textContent = product.name;
-      this.elements.productPrice.textContent = this.formatPrice(product.price);
-      this.elements.productTagline.textContent = product.tagline;
-
-      this.gallery.setup(product);
-
-      if (product.bullets && product.bullets.length > 0) {
-        this.elements.productFeatures.innerHTML = `<h3>Key Features</h3><ul>${product.bullets
-          .map((b) => `<li>${b}</li>`)
-          .join("")}</ul>`;
-      } else {
-        this.elements.productFeatures.innerHTML = "";
+    show404: () => {
+      if (this.elements.productsGrid) {
+        this.elements.productsGrid.innerHTML = `
+          <div class="not-found" role="alert">
+            <h2>Page Not Found</h2>
+            <p>The page you're looking for doesn't exist.</p>
+            <button onclick="window.location.hash = ''" class="btn btn-primary">
+              Go Home
+            </button>
+          </div>
+        `;
       }
-
-      if (product.ingredients && product.ingredients.length > 0) {
-        this.elements.productIngredients.innerHTML = product.ingredients
-          .map((ing) => `<li>${ing}</li>`)
-          .join("");
-      } else {
-        this.elements.productIngredients.innerHTML = "";
-      }
-
-      this.ui.renderNutritionInfo(product);
-
-      if (this.elements.addToCartDetail)
-        this.elements.addToCartDetail.onclick = () => this.cart.add(product.slug);
-      if (this.elements.addToWishlistDetail)
-        this.elements.addToWishlistDetail.onclick = () => this.wishlist.add(product.slug);
-
-      this.elements.productDetail.style.display = "block";
-      document.querySelectorAll("main > section").forEach((s) => {
-        if (s.id !== "product-detail") s.style.display = "none";
-      });
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    },
-
-    renderNutritionInfo: (product) => {
-      const n = product.nutrition || {
-        energy: "— kcal", protein: "— g", fat: "— g", carbs: "— g",
-        sugar: "— g", fibre: "— g", sodium: "— mg",
-      };
-      const rows = [
-        ["Energy", n.energy], ["Protein", n.protein], ["Total Fat", n.fat],
-        ["Carbohydrates", n.carbs], ["Added Sugar", n.sugar], 
-        ["Dietary Fibre", n.fibre], ["Sodium", n.sodium],
-      ];
-      this.elements.nutritionTable.innerHTML = rows
-        .map(([k, v]) => 
-          `<tr><td style="padding: .75rem; border: 1px solid #dee2e6;">${k}</td><td style="padding: .75rem; border: 1px solid #dee2e6;">${v}</td></tr>`
-        ).join("");
-    },
-
-    hideProductDetail: () => {
-      document.querySelectorAll("main > section").forEach((s) => {
-        if (s.id !== "product-detail") s.style.display = ""; // ← revert to CSS default
-      });
-      if (this.elements.productDetail) this.elements.productDetail.style.display = "none";
-      this.state.currentProduct = null;
-    },
+      
+      document.title = 'Page Not Found - PiNa Bakes';
+    }
   };
 
-  gallery = {
-    setup: (product) => {
-      const images = this.normalizeImages(product);
-      this.state.currentImageIndex = 0;
-      this.gallery.updateMainImage(images[0], product.name);
-      this.gallery.renderThumbnails(images, product.name);
-    },
-
-    updateMainImage: (src, productName) => {
-      const img = this.elements.productMainImage;
-      if (!img) return;
-      img.src = src;
-      img.alt = `${productName} cookies - Main image`;
-    },
-
-    renderThumbnails: (images, productName) => {
-      if (!this.elements.productThumbnails) return;
-      this.elements.productThumbnails.innerHTML = images
-        .map((image, index) => 
-          `<img src="${image}" 
-                alt="${productName} - Thumbnail ${index + 1}"
-                class="product-thumbnail ${index === 0 ? "active" : ""}"
-                loading="lazy"
-                width="80" height="80"
-                onclick="App.gallery.selectImage(${index})">`
-        ).join("");
-    },
-
-    selectImage: (index) => {
-      if (!this.state.currentProduct) return;
-      const images = this.normalizeImages(this.state.currentProduct);
-      if (index >= 0 && index < images.length) {
-        this.state.currentImageIndex = index;
-        this.gallery.updateMainImage(images[index], this.state.currentProduct.name);
-        this.gallery.updateActiveThumbnail(index);
-      }
-    },
-
-    updateActiveThumbnail: (activeIndex) => {
-      const thumbs = this.elements.productThumbnails?.querySelectorAll(".product-thumbnail") || [];
-      thumbs.forEach((t, i) => t.classList.toggle("active", i === activeIndex));
-    },
-  };
-
+  // Cart functionality
   cart = {
     load: () => {
-      try {
-        const saved = localStorage.getItem(this.config.storageKeys.cart);
-        this.state.cart = saved ? JSON.parse(saved) : [];
-        this.cart.render();
-      } catch (error) {
-        console.error("Failed to load cart:", error);
-        this.state.cart = [];
-      }
+      const cartData = this.storage.load(this.config.storageKeys.cart);
+      this.state.cart = cartData || [];
+      this.cart.updateUI();
     },
 
     save: () => {
-      try {
-        localStorage.setItem(this.config.storageKeys.cart, JSON.stringify(this.state.cart));
-      } catch (error) {
-        console.error("Failed to save cart:", error);
-      }
+      this.storage.save(this.config.storageKeys.cart, this.state.cart);
+      this.cart.updateUI();
     },
 
-    add: (productSlug, quantity = 1) => {
-      const product = this.state.products.find(p => p.slug === productSlug);
-      if (!product) {
-        this.ui.showError("Product not found");
-        return;
-      }
+    addItem: (slug, quantity = 1) => {
+      const product = this.state.products.find(p => p.slug === slug);
+      if (!product) return;
+
+      const existingItem = this.state.cart.find(item => item.slug === slug);
       
-      const existing = this.state.cart.find(item => item.slug === productSlug);
-      if (existing) {
-        existing.quantity += quantity;
+      if (existingItem) {
+        existingItem.quantity += quantity;
       } else {
-        this.state.cart.push({ ...product, quantity });
+        this.state.cart.push({
+          slug: slug,
+          name: product.name,
+          price: product.price,
+          image: product.images[0],
+          quantity: quantity
+        });
       }
 
       this.cart.save();
-      this.cart.render();
-      this.ui.showToast(`${product.name} added to cart!`, "success");
+      this.ui.showToast(`${product.name} added to cart`, 'success');
     },
 
-    remove: (slug) => {
+    removeItem: (slug) => {
       this.state.cart = this.state.cart.filter(item => item.slug !== slug);
       this.cart.save();
-      this.cart.render();
-      this.ui.showToast("Item removed from cart");
     },
 
-    updateQuantity: (slug, newQuantity) => {
-      if (newQuantity <= 0) {
-        return this.cart.remove(slug);
-      }
-      
+    updateQuantity: (slug, quantity) => {
       const item = this.state.cart.find(item => item.slug === slug);
-      if (item) {
-        item.quantity = newQuantity;
+      if (!item) return;
+
+      if (quantity <= 0) {
+        this.cart.removeItem(slug);
+      } else {
+        item.quantity = Math.min(quantity, 10); // Max 10 per item
         this.cart.save();
-        this.cart.render();
       }
-    },
-
-    getSubtotal: () => this.state.cart.reduce((total, item) => total + (item.price * item.quantity), 0),
-
-    getDiscount: (subtotal) => {
-      const c = this.state.appliedCoupon;
-      if (c && c.type === "percent") {
-        return Math.round((subtotal * c.value) / 100);
-      }
-      return 0;
-    },
-
-    getShipping: (subtotalAfterDiscount) => {
-      if (subtotalAfterDiscount >= this.config.freeShippingThreshold) return 0;
-      return this.state.cart.length > 0 ? this.config.shippingCharge : 0;
     },
 
     getTotal: () => {
-      const sub = this.cart.getSubtotal();
-      const disc = this.cart.getDiscount(sub);
-      const subAfter = Math.max(0, sub - disc);
-      const ship = this.cart.getShipping(subAfter);
-      return Math.max(0, subAfter + ship);
+      return this.state.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
     },
 
-    applyCoupon: () => {
-      const input = this.elements.couponCode;
-      const code = (input?.value || "").trim().toUpperCase();
-      if (!code) {
-        this.state.appliedCoupon = null;
-        this.cart.render();
-        return;
-      }
-      const def = this.config.coupons[code];
-      if (!def) {
-        this.state.appliedCoupon = null;
-        this.cart.render();
-        this.ui.showToast("Invalid coupon code", "error");
-        if (this.elements.couponMsg) this.elements.couponMsg.textContent = "Invalid code";
-        return;
-      }
-      this.state.appliedCoupon = { code, ...def };
-      this.cart.render();
-      this.ui.showToast(`Coupon applied: ${code} (${def.value}% off)`, "success");
-      if (this.elements.couponMsg)
-        this.elements.couponMsg.textContent = `Applied ${code}: ${def.value}% off`;
+    getItemCount: () => {
+      return this.state.cart.reduce((count, item) => count + item.quantity, 0);
     },
 
-    render: () => {
-      const totalItems = this.state.cart.reduce((count, item) => count + item.quantity, 0);
-      if (this.elements.cartCount) {
-        this.elements.cartCount.textContent = totalItems;
-        this.elements.cartCount.style.display = totalItems > 0 ? "flex" : "none";
-      }
-
-      if (this.elements.cartItems) {
-        if (this.state.cart.length === 0) {
-          this.elements.cartItems.innerHTML = `
-            <div style="text-align:center;padding:3rem 1rem;color:var(--text-secondary);">
-              <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom:1rem;opacity:.5;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01"/>
-              </svg>
-              <p>Your cart is empty</p>
-              <button class="btn btn-primary" onclick="App.cart.close(); App.router.navigate('#products');">Browse Products</button>
-            </div>`;
-        } else {
-          this.elements.cartItems.innerHTML = this.state.cart
-            .map((item) => `
-            <div class="cart-item">
-              <img src="${item.img}" alt="${item.name}" class="cart-item-image">
-              <div class="cart-item-details" style="flex: 1;">
-                <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-price">${this.formatPrice(item.price)}</div>
-                <div class="cart-item-actions">
-                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${item.slug}', ${item.quantity - 1})" aria-label="Decrease quantity">-</button>
-                  <span style="min-width:2rem; text-align:center;">${item.quantity}</span>
-                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${item.slug}', ${item.quantity + 1})" aria-label="Increase quantity">+</button>
-                </div>
-              </div>
-              <div style="text-align:right;">
-                <div style="font-weight:600;">${this.formatPrice(item.price * item.quantity)}</div>
-                <button onclick="App.cart.remove('${item.slug}')" style="color:#dc2626; background:none; border:none; cursor:pointer; margin-top:.5rem; font-size:.875rem;" aria-label="Remove ${item.name} from cart">Remove</button>
-              </div>
-            </div>
-          `).join("");
-        }
-      }
-
-      const subtotal = this.cart.getSubtotal();
-      const discount = this.cart.getDiscount(subtotal);
-      const afterDiscount = Math.max(0, subtotal - discount);
-      const shipping = this.cart.getShipping(afterDiscount);
-      const total = afterDiscount + shipping;
-
-      if (this.elements.cartSubtotal)
-        this.elements.cartSubtotal.textContent = this.formatPrice(subtotal);
-      if (this.elements.cartDiscount)
-        this.elements.cartDiscount.textContent = discount > 0 ? `- ${this.formatPrice(discount)}` : this.formatPrice(0);
-      if (this.elements.cartShipping)
-        this.elements.cartShipping.textContent = this.formatPrice(shipping);
-      if (this.elements.shippingNote)
-        this.elements.shippingNote.textContent = `Shipping ₹${this.config.shippingCharge} applies below ₹${this.config.freeShippingThreshold}. Free shipping on orders ₹${this.config.freeShippingThreshold}+`;
-      if (this.elements.cartTotal)
-        this.elements.cartTotal.textContent = this.formatPrice(total);
-      if (this.elements.checkoutForm)
-        this.elements.checkoutForm.style.display = this.state.cart.length > 0 ? "block" : "none";
+    clear: () => {
+      this.state.cart = [];
+      this.cart.save();
     },
 
-    toggle: () => (this.state.isCartOpen ? this.cart.close() : this.cart.open()),
+    toggle: () => {
+      this.state.isCartOpen ? this.cart.close() : this.cart.open();
+    },
 
     open: () => {
       this.state.isCartOpen = true;
-      this.elements.cartModal.classList.add("active");
-      this.elements.modalOverlay.classList.add("active");
-      document.body.style.overflow = "hidden";
+      this.elements.cartModal?.classList.add('active');
+      this.elements.modalOverlay?.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      // Focus management
+      const firstInput = this.elements.cartModal?.querySelector('input, button');
+      if (firstInput) {
+        setTimeout(() => firstInput.focus(), 100);
+      }
+
+      this.cart.renderCartItems();
     },
 
     close: () => {
       this.state.isCartOpen = false;
-      this.elements.cartModal.classList.remove("active");
+      this.elements.cartModal?.classList.remove('active');
       if (!this.state.isMobileMenuOpen && !this.state.isWishlistOpen) {
-        this.elements.modalOverlay.classList.remove("active");
+        this.elements.modalOverlay?.classList.remove('active');
       }
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     },
-  };
 
-  wishlist = {
-    load: () => {
-      try {
-        const saved = localStorage.getItem(this.config.storageKeys.wishlist);
-        this.state.wishlist = saved ? JSON.parse(saved) : [];
-        this.wishlist.render();
-      } catch (e) {
-        console.error("Failed to load wishlist:", e);
-        this.state.wishlist = [];
+    updateUI: () => {
+      const count = this.cart.getItemCount();
+      if (this.elements.cartCount) {
+        this.elements.cartCount.textContent = count;
+        this.elements.cartCount.style.display = count > 0 ? 'inline' : 'none';
       }
     },
 
-    save: () => {
-      try {
-        localStorage.setItem(this.config.storageKeys.wishlist, JSON.stringify(this.state.wishlist));
-      } catch (e) {
-        console.error("Failed to save wishlist:", e);
-      }
-    },
+    renderCartItems: () => {
+      if (!this.elements.cartItems) return;
 
-    add: (productSlug) => {
-      const product = this.state.products.find((p) => p.slug === productSlug);
-      if (!product) return this.ui.showError("Product not found");
-      
-      const exists = this.state.wishlist.find((i) => i.slug === productSlug);
-      if (exists) {
-        this.ui.showToast("Already in wishlist");
+      if (this.state.cart.length === 0) {
+        this.elements.cartItems.innerHTML = `
+          <div class="empty-cart">
+            <p>Your cart is empty</p>
+            <button onclick="window.pinaBakesApp.cart.close()" class="btn btn-primary">
+              Continue Shopping
+            </button>
+          </div>
+        `;
         return;
       }
-      
-      this.state.wishlist.push({ ...product });
-      this.wishlist.save();
-      this.wishlist.render();
-      this.ui.showToast(`${product.name} added to wishlist`);
-    },
 
-    remove: (slug) => {
-      this.state.wishlist = this.state.wishlist.filter((i) => i.slug !== slug);
-      this.wishlist.save();
-      this.wishlist.render();
-      this.ui.showToast("Removed from wishlist");
-    },
-
-    moveToCart: (slug) => {
-      const item = this.state.wishlist.find((i) => i.slug === slug);
-      if (!item) return;
-      this.cart.add(slug, 1);
-      this.wishlist.remove(slug);
-    },
-
-    moveAllToCart: () => {
-      this.state.wishlist.forEach((i) => this.cart.add(i.slug, 1));
-      this.state.wishlist = [];
-      this.wishlist.save();
-      this.wishlist.render();
-      this.ui.showToast("Moved all to cart");
-    },
-
-    render: () => {
-      const count = this.state.wishlist.length;
-      if (this.elements.wishlistCount) {
-        this.elements.wishlistCount.textContent = count;
-        this.elements.wishlistCount.style.display = count > 0 ? "flex" : "none";
-      }
-
-      if (this.elements.wishlistItems) {
-        if (count === 0) {
-          this.elements.wishlistItems.innerHTML = `
-            <div style="text-align:center; padding:3rem 1rem; color:var(--text-secondary);">
-              <svg width="64" height="64" viewBox="0 0 24 24" style="margin-bottom:1rem; opacity:.5;">
-                <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 8.25 12 9 12 .75 0 9-4.78 9-12z" fill="currentColor"/>
-              </svg>
-              <p>Your wishlist is empty</p>
-              <button class="btn btn-primary" onclick="App.wishlist.close(); App.router.navigate('#products');">Browse Products</button>
-            </div>`;
-        } else {
-          this.elements.wishlistItems.innerHTML = this.state.wishlist
-            .map((item) => `
-            <div class="wishlist-item">
-              <img src="${item.img}" alt="${item.name}" class="wishlist-item-image">
-              <div class="wishlist-item-details">
-                <div class="wishlist-item-title">${item.name}</div>
-                <div class="cart-item-price">${this.formatPrice(item.price)}</div>
-                <div class="wishlist-item-actions">
-                  <button class="btn btn-primary" onclick="App.wishlist.moveToCart('${item.slug}')">Move to Cart</button>
-                  <a class="btn btn-secondary" href="#/product/${item.slug}" onclick="App.wishlist.close()">View Details</a>
-                  <button class="btn btn-outline" onclick="App.wishlist.remove('${item.slug}')">Remove</button>
-                </div>
-              </div>
+      const cartHtml = this.state.cart.map(item => `
+        <div class="cart-item" data-slug="${item.slug}">
+          <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+          <div class="cart-item-details">
+            <h4>${item.name}</h4>
+            <div class="cart-item-controls">
+              <button class="quantity-btn" data-action="decrease" data-slug="${item.slug}" aria-label="Decrease quantity">-</button>
+              <span class="quantity">${item.quantity}</span>
+              <button class="quantity-btn" data-action="increase" data-slug="${item.slug}" aria-label="Increase quantity">+</button>
+              <button class="remove-btn" data-action="remove" data-slug="${item.slug}" aria-label="Remove item">×</button>
             </div>
-          `).join("");
+            <div class="cart-item-price">${this.formatPrice(item.price * item.quantity)}</div>
+          </div>
+        </div>
+      `).join('');
+
+      this.elements.cartItems.innerHTML = cartHtml;
+      this.cart.updateCartTotal();
+      this.cart.setupCartItemListeners();
+    },
+
+    setupCartItemListeners: () => {
+      // Quantity controls
+      document.querySelectorAll('.quantity-btn').forEach(btn => {
+        this.addEventListener(btn, 'click', (e) => {
+          const slug = btn.dataset.slug;
+          const action = btn.dataset.action;
+          const currentItem = this.state.cart.find(item => item.slug === slug);
+          
+          if (!currentItem) return;
+          
+          let newQuantity = currentItem.quantity;
+          if (action === 'increase') {
+            newQuantity += 1;
+          } else if (action === 'decrease') {
+            newQuantity -= 1;
+          }
+          
+          this.cart.updateQuantity(slug, newQuantity);
+          this.cart.renderCartItems();
+        });
+      });
+
+      // Remove buttons
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        this.addEventListener(btn, 'click', (e) => {
+          const slug = btn.dataset.slug;
+          this.cart.removeItem(slug);
+          this.cart.renderCartItems();
+          this.ui.showToast('Item removed from cart', 'info');
+        });
+      });
+    },
+
+    updateCartTotal: () => {
+      const subtotal = this.cart.getTotal();
+      const shipping = subtotal >= this.config.freeShippingThreshold ? 0 : this.config.shippingCharge;
+      const total = subtotal + shipping;
+
+      if (this.elements.cartSubtotal) {
+        this.elements.cartSubtotal.textContent = this.formatPrice(subtotal);
+      }
+      if (this.elements.cartShipping) {
+        this.elements.cartShipping.textContent = shipping === 0 ? 'FREE' : this.formatPrice(shipping);
+      }
+      if (this.elements.cartTotal) {
+        this.elements.cartTotal.textContent = this.formatPrice(total);
+      }
+      if (this.elements.shippingNote) {
+        if (subtotal < this.config.freeShippingThreshold) {
+          const remaining = this.config.freeShippingThreshold - subtotal;
+          this.elements.shippingNote.textContent = `Add ${this.formatPrice(remaining)} more for free shipping`;
+        } else {
+          this.elements.shippingNote.textContent = 'You qualify for free shipping!';
         }
       }
     },
 
-    toggle: () => (this.state.isWishlistOpen ? this.wishlist.close() : this.wishlist.open()),
+    applyCoupon: () => {
+      if (!this.elements.couponCode) return;
+      
+      const code = this.elements.couponCode.value.trim().toUpperCase();
+      const coupon = this.config.coupons[code];
+      
+      if (!coupon) {
+        this.ui.showToast('Invalid coupon code', 'error');
+        return;
+      }
+
+      this.state.appliedCoupon = coupon;
+      this.elements.couponCode.disabled = true;
+      this.cart.updateCartTotal();
+      this.ui.showToast(`Coupon applied! ${coupon.value}% off`, 'success');
+    }
+  };
+
+  // Wishlist functionality
+  wishlist = {
+    load: () => {
+      const wishlistData = this.storage.load(this.config.storageKeys.wishlist);
+      this.state.wishlist = wishlistData || [];
+      this.wishlist.updateUI();
+    },
+
+    save: () => {
+      this.storage.save(this.config.storageKeys.wishlist, this.state.wishlist);
+      this.wishlist.updateUI();
+    },
+
+    addItem: (slug) => {
+      const product = this.state.products.find(p => p.slug === slug);
+      if (!product) return;
+
+      if (this.wishlist.hasItem(slug)) {
+        this.ui.showToast('Item already in wishlist', 'info');
+        return;
+      }
+
+      this.state.wishlist.push({
+        slug: slug,
+        name: product.name,
+        price: product.price,
+        image: product.images[0],
+        addedAt: Date.now()
+      });
+
+      this.wishlist.save();
+      this.ui.showToast(`${product.name} added to wishlist`, 'success');
+    },
+
+    removeItem: (slug) => {
+      this.state.wishlist = this.state.wishlist.filter(item => item.slug !== slug);
+      this.wishlist.save();
+    },
+
+    hasItem: (slug) => {
+      return this.state.wishlist.some(item => item.slug === slug);
+    },
+
+    toggle: () => {
+      this.state.isWishlistOpen ? this.wishlist.close() : this.wishlist.open();
+    },
 
     open: () => {
       this.state.isWishlistOpen = true;
-      this.elements.wishlistModal.classList.add("active");
-      this.elements.modalOverlay.classList.add("active");
-      document.body.style.overflow = "hidden";
+      this.elements.wishlistModal?.classList.add('active');
+      this.elements.modalOverlay?.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      this.wishlist.renderWishlistItems();
     },
 
     close: () => {
       this.state.isWishlistOpen = false;
-      this.elements.wishlistModal.classList.remove("active");
+      this.elements.wishlistModal?.classList.remove('active');
       if (!this.state.isMobileMenuOpen && !this.state.isCartOpen) {
-        this.elements.modalOverlay.classList.remove("active");
+        this.elements.modalOverlay?.classList.remove('active');
       }
-      document.body.style.overflow = "";
+      document.body.style.overflow = '';
     },
-  };
 
-  checkout = {
-    populateForm: () => {
-      if (!this.state.user || !this.elements.checkoutForm) return;
-      ["name", "phone", "pincode", "city", "address", "notes"].forEach((field) => {
-        const el = document.getElementById(`customer-${field}`);
-        if (el && this.state.user[field]) el.value = this.state.user[field];
+    updateUI: () => {
+      const count = this.state.wishlist.length;
+      if (this.elements.wishlistCount) {
+        this.elements.wishlistCount.textContent = count;
+        this.elements.wishlistCount.style.display = count > 0 ? 'inline' : 'none';
+      }
+    },
+
+    renderWishlistItems: () => {
+      if (!this.elements.wishlistItems) return;
+
+      if (this.state.wishlist.length === 0) {
+        this.elements.wishlistItems.innerHTML = `
+          <div class="empty-wishlist">
+            <p>Your wishlist is empty</p>
+            <button onclick="window.pinaBakesApp.wishlist.close()" class="btn btn-primary">
+              Continue Shopping
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const wishlistHtml = this.state.wishlist.map(item => `
+        <div class="wishlist-item" data-slug="${item.slug}">
+          <img src="${item.image}" alt="${item.name}" class="wishlist-item-image">
+          <div class="wishlist-item-details">
+            <h4>${item.name}</h4>
+            <div class="wishlist-item-price">${this.formatPrice(item.price)}</div>
+            <div class="wishlist-item-actions">
+              <button class="btn btn-primary btn-sm" data-action="add-to-cart" data-slug="${item.slug}">
+                Add to Cart
+              </button>
+              <button class="btn btn-secondary btn-sm" data-action="remove" data-slug="${item.slug}">
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      this.elements.wishlistItems.innerHTML = wishlistHtml;
+      this.wishlist.setupWishlistItemListeners();
+    },
+
+    setupWishlistItemListeners: () => {
+      // Add to cart buttons
+      document.querySelectorAll('[data-action="add-to-cart"]').forEach(btn => {
+        this.addEventListener(btn, 'click', (e) => {
+          const slug = btn.dataset.slug;
+          this.cart.addItem(slug);
+        });
       });
-    },
 
-    handleFormSubmit: (e) => {
+      // Remove buttons
+      document.querySelectorAll('[data-action="remove"]').forEach(btn => {
+        this.addEventListener(btn, 'click', (e) => {
+          const slug = btn.dataset.slug;
+          this.wishlist.removeItem(slug);
+          this.wishlist.renderWishlistItems();
+          this.ui.showToast('Item removed from wishlist', 'info');
+        });
+      });
+    }
+  };
+
+  // Checkout functionality
+  checkout = {
+    handleFormSubmit: async (e) => {
       e.preventDefault();
-      this.checkout.proceed();
-    },
-
-    proceed: () => {
-      if (this.state.cart.length === 0) {
-        return this.ui.showToast("Your cart is empty!", "error");
+      
+      if (!this.validation.validateCheckoutForm()) {
+        this.ui.showToast('Please correct the errors in the form', 'error');
+        return;
       }
 
-      const formData = {
-        name: (document.getElementById("customer-name")?.value || "").trim(),
-        phone: (document.getElementById("customer-phone")?.value || "").trim(),
-        pincode: (document.getElementById("customer-pincode")?.value || "").trim(),
-        city: (document.getElementById("customer-city")?.value || "").trim(),
-        address: (document.getElementById("customer-address")?.value || "").trim(),
-        notes: (document.getElementById("customer-notes")?.value || "").trim(),
-      };
-
-      if (!formData.name || !formData.phone || !formData.address) {
-        return this.ui.showToast("Please fill in required fields", "error");
-      }
-
-      this.saveUserData(formData);
-
-      const subtotal = this.cart.getSubtotal();
-      const discount = this.cart.getDiscount(subtotal);
-      const subtotalAfter = Math.max(0, subtotal - discount);
-      const shipping = this.cart.getShipping(subtotalAfter);
-      const total = subtotalAfter + shipping;
-
-      const itemsList = this.state.cart
-        .map((i) => `• ${i.name} (×${i.quantity}) - ${this.formatPrice(i.price * i.quantity)}`)
-        .join("\n");
-
-      const order = {
-        id: `PIN${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        coupon: this.state.appliedCoupon?.code || "",
-        subtotal,
-        discount,
-        shipping,
-        total,
-        customer: formData,
-        items: this.state.cart.map((i) => ({
-          slug: i.slug,
-          name: i.name,
-          qty: i.quantity,
-          price: i.price,
-        })),
-      };
-
+      this.ui.showLoader();
+      this.ui.showToast('Processing your order...', 'info');
+      
       try {
-        const key = this.config.storageKeys.orders;
-        const prev = JSON.parse(localStorage.getItem(key) || "[]");
-        prev.push(order);
-        localStorage.setItem(key, JSON.stringify(prev));
-      } catch (e) {
-        console.warn("Could not persist orders locally:", e);
+        const orderData = this.checkout.prepareOrderData();
+        await this.checkout.submitOrder(orderData);
+        
+        this.checkout.handleSuccessfulOrder();
+        
+      } catch (error) {
+        this.handleError(error, 'Order submission failed');
+        this.ui.showToast('Order submission failed. Please try again.', 'error');
+      } finally {
+        this.ui.hideLoader();
       }
+    },
 
-      const message = this.checkout.generateWhatsAppMessage(order, itemsList);
-      const whatsappUrl = `https://wa.me/${this.config.whatsappNumber}?text=${encodeURIComponent(message)}`;
+    prepareOrderData: () => {
+      const form = this.elements.checkoutForm;
+      const formData = new FormData(form);
       
-      this.state.cart = [];
-      this.cart.save();
-      this.cart.render();
+      return {
+        customer: {
+          name: formData.get('name'),
+          email: formData.get('email'),
+          phone: formData.get('phone'),
+          address: formData.get('address')
+        },
+        items: this.state.cart.map(item => ({
+          name: item.name,
+          slug: item.slug,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity
+        })),
+        totals: {
+          subtotal: this.cart.getTotal(),
+          shipping: this.cart.getTotal() >= this.config.freeShippingThreshold ? 0 : this.config.shippingCharge,
+          discount: this.state.appliedCoupon ? this.cart.getTotal() * (this.state.appliedCoupon.value / 100) : 0,
+          total: this.cart.getTotal() + (this.cart.getTotal() >= this.config.freeShippingThreshold ? 0 : this.config.shippingCharge)
+        },
+        coupon: this.state.appliedCoupon,
+        orderDate: new Date().toISOString(),
+        orderId: this.generateOrderId()
+      };
+    },
+
+    submitOrder: async (orderData) => {
+      const response = await this.fetchWithTimeout(this.config.orderWebhook, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Order submission failed: ${response.status}`);
+      }
+
+      return response.json();
+    },
+
+    handleSuccessfulOrder: () => {
+      // Clear cart
+      this.cart.clear();
       
-      window.open(whatsappUrl, "_blank");
-      this.ui.showToast("Order placed! Redirecting to WhatsApp...", "success");
-      this.cart.close();
-    },
-
-    generateWhatsAppMessage: (order, itemsList) => {
-      const lines = [
-        `🍪 *PiNa Bakes Order Request*`,
-        ``,
-        `*Items Ordered:*`,
-        itemsList,
-        ``,
-        `*Subtotal:* ${this.formatPrice(order.subtotal)}`,
-      ];
-      if (order.discount > 0) {
-        lines.push(`*Discount${order.coupon ? ` (${order.coupon})` : ""}:* -${this.formatPrice(order.discount)}`);
-      }
-      if (order.shipping > 0) lines.push(`*Shipping:* ${this.formatPrice(order.shipping)}`);
-      else lines.push(`*Shipping:* Free`);
-      lines.push(`*Total Amount:* ${this.formatPrice(order.total)}`, ``);
+      // Close modals
+      this.ui.closeAllModals();
       
-      const c = order.customer;
-      lines.push(
-        `*Customer Details:*`,
-        `👤 Name: ${c.name || "—"}`,
-        `📱 Phone: ${c.phone || "—"}`,
-        `📮 Pincode: ${c.pincode || "—"}`,
-        `🏙️ City: ${c.city || "—"}`,
-        `🏠 Address: ${c.address || "—"}`,
-        `📝 Notes: ${c.notes || "—"}`,
-        ``,
-        `Thank you for choosing PiNa Bakes! 🙏`,
-        `Please confirm the order and let me know the delivery timeline.`
-      );
-      return lines.join("\n");
-    },
-  };
-
-  router = {
-    handleRoute: () => {
-      const hash = window.location.hash || "#home";
-      const m = hash.match(/^#\/product\/([^?#]+)/);
-      if (m && m[1]) {
-        this.router.showProduct(decodeURIComponent(m[1]));
-        return;
-      }
-      const sectionId = hash.replace(/^#/, "") || "home";
-      this.router.showSection(sectionId);
-    },
-
-    navigate: (path) => {
-      if (path.startsWith("#")) window.location.hash = path;
-      else if (path.startsWith("/")) window.location.hash = `#${path}`;
-      else window.location.hash = `#${path}`;
-    },
-
-    showProduct: (slug) => {
-      if (!Array.isArray(this.state.products) || !this.state.products.length) {
-        return this.ui.showError("Products not loaded yet.");
-      }
-      const product = this.state.products.find((p) => String(p.slug) === String(slug));
-      if (!product) {
-        this.ui.showError(`Product not found: ${slug}`);
-        this.router.navigate("#products");
-        return;
-      }
-      this.ui.renderProductDetail(product);
-    },
-
-    showSection: (id) => {
-      this.ui.hideProductDetail();
-      if (id && id !== "home") {
-        const el = document.getElementById(id);
-        el ? el.scrollIntoView({ behavior: "smooth" }) : window.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    },
-  };
-
-  search = {
-    init: () => {
-      const searchInput = this.elements.searchInput;
-      const suggestions = this.elements.searchSuggest;
+      // Reset form
+      this.elements.checkoutForm?.reset();
       
-      if (searchInput && suggestions) {
-        searchInput.addEventListener('input', (e) => {
-          const query = e.target.value.toLowerCase().trim();
-          if (!query) {
-            suggestions.classList.remove('active');
-            return;
-          }
-
-          const results = this.state.products.filter(product => 
-            product.name.toLowerCase().includes(query) ||
-            product.tagline.toLowerCase().includes(query) ||
-            product.ingredients.some(ing => ing.toLowerCase().includes(query))
-          ).slice(0, 5);
-
-          if (results.length === 0) {
-            suggestions.classList.remove('active');
-            return;
-          }
-
-          suggestions.innerHTML = results.map(product => 
-            `<div class="search-suggestion" onclick="App.router.navigate('#/product/${product.slug}'); App.search.closeSuggestions();">
-              ${product.name} · ${this.formatPrice(product.price)}
-            </div>`
-          ).join('');
-
-          suggestions.classList.add('active');
-        });
-
-        document.addEventListener('click', (e) => {
-          if (!searchInput.contains(e.target) && !suggestions.contains(e.target)) {
-            suggestions.classList.remove('active');
-          }
-        });
-      }
+      // Show success message
+      this.ui.showToast('Order placed successfully! You will receive a confirmation shortly.', 'success', 5000);
+      
+      // Navigate to home
+      this.router.navigate('#/');
     },
 
-    setupSearchIndex: () => {
-      console.log("Search index ready");
-    },
-
-    closeSuggestions: () => {
-      const suggestions = this.elements.searchSuggest;
-      if (suggestions) {
-        suggestions.classList.remove('active');
-      }
-    },
-  };
-
-  formatPrice(price) {
-    return new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(price);
-  }
-
-  normalizeImages(product) {
-    const out = [];
-    if (Array.isArray(product.images)) out.push(...product.images.filter(Boolean));
-    if (typeof product.images === "string") {
-      out.push(...product.images.split(",").map((s) => s.trim()).filter(Boolean));
+    generateOrderId: () => {
+      const timestamp = Date.now().toString(36);
+      const random = Math.random().toString(36).substring(2);
+      return `PB-${timestamp}-${random}`.toUpperCase();
     }
-    ["img", "image", "image1", "image2", "image3", "image4", "image5", "image6"].forEach((k) => {
-      const v = product[k];
-      if (v && !out.includes(v)) out.push(v);
-    });
-    return out.length ? out : [product.img].filter(Boolean);
-  }
+  };
 
+  // Utility methods
   loadUserData() {
-    try {
-      const userData = localStorage.getItem(this.config.storageKeys.user);
-      if (userData) {
-        this.state.user = JSON.parse(userData);
-        this.checkout.populateForm();
-      }
-    } catch (error) {
-      console.error("Failed to load user data:", error);
-    }
-  }
-
-  saveUserData(userData) {
-    try {
+    const userData = this.storage.load(this.config.storageKeys.user);
+    if (userData) {
       this.state.user = userData;
-      localStorage.setItem(this.config.storageKeys.user, JSON.stringify(userData));
-    } catch (error) {
-      console.error("Failed to save user data:", error);
     }
   }
 
-  updateCurrentYear() {
+  updateCurrentYear() { 
     if (this.elements.currentYear) {
       this.elements.currentYear.textContent = new Date().getFullYear();
     }
   }
 
   setupHeaderScrollEffect() {
-    window.addEventListener("scroll", this.throttle(() => {
-      const y = window.scrollY;
-      if (y > 100) this.elements.header.classList.add("scrolled");
-      else this.elements.header.classList.remove("scrolled");
-    }, 10));
-  }
-
-  handleKeyboardShortcuts(e) {
-    if (e.key === "Escape") this.ui.closeAllModals();
-  }
-
-  handleResize() {
-    if (window.innerWidth > 768 && this.state.isMobileMenuOpen) this.ui.closeMobileMenu();
-  }
-
-  debounce(func, wait) {
-    let timeout;
-    return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  }
-
-  throttle(func, limit) {
-    let inThrottle;
-    return (...args) => {
-      if (!inThrottle) {
-        func(...args);
-        inThrottle = true;
-        setTimeout(() => (inThrottle = false), limit);
+    let lastScrollY = window.scrollY;
+    
+    const handleScroll = this.debounce(() => {
+      const currentScrollY = window.scrollY;
+      const header = this.elements.header;
+      
+      if (!header) return;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        header.classList.add('header-hidden');
+      } else {
+        header.classList.remove('header-hidden');
       }
-    };
+      
+      lastScrollY = currentScrollY;
+    }, 10);
+
+    this.addEventListener(window, 'scroll', handleScroll);
+  }
+
+  // Cleanup method for proper disposal
+  destroy() {
+    // Remove all event listeners
+    this.removeAllEventListeners();
+    
+    // Cancel any ongoing requests
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+    
+    // Clear timeouts
+    clearTimeout(this.toastTimeout);
+    clearTimeout(this.searchTimeout);
+    
+    // Clear DOM references
+    this.elements = {};
+    
+    // Clear state
+    this.state = {};
+    
+    console.log('PiNa Bakes app destroyed');
   }
 }
 
-// Initialize the app
-const App = new PinaBakesApp();
-window.App = App;
+// Initialize app when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Initializing PiNa Bakes app...');
+  window.pinaBakesApp = new PinaBakesApp();
+});
 
-console.log("PiNa Bakes app loaded successfully!");
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+  if (window.pinaBakesApp) {
+    window.pinaBakesApp.destroy();
+  }
+});
+
+// Handle service worker updates
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(registration => {
+        console.log('SW registered: ', registration);
+        
+        // Listen for SW updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New SW is available, show update prompt
+              if (window.pinaBakesApp) {
+                window.pinaBakesApp.ui.showToast('New version available! Refresh to update.', 'info', 10000);
+              }
+            }
+          });
+        });
+      })
+      .catch(registrationError => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+
+// Global error handling
+window.addEventListener('error', (event) => {
+  console.error('Global error:', event.error);
+  if (window.pinaBakesApp) {
+    window.pinaBakesApp.handleError(event.error, 'Global error');
+  }
+});
+
+// Global promise rejection handling
+window.addEventListener('unhandledrejection', (event) => {
+  console.error('Unhandled promise rejection:', event.reason);
+  if (window.pinaBakesApp) {
+    window.pinaBakesApp.handleError(event.reason, 'Unhandled promise rejection');
+  }
+});

@@ -1,43 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>PiNa Bakes – Premium Millet Cookies | Healthy & Delicious</title>
-  <meta name="description" content="PiNa Bakes: Premium millet-based gourmet cookies from Delhi. Healthy, wholesome & delicious. Free delivery across India. FSSAI certified." />
-  <link rel="canonical" href="https://pinabakes.github.io/pina_website/" />
-  <meta name="theme-color" content="#2f6a3a" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="PiNa Bakes – Premium Millet Cookies" />
-  <meta property="og:description" content="Gourmet millet-based cookies from Delhi. Healthy, tasty & wholesome." />
-  <meta property="og:image" content="https://pinabakes.github.io/pina_website/assets/page_images/hero.jpg" />
-  <meta property="og:url" content="https://pinabakes.github.io/pina_website/" />
-  <meta property="og:site_name" content="PiNa Bakes" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="PiNa Bakes – Premium Millet Cookies" />
-  <meta name="twitter:description" content="Gourmet millet-based cookies from Delhi. Healthy, tasty & wholesome." />
-  <meta name="twitter:image" content="https://pinabakes.github.io/pina_website/assets/page_images/hero.jpg" />
+  <!-- Essential Meta Tags -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+  <meta name="format-detection" content="telephone=no">
+  
+  <!-- SEO Meta Tags -->
+  <title>PiNa Bakes - Premium Millet Cookies, Crafted with Love | Delhi</title>
+  <meta name="description" content="Artisanal millet-based cookies baked with love in Delhi. Gluten-friendly, wholesome, and delicious gourmet cookies delivered fresh across India. FSSAI certified quality.">
+  <meta name="keywords" content="millet cookies, healthy cookies, gluten-friendly cookies, artisanal cookies, Delhi bakery, premium cookies, wholesome snacks">
+  <meta name="author" content="PiNa Bakes">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://pinabakes.com/">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pinabakes.com/">
+  <meta property="og:title" content="PiNa Bakes - Premium Millet Cookies, Crafted with Love">
+  <meta property="og:description" content="Artisanal millet-based cookies baked with love in Delhi. Gluten-friendly, wholesome, and delicious gourmet cookies delivered fresh across India.">
+  <meta property="og:image" content="https://pinabakes.com/assets/page_images/hero.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="PiNa Bakes">
+  <meta property="og:locale" content="en_IN">
 
-  <link rel="icon" href="assets/logo/pina-bakes-logo.png" sizes="32x32" />
-  <link rel="apple-touch-icon" href="assets/logo/pina-bakes-logo.png" />
-  <link rel="manifest" href="assets/site.webmanifest" />
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://pinabakes.com/">
+  <meta property="twitter:title" content="PiNa Bakes - Premium Millet Cookies, Crafted with Love">
+  <meta property="twitter:description" content="Artisanal millet-based cookies baked with love in Delhi. Gluten-friendly, wholesome, and delicious gourmet cookies delivered fresh across India.">
+  <meta property="twitter:image" content="https://pinabakes.com/assets/page_images/hero.jpg">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#8B4513">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PiNa Bakes">
+  <meta name="msapplication-TileColor" content="#8B4513">
+  <meta name="msapplication-config" content="assets/browserconfig.xml">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="assets/logo/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/logo/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/logo/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/logo/apple-touch-icon.png">
+  <link rel="manifest" href="assets/site.webmanifest">
+
+  <!-- Preconnect to external domains for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="preload" href="assets/page_images/hero.jpg" as="image">
+  <link rel="preconnect" href="https://script.google.com">
 
+  <!-- Critical CSS inlined for performance -->
+  <style>
+    /* Critical CSS - Above the fold styles */
+    :root {
+      --primary-color: #8B4513;
+      --secondary-color: #D2691E;
+      --accent-color: #F4A460;
+      --text-color: #2F1B14;
+      --text-light: #6B4423;
+      --background: #FFF8F0;
+      --white: #FFFFFF;
+      --error: #DC3545;
+      --success: #28A745;
+      --warning: #FFC107;
+      --info: #17A2B8;
+      --border: #E5D5C8;
+      --shadow: 0 2px 10px rgba(139, 69, 19, 0.1);
+      --border-radius: 8px;
+      --transition: all 0.3s ease;
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-primary);
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--background);
+      overflow-x: hidden;
+    }
+
+    body.loading {
+      overflow: hidden;
+    }
+
+    /* Screen reader only content */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Skip to main content link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 6px;
+      background: var(--primary-color);
+      color: var(--white);
+      padding: 8px;
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      z-index: 1000;
+    }
+
+    .skip-link:focus {
+      top: 6px;
+    }
+
+    /* Header Styles */
+    .header {
+      background: var(--white);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: var(--transition);
+    }
+
+    .header.header-hidden {
+      transform: translateY(-100%);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .logo img {
+      width: 40px;
+      height: 40px;
+      margin-right: 0.5rem;
+      border-radius: 50%;
+    }
+
+    /* Navigation */
+    .nav {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--text-color);
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus {
+      color: var(--primary-color);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary-color);
+      transition: var(--transition);
+    }
+
+    .nav-link:hover::after,
+    .nav-link:focus::after {
+      width: 100%;
+    }
+
+    /* Mobile menu toggle */
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-color);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+
+    .mobile-menu-toggle:hover,
+    .mobile-menu-toggle:focus {
+      background: var(--accent-color);
+      color: var(--white);
+    }
+
+    /* Header actions */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .search-container {
+      position: relative;
+    }
+
+    .search-input {
+      padding: 0.5rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      background: var(--background);
+      color: var(--text-color);
+      width: 250px;
+      transition: var(--transition);
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+    }
+
+    .action-btn {
+      position: relative;
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      color: var(--text-color);
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+
+    .action-btn:hover,
+    .action-btn:focus {
+      background: var(--accent-color);
+      color: var(--white);
+    }
+
+    .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: var(--error);
+      color: var(--white);
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      min-width: 18px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    /* Main container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Hero section */
+    .hero {
+      padding: 3rem 0;
+      text-align: center;
+      background: linear-gradient(135deg, var(--background) 0%, var(--white) 100%);
+    }
+
+    .hero-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .hero-text h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+      font-weight: 800;
+    }
+
+    .hero-text p {
+      font-size: 1.2rem;
+      color: var(--text-light);
+      margin-bottom: 2rem;
+    }
+
+    .hero-image {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Loading states */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    body.loading .loader {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .loader-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border);
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .nav {
+        display: none;
+      }
+
+      .mobile-menu-toggle {
+        display: block;
+      }
+
+      .search-input {
+        width: 200px;
+      }
+
+      .hero-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .hero-text h1 {
+        font-size: 2rem;
+      }
+
+      .header-container {
+        padding: 0 0.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .search-input {
+        width: 150px;
+      }
+
+      .hero-text h1 {
+        font-size: 1.75rem;
+      }
+
+      .hero-text p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+
+  <!-- Structured Data for SEO -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "FoodEstablishment",
+    "@type": "LocalBusiness",
     "name": "PiNa Bakes",
-    "description": "Premium millet-based gourmet cookies from Delhi",
-    "url": "https://pinabakes.github.io/pina_website/",
-    "logo": "https://pinabakes.github.io/pina_website/assets/logo/pina-bakes-logo.png",
-    "image": "https://pinabakes.github.io/pina_website/assets/page_images/hero.jpg",
+    "description": "Premium millet-based cookies baked with love in Delhi. Gluten-friendly, wholesome, and delicious gourmet cookies.",
+    "url": "https://pinabakes.com",
+    "logo": "https://pinabakes.com/assets/logo/pina-bakes-logo.png",
+    "image": "https://pinabakes.com/assets/page_images/hero.jpg",
     "telephone": "+91-7678506669",
-    "email": "pinabakes@gmail.com",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "3684, DaribaPan, Paharganj",
@@ -45,650 +426,442 @@
       "postalCode": "110055",
       "addressCountry": "IN"
     },
-    "sameAs": ["https://instagram.com/PiNaBakes"],
-    "servesCuisine": "Bakery",
-    "priceRange": "₹199-₹349"
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "28.6448",
+      "longitude": "77.2097"
+    },
+    "openingHours": "Mo-Su 09:00-21:00",
+    "priceRange": "₹₹",
+    "servesCuisine": "Healthy Snacks",
+    "foundingDate": "2024",
+    "foundingLocation": "New Delhi, India",
+    "sameAs": [
+      "https://www.instagram.com/pinabakes/"
+    ]
   }
   </script>
-
-  <style>
-    :root{
-      --brand-primary:#2f6a3a;--brand-secondary:#6b4226;--brand-light:#e6f3e9;
-      --brand-gradient:linear-gradient(135deg,#2f6a3a 0%,#4a8c57 100%);
-      --bg-primary:#fffdf7;--bg-secondary:#fafafa;--bg-card:#ffffff;
-      --text-primary:#1a1a1a;--text-secondary:#565c64;--text-muted:#8b9297;
-      --border-light:rgba(0,0,0,.06);--border-medium:rgba(0,0,0,.12);
-      --shadow-sm:0 2px 8px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.08);
-      --shadow-lg:0 8px 32px rgba(0,0,0,.12);--shadow-xl:0 16px 48px rgba(0,0,0,.16);
-      --radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:24px;
-      --spacing-xs:.25rem;--spacing-sm:.5rem;--spacing-md:1rem;--spacing-lg:1.5rem;--spacing-xl:2rem;--spacing-2xl:3rem;
-      --font-heading:'Playfair Display',serif;--font-body:'Inter',system-ui,-apple-system,sans-serif;
-      --transition-fast:.15s ease;--transition-normal:.25s ease;--transition-slow:.35s ease;
-      --text-xs:.75rem;--text-sm:.875rem;--text-base:1rem;--text-lg:1.125rem;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth;font-size:16px}
-    body{background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-body);line-height:1.6;overflow-x:hidden}
-    img{max-width:100%;height:auto;border-radius:var(--radius-md)}
-    a{color:var(--brand-primary);text-decoration:none;transition:var(--transition-fast)}
-    a:hover{color:var(--brand-secondary)}
-    button{border:none;background:none;cursor:pointer;font-family:inherit;transition:var(--transition-fast)}
-    input,textarea{font-family:inherit}
-
-    .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;z-index:999999}
-    .skip-link:focus{left:1rem;top:1rem;width:auto;height:auto;background:var(--bg-card);padding:.5rem 1rem;border-radius:8px;box-shadow:var(--shadow-lg);font-weight:600}
-
-    .header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border-light);transition:var(--transition-normal)}
-    .header.scrolled{background:rgba(255,255,255,.98);border-bottom-color:var(--border-medium);box-shadow:var(--shadow-sm)}
-    .header-container{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.5rem;padding:1rem 1.5rem}
-    .brand-logo{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.25rem;color:var(--brand-primary)}
-    .brand-logo img{width:48px;height:48px;border-radius:50%;object-fit:cover}
-
-    .nav-desktop{display:flex;align-items:center;gap:2rem;justify-content:center}
-    .nav-links{display:flex;list-style:none;gap:1.5rem}
-    .nav-link{font-weight:500;color:var(--text-primary);position:relative;padding:.5rem 0}
-    .nav-link:hover{color:var(--brand-primary)}
-    .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:var(--brand-gradient);transition:var(--transition-normal)}
-    .nav-link:hover::after,.nav-link.active::after{width:100%}
-
-    .header-actions{display:flex;align-items:center;gap:1rem;justify-self:end}
-    .icon-button{position:relative;background:var(--brand-light);color:var(--brand-primary);padding:.5rem;border-radius:10px}
-    .icon-button:hover{background:var(--brand-primary);color:#fff}
-    .icon{width:24px;height:24px;stroke:currentColor;stroke-width:2;fill:none}
-    .badge-count{position:absolute;top:-6px;right:-6px;background:var(--brand-secondary);color:#fff;font-size:.75rem;font-weight:700;min-width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
-
-    .mobile-menu-toggle{display:none;flex-direction:column;justify-content:space-between;width:24px;height:18px}
-    .mobile-menu-toggle span{display:block;height:2px;width:100%;background:var(--text-primary);border-radius:1px;transition:var(--transition-normal)}
-
-    .mobile-nav{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:var(--bg-card);box-shadow:var(--shadow-xl);padding:2.5rem 1.5rem;z-index:200;transition:var(--transition-normal);display:flex;flex-direction:column;gap:1.5rem}
-    .mobile-nav.active{right:0}
-    .mobile-nav-close{align-self:flex-end;font-size:1.5rem;color:var(--text-secondary);margin-bottom:1.5rem}
-    .mobile-nav-link{font-weight:600;font-size:1.125rem;color:var(--text-primary);padding:.5rem 0;border-bottom:1px solid var(--border-light)}
-    .mobile-nav-link:hover{color:var(--brand-primary)}
-
-    .search{position:relative;display:flex;align-items:center;gap:.5rem}
-    .search-input{width:260px;max-width:45vw;padding:.55rem .75rem;border:1px solid var(--border-medium);background:var(--bg-card);color:var(--text-primary);border-radius:999px;font-size:.95rem;outline:none;transition:box-shadow .15s ease,border-color .15s ease}
-    .search-input:focus{border-color:transparent;box-shadow:0 0 0 3px rgba(47,106,58,.18)}
-    .search-suggestions{position:absolute;top:calc(100% + .5rem);left:0;width:100%;max-height:60vh;overflow:auto;background:var(--bg-card);border:1px solid var(--border-light);border-radius:12px;box-shadow:var(--shadow-lg);display:none;z-index:250}
-    .search-suggestions.active{display:block}
-    .search-suggestion{padding:.75rem 1rem;border-bottom:1px solid var(--border-light);cursor:pointer}
-    .search-suggestion:last-child{border-bottom:none}
-    .search-suggestion:hover{background:var(--brand-light)}
-
-    /* ✅ FIXED HERO SECTION WITH GRADIENT FALLBACK */
-    .hero{
-      position:relative;
-      min-height:80vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      color:#fff;
-      overflow:hidden;
-      background:linear-gradient(135deg,#2f6a3a 0%,#6b4226 100%);
-    }
-    .hero-background{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0}
-    .hero-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,rgba(47,106,58,.8) 0%,rgba(107,66,38,.6) 100%);z-index:1}
-    .hero-content{position:relative;z-index:2}
-    .hero-badge{display:inline-block;background:rgba(255,255,255,.2);backdrop-filter:blur(10px);color:#fff;padding:.5rem 1rem;border-radius:50px;font-weight:600;font-size:.875rem;margin-bottom:1.5rem;border:1px solid rgba(255,255,255,.2)}
-    .hero-title{font-family:var(--font-heading);font-size:clamp(2.5rem,5vw,4rem);font-weight:700;line-height:1.2;margin-bottom:1.5rem;text-shadow:0 2px 20px rgba(0,0,0,.3)}
-    .hero-description{font-size:1.25rem;font-weight:300;margin-bottom:3rem;opacity:.95;line-height:1.6}
-    .hero-cta{display:inline-flex;align-items:center;gap:.5rem;background:#fff;color:var(--brand-primary);padding:1rem 2.5rem;border-radius:50px;font-weight:600;font-size:1.125rem;box-shadow:var(--shadow-lg)}
-    .hero-cta:hover{transform:translateY(-2px);box-shadow:var(--shadow-xl);color:var(--brand-primary)}
-
-    .section{padding:3rem 1.5rem}
-    .section-container{max-width:1200px;margin:0 auto}
-    .section-header{text-align:center;margin-bottom:3rem}
-    .section-title{font-family:var(--font-heading);font-size:clamp(2rem,4vw,3rem);font-weight:600;color:var(--brand-primary);margin-bottom:1rem}
-    .section-description{font-size:1.125rem;color:var(--text-secondary);max-width:600px;margin:0 auto;line-height:1.6}
-
-    .products-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;margin-top:3rem}
-    .product-card{background:var(--bg-card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);transition:all .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
-    .product-card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 20px 40px rgba(0,0,0,.12)}
-    .product-image-container{position:relative;aspect-ratio:1;overflow:hidden}
-    .product-image{width:100%;height:100%;object-fit:cover;transition:var(--transition-slow)}
-    .product-card:hover .product-image{transform:scale(1.05)}
-    .product-badge{position:absolute;top:1rem;right:1rem;background:var(--brand-gradient);color:#fff;padding:.25rem .5rem;border-radius:8px;font-size:.75rem;font-weight:600}
-    .product-content{padding:1.5rem;flex-grow:1;display:flex;flex-direction:column}
-    .product-title{font-weight:700;font-size:1.25rem;margin-bottom:.5rem;color:var(--text-primary)}
-    .product-price{font-size:1.5rem;font-weight:800;color:var(--brand-primary);margin-bottom:.5rem}
-    .product-tagline{color:var(--text-secondary);margin-bottom:1.5rem;flex-grow:1}
-    .product-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:auto}
-
-    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.5rem 1rem;border-radius:10px;font-weight:600;font-size:.875rem;border:1px solid transparent;cursor:pointer;transition:var(--transition-fast)}
-    .btn-primary{background:var(--brand-gradient);color:#fff;box-shadow:var(--shadow-sm)}
-    .btn-primary:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
-    .btn-secondary{background:var(--brand-light);color:var(--brand-primary);border-color:var(--brand-primary)}
-    .btn-secondary:hover{background:var(--brand-primary);color:#fff}
-    .btn-outline{background:transparent;color:var(--text-primary);border-color:var(--border-medium)}
-    .btn-outline:hover{background:#1f2937;color:#fff}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
-
-    .product-detail{padding:3rem 1.5rem}
-    .product-detail-container{max-width:1200px;margin:0 auto}
-    .product-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
-    .product-gallery{position:relative}
-    .product-main-image{width:100%;aspect-ratio:1;object-fit:cover;border-radius:16px;margin-bottom:1rem;touch-action:pan-y;cursor:zoom-in}
-    .product-thumbnails{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.5rem}
-    .product-thumbnail{flex-shrink:0;width:80px;height:80px;border-radius:10px;object-fit:cover;cursor:pointer;border:2px solid transparent;transition:var(--transition-fast)}
-    .product-thumbnail.active{border-color:var(--brand-primary)}
-    .product-info h1{font-family:var(--font-heading);font-size:2.5rem;font-weight:600;margin-bottom:.5rem;color:var(--text-primary)}
-    .product-info .product-price{font-size:2rem;margin-bottom:1.5rem}
-    .product-features{margin:1.5rem 0}
-    .product-features ul{list-style:none;padding:0}
-    .product-features li{padding:.25rem 0;position:relative;padding-left:1.5rem}
-    .product-features li::before{content:'✓';position:absolute;left:0;color:var(--brand-primary);font-weight:bold}
-
-    /* ✅ FIXED MODAL SYSTEM */
-    .modal-overlay{
-      position:fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      background:rgba(0,0,0,.5);
-      z-index:250;
-      opacity:0;
-      visibility:hidden;
-      transition:all 0.3s ease;
-    }
-    .modal-overlay.active{opacity:1;visibility:visible}
-
-    .cart-modal,.wishlist-modal{
-      position:fixed;
-      top:0;
-      right:-100%;
-      width:90vw;
-      max-width:400px;
-      height:100vh;
-      background:var(--bg-card);
-      box-shadow:var(--shadow-xl);
-      z-index:300;
-      transition:right 0.3s ease;
-      display:flex;
-      flex-direction:column;
-    }
-    .cart-modal.active,.wishlist-modal.active{right:0}
-    
-    .cart-header,.wishlist-header{display:flex;align-items:center;justify-content:space-between;padding:1.5rem;border-bottom:1px solid var(--border-light)}
-    .cart-header h2,.wishlist-header h2{font-size:1.5rem;color:var(--brand-primary)}
-    .cart-close,.wishlist-close{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--text-secondary);padding:.5rem}
-    .cart-close:hover,.wishlist-close:hover{color:var(--text-primary)}
-    
-    .cart-body,.wishlist-body{flex:1;overflow-y:auto;padding:1.5rem;-webkit-overflow-scrolling:touch}
-    .cart-item,.wishlist-item{display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border-light)}
-    .cart-item-image,.wishlist-item-image{width:60px;height:60px;object-fit:cover;border-radius:10px}
-    .cart-item-title,.wishlist-item-title{font-weight:600;margin-bottom:.25rem}
-    .cart-item-price{color:var(--text-secondary);font-size:.875rem}
-    .cart-item-actions,.wishlist-item-actions{display:flex;align-items:center;gap:.5rem;margin-top:.5rem;flex-wrap:wrap}
-    .quantity-btn{width:32px;height:32px;border:1px solid var(--border-medium);border-radius:50%;background:var(--bg-card);font-weight:600}
-    .quantity-btn:hover{background:var(--brand-primary);color:#fff;border-color:var(--brand-primary)}
-    .cart-footer,.wishlist-footer{padding:1.5rem;border-top:1px solid var(--border-light);background:var(--bg-secondary)}
-
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-    .form-group{margin-top:1rem}
-    .form-label{display:block;font-weight:600;margin-bottom:.25rem;color:var(--text-primary)}
-    .form-input,.form-textarea{width:100%;background:var(--bg-card);border:1px solid var(--border-medium);border-radius:10px;padding:.65rem .75rem;color:var(--text-primary)}
-    .form-input:focus,.form-textarea:focus{outline:2px solid var(--brand-primary);outline-offset:2px;border-color:transparent}
-
-    .skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:loading 1.5s infinite}
-    .skeleton-product{background:linear-gradient(90deg,#f0f0f0 25%,#e6e6e6 50%,#f0f0f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:16px;min-height:360px}
-    @keyframes loading{0%{background-position:200% 0}100%{background-position:-200% 0}}
-    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-    @keyframes cartBounce{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
-
-    .video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:2rem;margin-top:3rem}
-    .video-card{background:var(--bg-card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);transition:var(--transition-normal)}
-    .video-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-    .video-wrapper{position:relative;width:100%;height:250px}
-    .video-wrapper video,.video-wrapper iframe{width:100%;height:100%;object-fit:cover;border:none}
-    .video-content{padding:1.5rem}
-
-    .about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:3rem;margin-top:3rem}
-    .about-card{background:var(--bg-card);padding:2rem;border-radius:16px;box-shadow:var(--shadow-sm)}
-    .about-card h3{font-family:var(--font-heading);font-size:1.5rem;color:var(--brand-primary);margin-bottom:1.5rem}
-
-    .reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem;margin-top:3rem}
-    .review-card{background:var(--bg-card);border-radius:16px;border:1px solid var(--border-light);box-shadow:var(--shadow-sm);padding:1.25rem;display:grid;grid-template-columns:auto 1fr;gap:.85rem;align-items:center}
-    .review-avatar{width:48px;height:48px;border-radius:50%;object-fit:cover}
-    .review-name{font-weight:700}
-    .review-stars{color:#f59e0b;font-size:1rem;letter-spacing:.05em}
-
-    .contact-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;margin-top:3rem}
-    .contact-item{display:flex;align-items:flex-start;gap:1rem}
-    .contact-icon{color:var(--brand-primary);flex-shrink:0}
-
-    .footer{background:var(--text-primary);color:#fff;padding:3rem 1.5rem;text-align:center}
-    .footer-content{max-width:1200px;margin:0 auto}
-    .footer-logo{width:60px;height:60px;border-radius:50%;margin:0 auto 1.5rem}
-    .fssai-info{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.5rem;padding:.5rem 1rem;background:rgba(255,255,255,.1);border-radius:10px}
-    .fssai-logo{width:30px;height:20px;object-fit:contain}
-
-    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1f2937;color:#ffffff;padding:1rem 1.5rem;border-radius:50px;font-weight:600;box-shadow:var(--shadow-lg);z-index:400;opacity:0;visibility:hidden;transition:var(--transition-normal)}
-    .toast.show{opacity:1;visibility:visible;transform:translateX(-50%) translateY(-10px)}
-    .toast.success{background:#16a34a;color:#fff}
-    .toast.error{background:#dc2626;color:#fff}
-    .toast.info{background:#1f2937;color:#fff}
-
-    @media (max-width:1024px){.search-input{width:200px}}
-    @media (max-width:900px){.header-container{grid-template-columns:auto auto auto}}
-
-    @media (max-width:768px){
-      .nav-desktop{display:none}
-      .mobile-menu-toggle{display:flex}
-      .search-input{max-width:50vw}
-      .site-search,#site-search,.header .search,.header [data-role="search"]{display:none !important}
-      .hero-content{padding:2rem 1rem}
-      .section{padding:2rem 1rem}
-      .products-grid{grid-template-columns:1fr;gap:1.5rem}
-      .product-detail-grid{grid-template-columns:1fr;gap:1.5rem}
-      .video-grid,.about-grid{grid-template-columns:1fr}
-      .contact-info{grid-template-columns:1fr}
-      .form-row{grid-template-columns:1fr}
-      
-      .cart-modal,.wishlist-modal{
-        width:100vw;
-        max-width:none;
-        height:100vh;
-        right:-100vw;
-        border-radius:0;
-      }
-      .cart-modal.active,.wishlist-modal.active{right:0}
-    }
-
-    @media (max-width:480px){
-      .hero-title{font-size:2rem}
-      .section-title{font-size:1.75rem}
-      .mobile-nav{width:100vw}
-    }
-
-    @media (prefers-color-scheme:dark){
-      :root{--bg-primary:#1a1a1a;--bg-secondary:#2a2a2a;--bg-card:#2d2d2d;--text-primary:#ffffff;--text-secondary:#b0b0b0;--text-muted:#808080;--border-light:rgba(255,255,255,.1);--border-medium:rgba(255,255,255,.2)}
-      .header{background:rgba(26,26,26,.95)}
-      .header.scrolled{background:rgba(26,26,26,.98)}
-      .btn-outline:hover{background:#374151;color:#fff}
-    }
-    *:focus{outline:2px solid var(--brand-primary);outline-offset:2px}
-    .btn:focus,.icon-button:focus,.mobile-menu-toggle:focus,.search-input:focus{outline:2px solid var(--brand-primary);outline-offset:2px}
-  </style>
 </head>
+
 <body>
+  <!-- Skip to main content for accessibility -->
   <a class="skip-link" href="#main-content">Skip to main content</a>
 
-  <header class="header" id="header">
+  <!-- Loading indicator -->
+  <div class="loader" aria-hidden="true" role="presentation">
+    <div class="loader-spinner" aria-label="Loading content"></div>
+  </div>
+
+  <!-- Header -->
+  <header id="header" class="header" role="banner">
     <div class="header-container">
-      <a href="#home" class="brand-logo" aria-label="PiNa Bakes - Home">
-        <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" loading="eager">
-        <span>PiNa Bakes</span>
+      <!-- Logo -->
+      <a href="#/" class="logo" aria-label="PiNa Bakes - Go to homepage">
+        <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes Logo" width="40" height="40">
+        PiNa Bakes
       </a>
 
-      <nav class="nav-desktop" aria-label="Main navigation">
-        <ul class="nav-links">
-          <li><a href="#home" class="nav-link active">Home</a></li>
-          <li><a href="#products" class="nav-link">Products</a></li>
-          <li><a href="#videos" class="nav-link">Videos</a></li>
-          <li><a href="#about" class="nav-link">About</a></li>
-          <li><a href="#contact" class="nav-link">Contact</a></li>
+      <!-- Navigation -->
+      <nav class="navigation" role="navigation" aria-label="Main navigation">
+        <ul class="nav">
+          <li><a href="#/" class="nav-link">Home</a></li>
+          <li><a href="#/products" class="nav-link">Products</a></li>
+          <li><a href="#/about" class="nav-link">About</a></li>
+          <li><a href="#/contact" class="nav-link">Contact</a></li>
         </ul>
       </nav>
 
+      <!-- Header Actions -->
       <div class="header-actions">
-        <div class="search" role="search">
-          <input id="site-search" class="search-input" type="search" placeholder="Search cookies…" autocomplete="off" aria-label="Search products">
+        <!-- Search -->
+        <div class="search-container">
+          <input 
+            type="search" 
+            id="site-search" 
+            class="search-input" 
+            placeholder="Search cookies..." 
+            aria-label="Search products"
+            autocomplete="off"
+          >
           <div id="search-suggestions" class="search-suggestions" role="listbox" aria-label="Search suggestions"></div>
         </div>
 
-        <button class="icon-button" onclick="App.wishlist.toggle()" aria-label="Open wishlist">
-          <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 8.25 12 9 12 .75 0 9-4.78 9-12z"/></svg>
-          <span class="badge-count" id="wishlist-count" aria-live="polite" aria-atomic="true">0</span>
+        <!-- Wishlist Button -->
+        <button 
+          class="action-btn" 
+          data-action="toggle-wishlist" 
+          aria-label="Open wishlist"
+          title="Wishlist"
+        >
+          ♡
+          <span id="wishlist-count" class="badge" style="display: none;">0</span>
         </button>
 
-        <button class="icon-button" onclick="App.cart.toggle()" aria-label="Open shopping cart">
-          <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" /></svg>
-          <span class="badge-count" id="cart-count" aria-live="polite" aria-atomic="true">0</span>
+        <!-- Cart Button -->
+        <button 
+          class="action-btn" 
+          data-action="toggle-cart" 
+          aria-label="Open shopping cart"
+          title="Shopping Cart"
+        >
+          🛒
+          <span id="cart-count" class="badge" style="display: none;">0</span>
         </button>
 
-        <button class="mobile-menu-toggle" onclick="App.ui.toggleMobileMenu()" aria-label="Toggle menu" aria-expanded="false">
-          <span></span><span></span><span></span>
+        <!-- Mobile Menu Toggle -->
+        <button 
+          class="mobile-menu-toggle" 
+          aria-expanded="false" 
+          aria-controls="mobile-nav" 
+          aria-label="Toggle mobile menu"
+        >
+          ☰
         </button>
       </div>
     </div>
+
+    <!-- Mobile Navigation -->
+    <nav id="mobile-nav" class="mobile-nav" role="navigation" aria-label="Mobile navigation">
+      <ul>
+        <li><a href="#/" class="nav-link">Home</a></li>
+        <li><a href="#/products" class="nav-link">Products</a></li>
+        <li><a href="#/about" class="nav-link">About</a></li>
+        <li><a href="#/contact" class="nav-link">Contact</a></li>
+      </ul>
+    </nav>
   </header>
 
-  <div class="modal-overlay" id="modal-overlay" onclick="App.ui.closeAllModals()"></div>
-  
-  <nav class="mobile-nav" aria-label="Mobile navigation">
-    <button class="mobile-nav-close" onclick="App.ui.closeMobileMenu()" aria-label="Close menu">&times;</button>
-    <div style="padding-bottom:1rem">
-      <input id="site-search-mobile" class="search-input" type="search" placeholder="Search cookies…" autocomplete="off" aria-label="Search products">
-    </div>
-    <a href="#home" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Home</a>
-    <a href="#products" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Products</a>
-    <a href="#videos" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Videos</a>
-    <a href="#about" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">About</a>
-    <a href="#contact" class="mobile-nav-link" onclick="App.ui.closeMobileMenu()">Contact</a>
-  </nav>
-
-  <main id="main-content">
-    <!-- ✅ HERO SECTION WITH WORKING IMAGE AND FALLBACK -->
-    <section id="home" class="hero" aria-labelledby="hero-title">
-      <picture class="hero-picture">
-        <img
-          src="assets/page_images/hero.jpg"
-          alt="Fresh, wholesome millet cookies by PiNa Bakes"
-          fetchpriority="high"
-          decoding="async"
-          class="hero-background"
-          width="1920" height="1080">
-      </picture>
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <div class="hero-badge">🌾 Healthy • Tasty • Wholesome</div>
-        <h1 id="hero-title" class="hero-title">Premium Millet Cookies, Crafted with Love</h1>
-        <p class="hero-description">Artisanal cookies made from finest millets in Delhi.<br>Gluten-friendly indulgence that's good for you and delicious too!</p>
-        <a href="#products" class="hero-cta">
-          <span>Explore Our Collection</span>
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-        </a>
-      </div>
-    </section>
-
-    <section id="products" class="section">
-      <div class="section-container">
-        <div class="section-header">
-          <h2 class="section-title">Our Gourmet Collection</h2>
-          <p class="section-description">Premium millet-based cookies, delivered fresh to your door with safe packaging. Each flavor crafted with authentic ingredients and love.</p>
-        </div>
-        <div class="products-grid" id="products-grid" aria-live="polite"></div>
-      </div>
-    </section>
-
-    <section id="product-detail" class="product-detail" style="display:none;">
-      <div class="product-detail-container">
-        <nav aria-label="Breadcrumb">
-          <button class="btn btn-outline" onclick="App.router.navigate('#products')">← Back to Products</button>
-        </nav>
-        <div class="product-detail-grid">
-          <div class="product-gallery">
-            <img id="product-main-image" class="product-main-image" alt="Product image">
-            <div class="product-thumbnails" id="product-thumbnails"></div>
+  <!-- Main Content -->
+  <main id="main-content" role="main">
+    <!-- Hero Section -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1 id="hero-title">Premium Millet Cookies, Crafted with Love</h1>
+            <p>Artisanal cookies made from finest millets in Delhi. Gluten-friendly indulgence that's good for you and delicious too!</p>
           </div>
-          <div class="product-info">
-            <h1 id="product-title">Product Name</h1>
-            <div class="product-price" id="product-price">₹0</div>
-            <p id="product-tagline" class="product-tagline">Product description</p>
-
-            <div class="product-actions">
-              <button class="btn btn-primary" id="add-to-cart-detail">Add to Cart</button>
-              <button class="btn btn-secondary" id="add-to-wishlist-detail">Add to Wishlist</button>
-            </div>
-
-            <div id="product-features" class="product-features"></div>
-
-            <div style="margin-top:2rem;">
-              <h3>Ingredients</h3>
-              <ul id="product-ingredients"></ul>
-            </div>
-
-            <div style="margin-top:2rem;">
-              <h3>Nutrition Information (per 100g)</h3>
-              <table style="width:100%;border-collapse:collapse;margin-top:1rem;">
-                <thead>
-                  <tr style="background:#f8f9fa;">
-                    <th style="padding:.75rem;text-align:left;border:1px solid #dee2e6;">Nutrient</th>
-                    <th style="padding:.75rem;text-align:left;border:1px solid #dee2e6;">Amount</th>
-                  </tr>
-                </thead>
-                <tbody id="nutrition-table"></tbody>
-              </table>
-            </div>
+          <div class="hero-image">
+            <img 
+              src="assets/page_images/hero.jpg" 
+              alt="Freshly baked premium millet cookies on rustic wooden surface" 
+              width="500" 
+              height="400"
+              loading="eager"
+            >
           </div>
         </div>
       </div>
     </section>
 
-    <section id="videos" class="section">
-      <div class="section-container">
-        <div class="section-header">
-          <h2 class="section-title">Behind the Scenes</h2>
-          <p class="section-description">Watch our artisans craft each batch with passion. From mixing to baking, every step is done with care and attention to quality.</p>
+    <!-- Products Section -->
+    <section class="products-section" aria-labelledby="products-title">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="products-title">Our Gourmet Collection</h2>
+          <p>Premium millet-based cookies, delivered fresh to your door with safe packaging. Each flavor crafted with authentic ingredients and love.</p>
+        </header>
+
+        <!-- Products Grid -->
+        <div id="products-grid" class="products-grid" role="region" aria-live="polite" aria-label="Product listings">
+          <!-- Products will be rendered here by JavaScript -->
         </div>
-        <div class="video-grid">
-          <div class="video-card">
-            <div class="video-wrapper">
-              <video controls poster="assets/videos/cookie-thumb.jpg" preload="metadata">
-                <source src="assets/videos/cookies-baking.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <div class="video-content">
-              <h3>Fresh Batch in the Making</h3>
-              <p>Our Richie-Pistachio cookies being crafted with love in our Delhi kitchen.</p>
-            </div>
+      </div>
+    </section>
+
+    <!-- Behind the Scenes Section -->
+    <section class="behind-scenes" aria-labelledby="behind-title">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="behind-title">Behind the Scenes</h2>
+          <p>Watch our artisans craft each batch with passion. From mixing to baking, every step is done with care and attention to quality.</p>
+        </header>
+
+        <div class="content-grid">
+          <div class="content-item">
+            <figure>
+              <img 
+                src="assets/products/richie-pistachio/pina-bakes-Richie-Pistachio-1.jpg" 
+                alt="Artisan carefully crafting Richie-Pistachio cookies in PiNa Bakes kitchen" 
+                loading="lazy"
+                width="400" 
+                height="300"
+              >
+              <figcaption>
+                <h3>Fresh Batch in the Making</h3>
+                <p>Our Richie-Pistachio cookies being crafted with love in our Delhi kitchen.</p>
+              </figcaption>
+            </figure>
           </div>
 
-          <div class="video-card">
-            <div class="video-wrapper">
-              <video controls poster="assets/videos/process-thumb.jpg" preload="metadata">
-                <source src="assets/videos/baking-process.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            <div class="video-content">
+          <div class="content-item">
+            <article>
               <h3>The PiNa Bakes Story</h3>
               <p>Discover the passion and process behind our premium millet cookies.</p>
-            </div>
+            </article>
           </div>
-        <div style="text-align:center;margin-top:3rem;padding:2rem;background:#f8f9fa;border-radius:16px;">
-          <h3>Follow Our Journey</h3>
-          <p style="margin-bottom:1.5rem;">See daily bakes and behind-the-scenes content on our social media!</p>
-          <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener" class="btn btn-primary">Follow @PiNaBakes on Instagram</a>
+
+          <div class="content-item">
+            <article>
+              <h3>Follow Our Journey</h3>
+              <p>See daily bakes and behind-the-scenes content on our social media!</p>
+              <p><a href="https://www.instagram.com/pinabakes/" target="_blank" rel="noopener noreferrer" aria-label="Follow PiNa Bakes on Instagram (opens in new tab)">Follow @PiNaBakes on Instagram</a></p>
+            </article>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="about" class="section">
-      <div class="section-container">
-        <div class="section-header">
-          <h2 class="section-title">About PiNa Bakes</h2>
-          <p class="section-description">Bringing wholesome, millet-based gourmet cookies to families across India. Our commitment to quality, health, and taste drives everything we do.</p>
-        </div>
-        <div class="about-grid">
-          <div class="about-card">
+    <!-- About Section -->
+    <section class="about-section" aria-labelledby="about-title">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="about-title">About PiNa Bakes</h2>
+          <p>Bringing wholesome, millet-based gourmet cookies to families across India. Our commitment to quality, health, and taste drives everything we do.</p>
+        </header>
+
+        <div class="about-content">
+          <article class="about-story">
             <h3>Our Story</h3>
             <p>Founded in Delhi with a vision to make healthy snacking delicious, PiNa Bakes specializes in premium millet-based cookies. We believe that wholesome ingredients and traditional techniques create the perfect balance of health and indulgence.</p>
-            <p><strong>Packaging:</strong> Eco-friendly cardboard, safe for shipping nationwide.<br><strong>Certification:</strong> FSSAI licensed and compliant.</p>
-          </div>
-          <div class="about-card">
+            <p><strong>Packaging:</strong> Eco-friendly cardboard, safe for shipping nationwide. <strong>Certification:</strong> FSSAI licensed and compliant.</p>
+          </article>
+
+          <article class="about-benefits">
             <h3>Why Choose PiNa Bakes?</h3>
-            <ul style="list-style:none;padding:0;">
-              <li style="margin-bottom:.75rem;">🌾 100% premium millet blends</li>
-              <li style="margin-bottom:.75rem;">💖 Rich, authentic flavors</li>
-              <li style="margin-bottom:.75rem;">🥗 Gluten-friendly, wholesome nutrition</li>
-              <li style="margin-bottom:.75rem;">🚚 Pan-India delivery with safe packaging</li>
-              <li style="margin-bottom:.75rem;">🏆 FSSAI certified quality</li>
-              <li style="margin-bottom:.75rem;">🤝 Manufactured & marketed by PiNa Bakes</li>
+            <ul role="list">
+              <li>🌾 100% premium millet blends</li>
+              <li>💖 Rich, authentic flavors</li>
+              <li>🥗 Gluten-friendly, wholesome nutrition</li>
+              <li>🚚 Pan-India delivery with safe packaging</li>
+              <li>🏆 FSSAI certified quality</li>
+              <li>🤝 Manufactured &amp; marketed by PiNa Bakes</li>
             </ul>
-          </div>
+          </article>
         </div>
       </div>
     </section>
-    <section id="contact" class="section">
-      <div class="section-container">
-        <div class="section-header">
-          <h2 class="section-title">Get in Touch</h2>
-          <p class="section-description">Have questions about our products or want to place a bulk order? We'd love to hear from you!</p>
-        </div>
+
+    <!-- Contact Section -->
+    <section class="contact-section" aria-labelledby="contact-title">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="contact-title">Get in Touch</h2>
+          <p>Have questions about our products or want to place a bulk order? We'd love to hear from you!</p>
+        </header>
+
         <div class="contact-info">
-          <div class="contact-item">
-            <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
-            <div>
-              <h3>Address</h3>
-              <p>3684, DaribaPan, Paharganj<br>New Delhi – 110055</p>
-            </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-            </div>
-            <div>
-              <h3>Call/WhatsApp</h3>
-              <a href="https://wa.me/917678506669" target="_blank" rel="noopener">+91 7678506669</a>
-            </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </div>
-            <div>
-              <h3>Email</h3>
-              <a href="mailto:pinabakes@gmail.com?subject=PiNa%20Bakes%20Enquiry">pinabakes@gmail.com</a>
-            </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-icon">
-              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><path d="m22 7-10 5L2 7"/></svg>
-            </div>
-            <div>
-              <h3>Instagram</h3>
-              <a href="https://instagram.com/PiNaBakes" target="_blank" rel="noopener">@PiNaBakes</a>
-            </div>
+          <address>
+            <h3>Address</h3>
+            <p>
+              3684, DaribaPan, Paharganj<br>
+              New Delhi – 110055<br>
+              India
+            </p>
+          </address>
+
+          <div class="contact-details">
+            <h3>Contact Information</h3>
+            <p>
+              <strong>Phone:</strong> <a href="tel:+917678506669">+91 76785 06669</a><br>
+              <strong>WhatsApp:</strong> <a href="https://wa.me/917678506669" target="_blank" rel="noopener">Chat with us</a>
+            </p>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="footer-content">
-      <img src="assets/logo/pina-bakes-logo.png" alt="PiNa Bakes logo" class="footer-logo">
-      <p>© <span id="current-year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!</p>
-      <div class="fssai-info">
-        <img
-          src="assets/logo/fssai/logo.png"
-          alt="FSSAI Logo"
-          class="fssai-logo"
-          width="30"
-          height="20"
-          loading="lazy"
-          decoding="async"
-        >
-        <span>FSSAI License: 23325005002208</span>
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h3>PiNa Bakes</h3>
+          <p>Premium millet cookies, crafted with love.</p>
+        </div>
+
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#/">Home</a></li>
+            <li><a href="#/products">Products</a></li>
+            <li><a href="#/about">About</a></li>
+            <li><a href="#/contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-social">
+          <h4>Follow Us</h4>
+          <a href="https://www.instagram.com/pinabakes/" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram">Instagram</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; <span id="current-year">2025</span> PiNa Bakes. All rights reserved.</p>
+        <p>Made with ❤️ in Delhi, India</p>
       </div>
     </div>
   </footer>
 
-  <!-- CART MODAL -->
-  <div class="cart-modal" id="cart-modal" role="dialog" aria-modal="true" aria-labelledby="cart-title">
-    <div class="cart-header">
-      <h2 id="cart-title">Your Cart</h2>
-      <button class="cart-close" onclick="App.cart.close()" aria-label="Close cart">&times;</button>
-    </div>
-    <div class="cart-body">
-      <div id="cart-items"></div>
-      <form class="checkout-form" id="checkout-form" style="display:none;">
-        <h3>Delivery Information</h3>
-        <div class="form-group">
-          <label class="form-label" for="customer-name">Full Name</label>
-          <input type="text" id="customer-name" name="name" class="form-input" autocomplete="name" required>
+  <!-- Modal Overlay -->
+  <div id="modal-overlay" class="modal-overlay" aria-hidden="true"></div>
+
+  <!-- Cart Modal -->
+  <div id="cart-modal" class="modal cart-modal" role="dialog" aria-labelledby="cart-title" aria-hidden="true">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2 id="cart-title">Shopping Cart</h2>
+        <button class="modal-close" aria-label="Close cart">&times;</button>
+      </header>
+
+      <div class="modal-body">
+        <div id="cart-items" class="cart-items"></div>
+        
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span id="cart-subtotal">₹0</span>
+          </div>
+          <div class="summary-row" id="discount-row" style="display: none;">
+            <span>Discount:</span>
+            <span id="cart-discount">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span>Shipping:</span>
+            <span id="cart-shipping">₹60</span>
+          </div>
+          <div class="summary-row total">
+            <strong>Total: <span id="cart-total">₹0</span></strong>
+          </div>
+          <div id="shipping-note" class="shipping-note"></div>
         </div>
-        <div class="form-group">
-          <label class="form-label" for="customer-phone">Phone (WhatsApp)</label>
-          <input type="tel" id="customer-phone" name="phone" class="form-input"
-                autocomplete="tel"
-                inputmode="numeric"
-                pattern="[0-9]{10,12}"
-                required>
+
+        <div class="coupon-section">
+          <input 
+            type="text" 
+            id="coupon-code" 
+            placeholder="Enter coupon code" 
+            aria-label="Coupon code"
+          >
+          <button onclick="window.pinaBakesApp?.cart.applyCoupon()">Apply</button>
+          <div id="coupon-msg" class="coupon-message"></div>
         </div>
-        <div class="form-row">
+      </div>
+
+      <footer class="modal-footer">
+        <form id="checkout-form" class="checkout-form">
+          <h3>Delivery Details</h3>
           <div class="form-group">
-            <label class="form-label" for="customer-pincode">Pincode</label>
-            <input type="text" id="customer-pincode" name="pincode" class="form-input"
-                  inputmode="numeric"
-                  pattern="[1-9][0-9]{5}"
-                  required>
+            <label for="customer-name">Full Name *</label>
+            <input type="text" id="customer-name" name="name" required aria-required="true">
           </div>
           <div class="form-group">
-            <label class="form-label" for="customer-city">City</label>
-            <input type="text" id="customer-city" name="city" class="form-input" autocomplete="address-level2" required>
+            <label for="customer-email">Email Address *</label>
+            <input type="email" id="customer-email" name="email" required aria-required="true">
           </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="customer-address">Full Address</label>
-          <textarea id="customer-address" name="address" class="form-textarea" rows="3" autocomplete="street-address" placeholder="House no., street, area, landmark" required></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="customer-notes">Special Instructions</label>
-          <textarea id="customer-notes" name="notes" class="form-textarea" rows="2" placeholder="Any special delivery instructions or preferences"></textarea>
-        </div>
-      </form>
-    </div>
-    <div class="cart-footer">
-      <div style="display:flex;gap:.5rem;margin-bottom:.75rem;">
-        <input id="coupon-code" class="form-input" placeholder="Enter Coupon code:" style="flex:1;">
-        <button class="btn btn-outline" onclick="App.cart.applyCoupon()">Apply</button>
-      </div>
-      <div id="coupon-msg" style="font-size:.9rem;color:var(--text-secondary);margin-bottom:.5rem;"></div>
-      <div class="cart-total">
-        <div style="display:flex;justify-content:space-between;margin-bottom:.25rem;">
-          <span>Subtotal</span><span id="cart-subtotal">₹0</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:.25rem;">
-          <span>Discount</span><span id="cart-discount">₹0</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:.25rem;">
-          <span>Shipping</span><span id="cart-shipping">₹0</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:1.25rem;font-weight:700;margin-top:.5rem;">
-          <span>Total</span><span id="cart-total">₹0</span>
-        </div>
-        <div id="shipping-note" style="font-size:.85rem;color:var(--text-secondary);margin-top:.25rem;"></div>
-      </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:.75rem;" onclick="App.checkout.proceed()">Proceed to Checkout</button>
+          <div class="form-group">
+            <label for="customer-phone">Phone Number *</label>
+            <input type="tel" id="customer-phone" name="phone" required aria-required="true">
+          </div>
+          <div class="form-group">
+            <label for="customer-address">Delivery Address *</label>
+            <textarea id="customer-address" name="address" rows="3" required aria-required="true"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Place Order</button>
+        </form>
+      </footer>
     </div>
   </div>
 
-  <!-- WISHLIST MODAL -->
-  <div class="wishlist-modal" id="wishlist-modal" role="dialog" aria-modal="true" aria-labelledby="wishlist-title">
-    <div class="wishlist-header">
-      <h2 id="wishlist-title">Your Wishlist</h2>
-      <button class="wishlist-close" onclick="App.wishlist.close()" aria-label="Close wishlist">&times;</button>
-    </div>
-    <div class="wishlist-body">
-      <div id="wishlist-items"></div>
-    </div>
-    <div class="wishlist-footer">
-      <button class="btn btn-primary" style="width:100%" onclick="App.wishlist.moveAllToCart()">Move All To Cart</button>
+  <!-- Wishlist Modal -->
+  <div id="wishlist-modal" class="modal wishlist-modal" role="dialog" aria-labelledby="wishlist-title" aria-hidden="true">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2 id="wishlist-title">My Wishlist</h2>
+        <button class="modal-close" aria-label="Close wishlist">&times;</button>
+      </header>
+      <div class="modal-body">
+        <div id="wishlist-items" class="wishlist-items"></div>
+      </div>
     </div>
   </div>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- Product Detail Modal -->
+  <div id="product-detail" class="modal product-modal" role="dialog" aria-labelledby="product-title" aria-hidden="true">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2 id="product-title"></h2>
+        <button class="modal-close" aria-label="Close product details">&times;</button>
+      </header>
+      <div class="modal-body">
+        <div class="product-detail-content">
+          <div class="product-images">
+            <img id="product-main-image" alt="" loading="lazy">
+            <div id="product-thumbnails" class="product-thumbnails"></div>
+          </div>
+          <div class="product-info">
+            <p id="product-tagline" class="product-tagline"></p>
+            <div id="product-price" class="product-price"></div>
+            <div id="product-features" class="product-features"></div>
+            <div id="product-ingredients" class="product-ingredients"></div>
+            <div id="nutrition-table" class="nutrition-table"></div>
+            <div class="product-actions">
+              <button id="add-to-cart-detail" class="btn btn-primary">Add to Cart</button>
+              <button id="add-to-wishlist-detail" class="btn btn-secondary">Add to Wishlist</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!-- ✅ FORCE LOADER STOP SCRIPT -->
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" role="alert" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- External CSS - Non-critical styles loaded after critical content -->
+  <link rel="stylesheet" href="assets/css/styles.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="assets/css/styles.css"></noscript>
+
+  <!-- JavaScript -->
   <script>
-    // Prevent infinite loading - force hide loaders after 5 seconds
-    setTimeout(() => {
-      document.querySelectorAll('.skeleton, .skeleton-product').forEach(el => {
-        el.style.display = 'none';
+    // Inline critical JavaScript for immediate functionality
+    document.documentElement.classList.add('js');
+    
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => console.log('SW registered'))
+          .catch(error => console.log('SW registration failed'));
       });
-      document.body.style.opacity = '1';
-      console.log('🔧 Emergency loader removal after 5 seconds');
-    }, 5000);
-  </script>
+    }
 
-  <script src="app.js"></script>
-
-<script>
-  if ('serviceWorker' in navigator) {
+    // Critical performance optimizations
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js', { scope: './' })
-        .then(reg => console.log('SW registered:', reg.scope))
-        .catch(err => console.warn('SW registration failed:', err));
+      // Remove loading class when page is fully loaded
+      document.body.classList.remove('loading');
+      
+      // Preload critical resources
+      const criticalImages = [
+        'assets/products/nutty-coco/pina-bakes-nutty-coco-1.jpg',
+        'assets/products/jowar-peanut-butter/pina-bakes-jowar-peanut-butter-1.jpg'
+      ];
+      
+      criticalImages.forEach(src => {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = src;
+        document.head.appendChild(link);
+      });
     });
-  }
   </script>
 
+  <!-- Main Application JavaScript -->
+  <script src="app.js" defer></script>
+
+  <!-- Google Analytics (if needed) -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=GA_TRACKING_ID"></script> -->
 </body>
 </html>

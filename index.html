@@ -310,7 +310,126 @@
     }
     *:focus{outline:2px solid var(--brand-primary);outline-offset:2px}
     .btn:focus,.icon-button:focus,.mobile-menu-toggle:focus,.search-input:focus{outline:2px solid var(--brand-primary);outline-offset:2px}
-  </style>
+  
+/* User Authentication & Profile Styles */
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.user-dropdown.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-dropdown a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid var(--border);
+}
+
+.user-dropdown a:last-child {
+  border-bottom: none;
+}
+
+.user-dropdown a:hover {
+  background-color: var(--background);
+}
+
+/* Order Card Styles */
+.order-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.order-items {
+  margin-bottom: 1rem;
+}
+
+.order-summary {
+  background: var(--background);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.order-footer {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+/* Auth Modal Specific Styles */
+#auth-modal .modal-content {
+  max-width: 420px;
+}
+
+#auth-modal input[type="tel"],
+#auth-modal input[type="text"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+#auth-modal input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  #user-menu-btn {
+    display: none !important;
+  }
+
+  #guest-menu-btn .btn {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.75rem;
+  }
+
+  .order-card {
+    padding: 1rem;
+  }
+
+  .order-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
+</style>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -347,6 +466,46 @@
           <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" /></svg>
           <span class="badge-count" id="cart-count" aria-live="polite" aria-atomic="true">0</span>
         </button>
+
+        <!-- User Menu (shown when logged in) -->
+        <div id="user-menu-btn" style="display: none; align-items: center; gap: 0.5rem;">
+          <button class="icon-button" onclick="App.router.navigate('#/orders')" aria-label="My Orders">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </button>
+          <div style="position: relative;">
+            <button class="btn btn-outline" style="font-size: 0.875rem; padding: 0.5rem 1rem;" onclick="event.stopPropagation(); document.getElementById('user-dropdown').classList.toggle('active')">
+              <span id="user-phone">+91XXXXXXXXXX</span>
+              <svg style="width: 16px; height: 16px; margin-left: 0.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div id="user-dropdown" class="user-dropdown">
+              <a href="#/orders" onclick="document.getElementById('user-dropdown').classList.remove('active')">
+                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                My Orders
+              </a>
+              <a href="#" onclick="event.preventDefault(); App.auth.logout(); document.getElementById('user-dropdown').classList.remove('active')">
+                <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guest Menu (shown when not logged in) -->
+        <div id="guest-menu-btn" style="display: flex;">
+          <button class="btn btn-primary" onclick="App.auth.openLoginModal()" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+            Login
+          </button>
+        </div>
+
+        <button class="mobile-menu-toggle"
 
         <button class="mobile-menu-toggle" onclick="App.ui.toggleMobileMenu()" aria-label="Toggle menu" aria-expanded="false">
           <span></span><span></span><span></span>
@@ -567,7 +726,7 @@
       <p>© <span id="current-year"></span> PiNa Bakes • Bringing gourmet millet cookies from Delhi to you!</p>
       <div class="fssai-info">
         <img
-          src="assets/logo/fssai-logo.png"
+          src="assets/logo/fssai/logo.png"
           alt="FSSAI Logo"
           class="fssai-logo"
           width="30"
@@ -689,6 +848,82 @@
     });
   }
   </script>
+
+
+  <!-- Login/Signup Modal -->
+  <div id="auth-modal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h2>Login / Sign Up</h2>
+        <button class="modal-close" onclick="App.auth.closeLoginModal()" aria-label="Close login modal">&times;</button>
+      </div>
+
+      <!-- Step 1: Phone Number -->
+      <div id="auth-step-1" style="display: block;">
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);">Enter your mobile number to receive OTP</p>
+        <div class="form-group">
+          <label for="auth-phone">Mobile Number</label>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-weight: 500; color: var(--text-primary);">+91</span>
+            <input 
+              type="tel" 
+              id="auth-phone" 
+              placeholder="Enter 10-digit mobile number" 
+              maxlength="10" 
+              pattern="[6-9][0-9]{9}"
+              style="flex: 1;"
+              required
+            >
+          </div>
+        </div>
+        <div id="recaptcha-container"></div>
+        <button class="btn btn-primary" onclick="App.auth.sendOTP()" style="width: 100%; margin-top: 1rem;">
+          Send OTP
+        </button>
+        <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-secondary); text-align: center;">
+          By continuing, you agree to our Terms of Service
+        </p>
+      </div>
+
+      <!-- Step 2: OTP Verification -->
+      <div id="auth-step-2" style="display: none;">
+        <p style="margin-bottom: 1rem; color: var(--text-secondary);">Enter the 6-digit OTP sent to your mobile</p>
+        <div class="form-group">
+          <label for="auth-otp">Enter OTP</label>
+          <input 
+            type="text" 
+            id="auth-otp" 
+            placeholder="Enter 6-digit OTP" 
+            maxlength="6" 
+            pattern="[0-9]{6}"
+            required
+          >
+        </div>
+        <button class="btn btn-primary" onclick="App.auth.verifyOTP()" style="width: 100%; margin-top: 1rem;">
+          Verify & Login
+        </button>
+        <button class="btn btn-outline" onclick="App.auth.showStep1()" style="width: 100%; margin-top: 0.5rem;">
+          Change Number
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order History Section -->
+  <section id="order-history" class="section" style="display: none; padding: 2rem 0; min-height: 60vh;">
+    <div class="container">
+      <div style="max-width: 1200px; margin: 0 auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+          <h1 style="font-size: 2rem; font-weight: 700;">My Orders</h1>
+          <button class="btn btn-outline" onclick="App.router.navigate('#/products')">
+            Continue Shopping
+          </button>
+        </div>
+        <div id="order-history-list"></div>
+      </div>
+    </div>
+  </section>
+
 
 </body>
 </html>

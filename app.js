@@ -7,12 +7,12 @@ class PinaBakesApp {
       whatsappNumber: "917678506669",
       // Firebase configuration - REPLACE WITH YOUR CONFIG
       firebase: {
-        apiKey: "YOUR_FIREBASE_API_KEY",
-        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT_ID.appspot.com",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
+        apiKey: "AIzaSyBoTJTB5cU7cbc4syZJzlHAeC1ZWIj0ydA",
+        authDomain: "pinabakes-db2e4.firebaseapp.com",
+        projectId: "pinabakes-db2e4",
+        storageBucket: "pinabakes-db2e4.firebasestorage.app",
+        messagingSenderId: "548168287702",
+        appId: "1:548168287702:web:fe356dab8cf0f81d415077"
       },
       storageKeys: {
         cart: "pinabakes_cart",

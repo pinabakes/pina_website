@@ -1,10 +1,19 @@
-// PiNa Bakes - COMPLETE FIXED VERSION WITH ALL UPDATES
+// PiNa Bakes - WITH FIREBASE AUTHENTICATION & ORDER HISTORY
 class PinaBakesApp {
   constructor() {
     this.config = {
       razorpayKey: "rzp_live_RftmwdZpVNNgkh",
       orderWebhook: "https://script.google.com/macros/s/AKfycbwR_3cz5m-FOJertmmRos7-Zc7nundBbNTJ0HuZoLPZ9gHuDwxNO9Th4ThXIru_Kztc/exec",
       whatsappNumber: "917678506669",
+      // Firebase configuration - REPLACE WITH YOUR CONFIG
+      firebase: {
+        apiKey: "YOUR_FIREBASE_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+      },
       storageKeys: {
         cart: "pinabakes_cart",
         user: "pinabakes_user",
@@ -32,6 +41,9 @@ class PinaBakesApp {
       isWishlistOpen: false,
       currentImageIndex: 0,
       appliedCoupon: null,
+      isAuthenticated: false,
+      currentUser: null,
+      userOrders: [],
     };
 
     this.elements = {};
@@ -52,10 +64,43 @@ class PinaBakesApp {
     });
   }
 
+  loadFirebaseScript() {
+    return new Promise((resolve, reject) => {
+      if (window.firebase) {
+        resolve();
+        return;
+      }
+
+      // Load Firebase App
+      const appScript = document.createElement('script');
+      appScript.src = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
+      appScript.onload = () => {
+        // Load Firebase Auth after App loads
+        const authScript = document.createElement('script');
+        authScript.src = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js';
+        authScript.onload = () => resolve();
+        authScript.onerror = () => reject(new Error('Failed to load Firebase Auth'));
+        document.head.appendChild(authScript);
+      };
+      appScript.onerror = () => reject(new Error('Failed to load Firebase App'));
+      document.head.appendChild(appScript);
+    });
+  }
+
   async init() {
     try {
       console.log("Loading PiNa Bakes app...");
+
+      // Load external scripts
       await this.loadRazorpayScript().catch(err => console.warn('Razorpay SDK load failed:', err));
+      await this.loadFirebaseScript().catch(err => console.warn('Firebase SDK load failed:', err));
+
+      // Initialize Firebase
+      if (window.firebase && !firebase.apps.length) {
+        firebase.initializeApp(this.config.firebase);
+        this.auth.setupAuthListener();
+      }
+
       this.cacheElements();
       this.setupEventListeners();
       this.loadUserData();
@@ -163,6 +208,19 @@ class PinaBakesApp {
       wishlistModal: document.getElementById("wishlist-modal"),
       wishlistCount: document.getElementById("wishlist-count"),
       wishlistItems: document.getElementById("wishlist-items"),
+      // Auth elements
+      authModal: document.getElementById("auth-modal"),
+      authPhone: document.getElementById("auth-phone"),
+      authOtp: document.getElementById("auth-otp"),
+      authStep1: document.getElementById("auth-step-1"),
+      authStep2: document.getElementById("auth-step-2"),
+      recaptchaContainer: document.getElementById("recaptcha-container"),
+      userMenuBtn: document.getElementById("user-menu-btn"),
+      guestMenuBtn: document.getElementById("guest-menu-btn"),
+      userPhone: document.getElementById("user-phone"),
+      // Order history elements
+      orderHistorySection: document.getElementById("order-history"),
+      orderHistoryList: document.getElementById("order-history-list"),
     };
   }
 
@@ -195,6 +253,258 @@ class PinaBakesApp {
       });
     }
   }
+
+  // Firebase Authentication Module
+  auth = {
+    setupAuthListener: () => {
+      firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          this.state.isAuthenticated = true;
+          this.state.currentUser = {
+            uid: user.uid,
+            phone: user.phoneNumber,
+          };
+          this.auth.updateUI();
+          this.orderHistory.loadOrders();
+        } else {
+          this.state.isAuthenticated = false;
+          this.state.currentUser = null;
+          this.state.userOrders = [];
+          this.auth.updateUI();
+        }
+      });
+    },
+
+    updateUI: () => {
+      if (this.state.isAuthenticated) {
+        if (this.elements.userMenuBtn) this.elements.userMenuBtn.style.display = "flex";
+        if (this.elements.guestMenuBtn) this.elements.guestMenuBtn.style.display = "none";
+        if (this.elements.userPhone) this.elements.userPhone.textContent = this.state.currentUser.phone;
+      } else {
+        if (this.elements.userMenuBtn) this.elements.userMenuBtn.style.display = "none";
+        if (this.elements.guestMenuBtn) this.elements.guestMenuBtn.style.display = "flex";
+      }
+    },
+
+    openLoginModal: () => {
+      this.elements.authModal?.classList.add("active");
+      this.elements.modalOverlay?.classList.add("active");
+      document.body.style.overflow = "hidden";
+      this.auth.showStep1();
+    },
+
+    closeLoginModal: () => {
+      this.elements.authModal?.classList.remove("active");
+      if (!this.state.isCartOpen && !this.state.isMobileMenuOpen && !this.state.isWishlistOpen) {
+        this.elements.modalOverlay?.classList.remove("active");
+      }
+      document.body.style.overflow = "";
+      this.auth.resetForm();
+    },
+
+    showStep1: () => {
+      if (this.elements.authStep1) this.elements.authStep1.style.display = "block";
+      if (this.elements.authStep2) this.elements.authStep2.style.display = "none";
+    },
+
+    showStep2: () => {
+      if (this.elements.authStep1) this.elements.authStep1.style.display = "none";
+      if (this.elements.authStep2) this.elements.authStep2.style.display = "block";
+    },
+
+    resetForm: () => {
+      if (this.elements.authPhone) this.elements.authPhone.value = "";
+      if (this.elements.authOtp) this.elements.authOtp.value = "";
+      this.auth.showStep1();
+    },
+
+    sendOTP: async () => {
+      const phone = this.elements.authPhone?.value.trim();
+      if (!phone) {
+        this.ui.showToast("Please enter phone number", "error");
+        return;
+      }
+
+      // Validate Indian phone number
+      const phoneRegex = /^[6-9]\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        this.ui.showToast("Please enter valid 10-digit mobile number", "error");
+        return;
+      }
+
+      const fullPhone = `+91${phone}`;
+
+      try {
+        if (!window.recaptchaVerifier) {
+          window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+            size: 'invisible',
+            callback: () => {
+              console.log("reCAPTCHA solved");
+            }
+          });
+        }
+
+        this.ui.showToast("Sending OTP...", "info");
+
+        const confirmationResult = await firebase.auth().signInWithPhoneNumber(fullPhone, window.recaptchaVerifier);
+        window.confirmationResult = confirmationResult;
+
+        this.ui.showToast("OTP sent successfully!", "success");
+        this.auth.showStep2();
+      } catch (error) {
+        console.error("Error sending OTP:", error);
+        this.ui.showToast(`Error: ${error.message}`, "error");
+        window.recaptchaVerifier.render().then(widgetId => {
+          grecaptcha.reset(widgetId);
+        });
+      }
+    },
+
+    verifyOTP: async () => {
+      const otp = this.elements.authOtp?.value.trim();
+      if (!otp || otp.length !== 6) {
+        this.ui.showToast("Please enter 6-digit OTP", "error");
+        return;
+      }
+
+      try {
+        this.ui.showToast("Verifying OTP...", "info");
+        const result = await window.confirmationResult.confirm(otp);
+        const user = result.user;
+
+        this.ui.showToast("Login successful!", "success");
+        this.auth.closeLoginModal();
+        console.log("User logged in:", user.phoneNumber);
+      } catch (error) {
+        console.error("Error verifying OTP:", error);
+        this.ui.showToast("Invalid OTP. Please try again.", "error");
+      }
+    },
+
+    logout: () => {
+      firebase.auth().signOut().then(() => {
+        this.ui.showToast("Logged out successfully", "success");
+        this.router.navigate("#/home");
+      }).catch((error) => {
+        console.error("Error logging out:", error);
+        this.ui.showToast("Error logging out", "error");
+      });
+    },
+  };
+
+  // Order History Module
+  orderHistory = {
+    loadOrders: async () => {
+      if (!this.state.isAuthenticated) {
+        this.state.userOrders = [];
+        return;
+      }
+
+      try {
+        const phone = this.state.currentUser.phone;
+        // Fetch orders from Google Sheets via Apps Script
+        const response = await fetch(`${this.config.orderWebhook}?action=getOrders&phone=${encodeURIComponent(phone)}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          this.state.userOrders = data.orders || [];
+          this.orderHistory.render();
+        }
+      } catch (error) {
+        console.error("Error loading orders:", error);
+        // Try to load from localStorage as fallback
+        try {
+          const localOrders = JSON.parse(localStorage.getItem(this.config.storageKeys.orders) || "[]");
+          this.state.userOrders = localOrders.filter(order => 
+            order.customer.phone === this.state.currentUser.phone.replace("+91", "")
+          );
+          this.orderHistory.render();
+        } catch (e) {
+          console.error("Error loading local orders:", e);
+        }
+      }
+    },
+
+    render: () => {
+      if (!this.elements.orderHistoryList) return;
+
+      if (this.state.userOrders.length === 0) {
+        this.elements.orderHistoryList.innerHTML = `
+          <div style="text-align: center; padding: 3rem 1rem; color: var(--text-secondary);">
+            <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom: 1rem; opacity: .5;">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p>No orders yet</p>
+            <button class="btn btn-primary" onclick="App.router.navigate('#/products')">Start Shopping</button>
+          </div>
+        `;
+        return;
+      }
+
+      this.elements.orderHistoryList.innerHTML = this.state.userOrders.map(order => `
+        <div class="order-card">
+          <div class="order-header">
+            <div>
+              <strong>Order #${order.id}</strong>
+              <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                ${new Date(order.createdAt).toLocaleDateString('en-IN', { 
+                  day: 'numeric', 
+                  month: 'short', 
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 1.25rem; font-weight: 600; color: var(--primary);">
+                ${this.formatPrice(order.total)}
+              </div>
+              ${order.paymentId ? `<div style="font-size: 0.75rem; color: var(--success); margin-top: 0.25rem;">✓ Paid</div>` : ''}
+            </div>
+          </div>
+          <div class="order-items">
+            ${order.items.map(item => `
+              <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                <span>${item.name} × ${item.qty}</span>
+                <span style="font-weight: 500;">${this.formatPrice(item.price * item.qty)}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="order-summary">
+            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+              <span>Subtotal</span>
+              <span>${this.formatPrice(order.subtotal)}</span>
+            </div>
+            ${order.discount > 0 ? `
+              <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; color: var(--success);">
+                <span>Discount ${order.coupon ? `(${order.coupon})` : ''}</span>
+                <span>-${this.formatPrice(order.discount)}</span>
+              </div>
+            ` : ''}
+            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+              <span>Shipping</span>
+              <span>${order.shipping > 0 ? this.formatPrice(order.shipping) : 'Free'}</span>
+            </div>
+            ${order.paymentId ? `
+              <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.875rem; color: var(--text-secondary);">
+                <span>Payment ID</span>
+                <span>${order.paymentId}</span>
+              </div>
+            ` : ''}
+          </div>
+          <div class="order-footer">
+            <div>
+              <div style="font-weight: 500; margin-bottom: 0.25rem;">Delivery Address:</div>
+              <div style="font-size: 0.875rem; color: var(--text-secondary);">
+                ${order.customer.address}, ${order.customer.city} - ${order.customer.pincode}
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    },
+  };
 
   ui = {
     showToast: (message, type = "info", duration = 3000) => {
@@ -241,6 +551,7 @@ class PinaBakesApp {
       this.ui.closeMobileMenu();
       this.cart.close();
       this.wishlist.close();
+      this.auth.closeLoginModal();
     },
 
     renderSkeletonProducts: () => {
@@ -353,7 +664,7 @@ class PinaBakesApp {
 
     hideProductDetail: () => {
       document.querySelectorAll("main > section").forEach(s => {
-        if (s.id !== "product-detail") s.style.display = "";
+        if (s.id !== "product-detail" && s.id !== "order-history") s.style.display = "";
       });
       if (this.elements.productDetail) this.elements.productDetail.style.display = "none";
       this.state.currentProduct = null;
@@ -743,7 +1054,7 @@ class PinaBakesApp {
 
       const options = {
         key: this.config.razorpayKey,
-        amount: total * 100, // Razorpay expects amount in paise
+        amount: total * 100,
         currency: "INR",
         name: "PiNa Bakes",
         description: "Healthy Millet Cookies",
@@ -783,6 +1094,7 @@ class PinaBakesApp {
         shipping,
         total,
         paymentId: paymentId,
+        userPhone: this.state.isAuthenticated ? this.state.currentUser.phone : null,
         customer: formData,
         items: this.state.cart.map((i) => ({
           slug: i.slug,
@@ -818,6 +1130,11 @@ class PinaBakesApp {
       this.state.cart = [];
       this.cart.save();
       this.cart.render();
+
+      // Reload order history if user is logged in
+      if (this.state.isAuthenticated) {
+        this.orderHistory.loadOrders();
+      }
 
       // Redirect to WhatsApp
       this.ui.showToast("Payment successful! Redirecting to WhatsApp...", "success");
@@ -880,6 +1197,18 @@ class PinaBakesApp {
   router = {
     handleRoute: () => {
       const hash = window.location.hash || "#home";
+
+      // Handle order history route
+      if (hash === "#/orders" || hash === "#orders") {
+        if (!this.state.isAuthenticated) {
+          this.ui.showToast("Please login to view order history", "error");
+          this.auth.openLoginModal();
+          return;
+        }
+        this.router.showOrderHistory();
+        return;
+      }
+
       const m = hash.match(/#\/product\/(.+)/);
       if (m && m[1]) {
         this.router.showProduct(decodeURIComponent(m[1]));
@@ -914,12 +1243,26 @@ class PinaBakesApp {
 
     showSection: (id) => {
       this.ui.hideProductDetail();
+      if (this.elements.orderHistorySection) {
+        this.elements.orderHistorySection.style.display = "none";
+      }
       if (id && id !== "home") {
         const el = document.getElementById(id);
         el ? el.scrollIntoView({ behavior: "smooth" }) : window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
+    },
+
+    showOrderHistory: () => {
+      document.querySelectorAll("main > section").forEach(s => {
+        if (s.id !== "order-history") s.style.display = "none";
+      });
+      if (this.elements.orderHistorySection) {
+        this.elements.orderHistorySection.style.display = "block";
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      this.orderHistory.loadOrders();
     },
   };
 

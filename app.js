@@ -200,7 +200,7 @@ class PinaBakesApp {
       productTagline: document.getElementById("product-tagline"),
       productFeatures: document.getElementById("product-features"),
       productIngredients: document.getElementById("product-ingredients"),
-      nutritionTable: document.getElementById("nutrition-table"),
+      nutritionTable: document.getElementById("product-nutrition") || document.getElementById("nutrition-table"),
       addToCartDetail: document.getElementById("add-to-cart-detail"),
       addToWishlistDetail: document.getElementById("add-to-wishlist-detail"),
       toast: document.getElementById("toast"),
@@ -220,7 +220,7 @@ class PinaBakesApp {
       userPhone: document.getElementById("user-phone"),
       // Order history elements
       orderHistorySection: document.getElementById("order-history"),
-      orderHistoryList: document.getElementById("order-history-list"),
+      orderHistoryList: document.getElementById("orders-container"),
     };
   }
 
@@ -430,11 +430,12 @@ class PinaBakesApp {
 
       if (this.state.userOrders.length === 0) {
         this.elements.orderHistoryList.innerHTML = `
-          <div style="text-align: center; padding: 3rem 1rem; color: var(--text-secondary);">
-            <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom: 1rem; opacity: .5;">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          <div style="text-align:center;padding:4rem 1rem;color:var(--text-muted);">
+            <svg width="56" height="56" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:0 auto 1rem;display:block;opacity:.35;stroke-width:1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
-            <p>No orders yet</p>
+            <p style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:.5rem;color:var(--text-ink)">No orders yet</p>
+            <p style="font-size:.875rem;margin-bottom:1.5rem">Your order history will appear here</p>
             <button class="btn btn-primary" onclick="App.router.navigate('#/products')">Start Shopping</button>
           </div>
         `;
@@ -445,61 +446,33 @@ class PinaBakesApp {
         <div class="order-card">
           <div class="order-header">
             <div>
-              <strong>Order #${order.id}</strong>
-              <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                ${new Date(order.createdAt).toLocaleDateString('en-IN', { 
-                  day: 'numeric', 
-                  month: 'short', 
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
+              <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:600;color:var(--text-ink)">Order #${order.id}</div>
+              <div style="font-size:.85rem;color:var(--text-muted);margin-top:.2rem">
+                ${new Date(order.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}
               </div>
             </div>
-            <div style="text-align: right;">
-              <div style="font-size: 1.25rem; font-weight: 600; color: var(--primary);">
-                ${this.formatPrice(order.total)}
-              </div>
-              ${order.paymentId ? `<div style="font-size: 0.75rem; color: var(--success); margin-top: 0.25rem;">✓ Paid</div>` : ''}
+            <div style="text-align:right">
+              <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--green-mid)">${this.formatPrice(order.total)}</div>
+              ${order.paymentId ? `<div style="font-size:.75rem;color:#16a34a;margin-top:.2rem;font-weight:600">✓ Payment Confirmed</div>` : ''}
             </div>
           </div>
           <div class="order-items">
             ${order.items.map(item => `
-              <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
-                <span>${item.name} × ${item.qty}</span>
-                <span style="font-weight: 500;">${this.formatPrice(item.price * item.qty)}</span>
+              <div style="display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--border-hair);font-size:.875rem">
+                <span style="color:var(--text-body)">${item.name} × ${item.qty}</span>
+                <span style="font-weight:600;color:var(--text-ink)">${this.formatPrice(item.price * item.qty)}</span>
               </div>
             `).join('')}
           </div>
           <div class="order-summary">
-            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
-              <span>Subtotal</span>
-              <span>${this.formatPrice(order.subtotal)}</span>
-            </div>
-            ${order.discount > 0 ? `
-              <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; color: var(--success);">
-                <span>Discount ${order.coupon ? `(${order.coupon})` : ''}</span>
-                <span>-${this.formatPrice(order.discount)}</span>
-              </div>
-            ` : ''}
-            <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
-              <span>Shipping</span>
-              <span>${order.shipping > 0 ? this.formatPrice(order.shipping) : 'Free'}</span>
-            </div>
-            ${order.paymentId ? `
-              <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.875rem; color: var(--text-secondary);">
-                <span>Payment ID</span>
-                <span>${order.paymentId}</span>
-              </div>
-            ` : ''}
+            <div style="display:flex;justify-content:space-between;padding:.4rem 0;font-size:.875rem"><span style="color:var(--text-muted)">Subtotal</span><span>${this.formatPrice(order.subtotal)}</span></div>
+            ${order.discount > 0 ? `<div style="display:flex;justify-content:space-between;padding:.4rem 0;font-size:.875rem;color:#16a34a"><span>Discount ${order.coupon ? `(${order.coupon})` : ''}</span><span>−${this.formatPrice(order.discount)}</span></div>` : ''}
+            <div style="display:flex;justify-content:space-between;padding:.4rem 0;font-size:.875rem"><span style="color:var(--text-muted)">Shipping</span><span>${order.shipping > 0 ? this.formatPrice(order.shipping) : 'Free'}</span></div>
+            ${order.paymentId ? `<div style="display:flex;justify-content:space-between;padding:.4rem 0;font-size:.775rem;color:var(--text-muted)"><span>Payment ID</span><span style="font-family:monospace">${order.paymentId}</span></div>` : ''}
           </div>
           <div class="order-footer">
-            <div>
-              <div style="font-weight: 500; margin-bottom: 0.25rem;">Delivery Address:</div>
-              <div style="font-size: 0.875rem; color: var(--text-secondary);">
-                ${order.customer.address}, ${order.customer.city} - ${order.customer.pincode}
-              </div>
-            </div>
+            <div style="font-size:.875rem;font-weight:600;color:var(--text-ink);margin-bottom:.25rem">Delivery Address</div>
+            <div style="font-size:.875rem;color:var(--text-muted)">${order.customer.address}, ${order.customer.city} – ${order.customer.pincode}</div>
           </div>
         </div>
       `).join('');
@@ -563,16 +536,11 @@ class PinaBakesApp {
     renderProductError: (errorMessage) => {
       if (!this.elements.productsGrid) return;
       this.elements.productsGrid.innerHTML = `
-        <div style="grid-column: 1/-1; padding: 2rem; text-align: center; border: 1px solid #fecaca; background: #fee2e2; border-radius: 12px; color: #b91c1c;">
-          <h3>Could not load products</h3>
-          <p><strong>Error:</strong> ${errorMessage}</p>
-          <p style="margin-top: 1rem;"><strong>Please check:</strong></p>
-          <ul style="text-align: left; max-width: 400px; margin: 1rem auto 0;">
-            <li> products.json file exists in same folder as index.html</li>
-            <li> JSON file is valid and not corrupted</li>
-            <li> You're running on a web server (not file://)</li>
-          </ul>
-          <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 1rem;">Reload Page</button>
+        <div style="grid-column:1/-1;padding:2.5rem;text-align:center;border:1.5px solid #fecaca;background:#fff5f5;border-radius:var(--r-lg);color:#b91c1c;">
+          <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:.5rem">Could not load products</h3>
+          <p style="font-size:.9rem;margin-bottom:.75rem"><strong>Error:</strong> ${errorMessage}</p>
+          <p style="font-size:.875rem;color:#7f1d1d;margin-bottom:.5rem">Please check that <code>products.json</code> exists alongside <code>index.html</code> and you're running on a web server.</p>
+          <button onclick="location.reload()" class="btn btn-primary" style="margin-top:1rem">Reload Page</button>
         </div>
       `;
     },
@@ -582,31 +550,66 @@ class PinaBakesApp {
       const products = this.state.filteredProducts || this.state.products;
       if (!products.length) {
         this.elements.productsGrid.innerHTML = `
-          <div style="grid-column: 1/-1; padding: 2rem; text-align: center; color: var(--text-secondary);">
-            <p>No products found.</p>
+          <div style="grid-column:1/-1;padding:3rem;text-align:center;color:var(--text-muted);">
+            <p style="font-size:1.1rem">No products found.</p>
           </div>
         `;
         return;
       }
 
-      const html = products.map(product => `
-        <article class="product-card" data-product-id="${product.slug}">
+      const tagLabels = {
+        'gluten-friendly': 'Gluten Friendly',
+        'high-fiber': 'High Fibre',
+        'natural-sweetener': 'Natural Sweetener',
+        'high-protein': 'High Protein',
+        'maida-free': 'Maida Free',
+        'post-workout': 'Post-Workout',
+        'antioxidant-rich': 'Antioxidant',
+        'premium': 'Premium',
+        'superfood': 'Superfood',
+        'complete-protein': 'Complete Protein',
+        'high-calcium': 'High Calcium',
+        'gluten-free': 'Gluten Free',
+        'traditional': 'Traditional',
+        'belgian-cocoa': 'Belgian Cocoa',
+        'ancient-grain': 'Ancient Grain',
+      };
+
+      const html = products.map(product => {
+        const primaryTag = product.tags && product.tags[0] ? (tagLabels[product.tags[0]] || product.tags[0]) : null;
+        const isPremium = product.price > 300;
+        return `
+        <article class="product-card fade-in" data-product-id="${product.slug}">
           <div class="product-image-container">
-            <img src="${product.img}" alt="${product.name} cookies by PiNa Bakes" class="product-image" loading="lazy" width="600" height="600" onerror="this.src='https://via.placeholder.com/600x600/f3f4f6/9ca3af?text=No+Image'">
-            ${product.price > 300 ? '<span class="product-badge">Premium</span>' : ''}
+            <img src="${product.img}" alt="${product.name} cookies by PiNa Bakes" class="product-image" loading="lazy" width="600" height="600"
+              onerror="this.src='https://placehold.co/600x600/eef6f0/2f6a3a?text=PiNa+Bakes'">
+            <div class="product-tags-overlay">
+              ${primaryTag ? `<span class="tag-chip">${primaryTag}</span>` : ''}
+              ${isPremium ? `<span class="tag-chip amber">Premium</span>` : ''}
+            </div>
+            <button class="card-wishlist-btn" onclick="event.stopPropagation();App.wishlist.add('${product.slug}')" aria-label="Add to wishlist">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 8.25 12 9 12 .75 0 9-4.78 9-12z"/>
+              </svg>
+            </button>
           </div>
           <div class="product-content">
-            <h3 class="product-title">${product.name}</h3>
+            <div class="product-meta">
+              <h3 class="product-title">${product.name}</h3>
+            </div>
             <div class="product-price">${this.formatPrice(product.price)}</div>
             <p class="product-tagline">${product.tagline}</p>
             <div class="product-actions">
-              <a href="#/product/${product.slug}" class="btn btn-secondary">View Details</a>
-              <button class="btn btn-primary" onclick="App.cart.add('${product.slug}')">Add to Cart</button>
-              <button class="btn btn-outline" onclick="App.wishlist.add('${product.slug}')">♡</button>
+              <a href="#/product/${product.slug}" class="btn btn-secondary" style="flex:1">View Details</a>
+              <button class="btn btn-primary" style="flex:1.4" onclick="App.cart.add('${product.slug}')">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/></svg>
+                Add to Cart
+              </button>
             </div>
           </div>
         </article>
-      `).join('');
+        `;
+      }).join('');
       this.elements.productsGrid.innerHTML = html;
     },
 
@@ -620,14 +623,25 @@ class PinaBakesApp {
 
       this.gallery.setup(product);
 
+      // Tags
+      const tagsEl = document.getElementById('product-detail-tags');
+      if (tagsEl && product.tags && product.tags.length) {
+        tagsEl.innerHTML = product.tags.map(t =>
+          `<span class="detail-tag">${t.replace(/-/g,' ')}</span>`
+        ).join('');
+        tagsEl.style.display = 'flex';
+      } else if (tagsEl) {
+        tagsEl.style.display = 'none';
+      }
+
       if (product.bullets && product.bullets.length > 0) {
-        this.elements.productFeatures.innerHTML = `<h3>Key Features</h3><ul>${product.bullets.map(b => `<li>${b}</li>`).join('')}</ul>`;
+        this.elements.productFeatures.innerHTML = `<h3 class="detail-section-title">Key Features</h3><ul>${product.bullets.map(b => `<li>${b}</li>`).join('')}</ul>`;
       } else {
         this.elements.productFeatures.innerHTML = '';
       }
 
       if (product.ingredients && product.ingredients.length > 0) {
-        this.elements.productIngredients.innerHTML = product.ingredients.map(ing => `<li>${ing}</li>`).join('');
+        this.elements.productIngredients.innerHTML = product.ingredients.map(ing => `<span class="ingredient-pill">${ing}</span>`).join('');
       } else {
         this.elements.productIngredients.innerHTML = '';
       }
@@ -659,7 +673,7 @@ class PinaBakesApp {
         ["Dietary Fibre (g)", n.fibre],
         ["Sodium (mg)", n.sodium],
       ];
-      this.elements.nutritionTable.innerHTML = rows.map(([k, v]) => `<tr><td style="padding: .75rem; border: 1px solid #dee2e6;">${k}</td><td style="padding: .75rem; border: 1px solid #dee2e6;">${v}</td></tr>`).join('');
+      this.elements.nutritionTable.innerHTML = rows.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('');
     },
 
     hideProductDetail: () => {
@@ -821,30 +835,31 @@ class PinaBakesApp {
       if (this.elements.cartItems) {
         if (this.state.cart.length === 0) {
           this.elements.cartItems.innerHTML = `
-            <div style="text-align: center; padding: 3rem 1rem; color: var(--text-secondary);">
-              <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom: 1rem; opacity: .5;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6.5-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" />
+            <div style="text-align:center;padding:3rem 1rem;color:var(--text-muted);">
+              <svg width="56" height="56" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:0 auto 1rem;opacity:.35;display:block;">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/>
               </svg>
-              <p>Your cart is empty</p>
-              <button class="btn btn-primary" onclick="App.cart.close(); App.router.navigate('#/products')">Browse Products</button>
+              <p style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:.5rem;color:var(--text-ink)">Your cart is empty</p>
+              <p style="font-size:.875rem;margin-bottom:1.5rem">Add some delicious cookies!</p>
+              <button class="btn btn-primary" onclick="App.cart.close();App.router.navigate('#/products')">Browse Collection</button>
             </div>
           `;
         } else {
           this.elements.cartItems.innerHTML = this.state.cart.map(item => `
             <div class="cart-item">
-              <img src="${item.img}" alt="${item.name}" class="cart-item-image">
-              <div class="cart-item-details" style="flex: 1;">
+              <img src="${item.img}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://placehold.co/64x64/eef6f0/2f6a3a?text=🍪'">
+              <div class="cart-item-info">
                 <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-price">${this.formatPrice(item.price)}</div>
+                <div class="cart-item-price">${this.formatPrice(item.price)} each</div>
                 <div class="cart-item-actions">
-                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${item.slug}', ${item.quantity - 1})" aria-label="Decrease quantity">−</button>
-                  <span style="min-width: 2rem; text-align: center;">${item.quantity}</span>
-                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${item.slug}', ${item.quantity + 1})" aria-label="Increase quantity">+</button>
+                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${item.slug}',${item.quantity-1})" aria-label="Decrease">−</button>
+                  <span style="min-width:1.75rem;text-align:center;font-weight:600">${item.quantity}</span>
+                  <button class="quantity-btn" onclick="App.cart.updateQuantity('${item.slug}',${item.quantity+1})" aria-label="Increase">+</button>
+                  <button onclick="App.cart.remove('${item.slug}')" style="margin-left:.25rem;font-size:.775rem;color:#dc2626;font-weight:500;background:none;border:none;cursor:pointer;padding:.2rem .5rem;border-radius:var(--r-sm)" aria-label="Remove">Remove</button>
                 </div>
               </div>
-              <div style="text-align: right;">
-                <div style="font-weight: 600;">${this.formatPrice(item.price * item.quantity)}</div>
-                <button onclick="App.cart.remove('${item.slug}')" style="color: #dc2626; background: none; border: none; cursor: pointer; margin-top: .5rem; font-size: .875rem;" aria-label="Remove ${item.name} from cart">Remove</button>
+              <div style="text-align:right;flex-shrink:0">
+                <div style="font-weight:700;color:var(--green-mid);font-family:var(--font-display);font-size:1.05rem">${this.formatPrice(item.price * item.quantity)}</div>
               </div>
             </div>
           `).join('');
@@ -959,25 +974,26 @@ class PinaBakesApp {
       if (this.elements.wishlistItems) {
         if (count === 0) {
           this.elements.wishlistItems.innerHTML = `
-            <div style="text-align: center; padding: 3rem 1rem; color: var(--text-secondary);">
-              <svg width="64" height="64" viewBox="0 0 24 24" style="margin-bottom: 1rem; opacity: .5;">
-                <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 8.25 12 9 12 .75 0 9-4.78 9-12z" fill="currentColor" />
+            <div style="text-align:center;padding:3rem 1rem;color:var(--text-muted);">
+              <svg width="56" height="56" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:0 auto 1rem;opacity:.35;display:block;stroke-width:1.5">
+                <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 8.25 12 9 12 .75 0 9-4.78 9-12z"/>
               </svg>
-              <p>Your wishlist is empty</p>
-              <button class="btn btn-primary" onclick="App.wishlist.close(); App.router.navigate('#/products')">Browse Products</button>
+              <p style="font-family:var(--font-display);font-size:1.2rem;margin-bottom:.5rem;color:var(--text-ink)">Your wishlist is empty</p>
+              <p style="font-size:.875rem;margin-bottom:1.5rem">Save your favourite cookies here!</p>
+              <button class="btn btn-primary" onclick="App.wishlist.close();App.router.navigate('#/products')">Browse Collection</button>
             </div>
           `;
         } else {
           this.elements.wishlistItems.innerHTML = this.state.wishlist.map(item => `
             <div class="wishlist-item">
-              <img src="${item.img}" alt="${item.name}" class="wishlist-item-image">
-              <div class="wishlist-item-details">
+              <img src="${item.img}" alt="${item.name}" class="wishlist-item-image" onerror="this.src='https://placehold.co/64x64/eef6f0/2f6a3a?text=🍪'">
+              <div class="wishlist-item-details" style="flex:1">
                 <div class="wishlist-item-title">${item.name}</div>
-                <div class="cart-item-price">${this.formatPrice(item.price)}</div>
+                <div class="cart-item-price" style="color:var(--green-mid);font-weight:600">${this.formatPrice(item.price)}</div>
                 <div class="wishlist-item-actions">
-                  <button class="btn btn-primary" onclick="App.wishlist.moveToCart('${item.slug}')">Move to Cart</button>
-                  <a class="btn btn-secondary" href="#/product/${item.slug}" onclick="App.wishlist.close()">View Details</a>
-                  <button class="btn btn-outline" onclick="App.wishlist.remove('${item.slug}')">Remove</button>
+                  <button class="btn btn-primary btn-sm" onclick="App.wishlist.moveToCart('${item.slug}')">Add to Cart</button>
+                  <a class="btn btn-outline btn-sm" href="#/product/${item.slug}" onclick="App.wishlist.close()">Details</a>
+                  <button class="btn btn-ghost btn-sm" onclick="App.wishlist.remove('${item.slug}')" style="color:#dc2626">✕</button>
                 </div>
               </div>
             </div>

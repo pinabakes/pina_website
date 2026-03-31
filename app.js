@@ -115,6 +115,10 @@ class PinaBakesApp {
         ),
       ]);
 
+  // Initialize reviews (static + persisted user reviews)
+  this.reviews.load();
+  this.reviews.render();
+
       this.search.init();
       this.router.handleRoute();
       this.updateCurrentYear();
@@ -578,6 +582,8 @@ class PinaBakesApp {
       const html = products.map(product => {
         const primaryTag = product.tags && product.tags[0] ? (tagLabels[product.tags[0]] || product.tags[0]) : null;
         const isPremium = product.price > 300;
+        const mrp = product.mrp || product.price;
+        const discountPercent = mrp > product.price ? Math.round(((mrp - product.price) / mrp) * 100) : 0;
         return `
         <article class="product-card fade-in" data-product-id="${product.slug}">
           <div class="product-image-container">
@@ -597,7 +603,7 @@ class PinaBakesApp {
             <div class="product-meta">
               <h3 class="product-title">${product.name}</h3>
             </div>
-            <div class="product-price">${this.formatPrice(product.price)}</div>
+            <div class="product-price">${discountPercent > 0 ? `<span style="text-decoration:line-through;color:var(--text-muted);font-size:.9rem;margin-right:.5rem">${this.formatPrice(mrp)}</span><span style="color:var(--green-mid);font-weight:700">${this.formatPrice(product.price)}</span><span style="font-size:.85rem;color:var(--amber);margin-left:.5rem">${discountPercent}% off</span>` : `${this.formatPrice(product.price)}`}</div>
             <p class="product-tagline">${product.tagline}</p>
             <div class="product-actions">
               <a href="#/product/${product.slug}" class="btn btn-secondary" style="flex:1">View Details</a>
@@ -618,7 +624,15 @@ class PinaBakesApp {
       this.state.currentProduct = product;
 
       this.elements.productTitle.textContent = product.name;
-      this.elements.productPrice.textContent = this.formatPrice(product.price);
+      const mrp = product.mrp || product.price;
+      const discountPercent = mrp > product.price ? Math.round(((mrp - product.price) / mrp) * 100) : 0;
+      if (this.elements.productPrice) {
+        if (discountPercent > 0) {
+          this.elements.productPrice.innerHTML = `<span style=\"text-decoration:line-through;color:var(--text-muted);font-size:1rem;margin-right:.6rem\">${this.formatPrice(mrp)}</span><span style=\"color:var(--green-mid);font-weight:700;font-size:1.6rem\">${this.formatPrice(product.price)}</span><span style=\"font-size:.9rem;color:var(--amber);margin-left:.6rem\">${discountPercent}% off</span>`;
+        } else {
+          this.elements.productPrice.textContent = this.formatPrice(product.price);
+        }
+      }
       this.elements.productTagline.textContent = product.tagline;
 
       this.gallery.setup(product);
@@ -845,12 +859,15 @@ class PinaBakesApp {
             </div>
           `;
         } else {
-          this.elements.cartItems.innerHTML = this.state.cart.map(item => `
+          this.elements.cartItems.innerHTML = this.state.cart.map(item => {
+            const mrp = item.mrp || item.price;
+            const discountPercent = mrp > item.price ? Math.round(((mrp - item.price) / mrp) * 100) : 0;
+            return `
             <div class="cart-item">
               <img src="${item.img}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://placehold.co/64x64/eef6f0/2f6a3a?text=🍪'">
               <div class="cart-item-info">
                 <div class="cart-item-title">${item.name}</div>
-                <div class="cart-item-price">${this.formatPrice(item.price)} each</div>
+                <div class="cart-item-price">${discountPercent > 0 ? `<span style=\"text-decoration:line-through;color:var(--text-muted);font-size:.85rem;margin-right:.45rem\">${this.formatPrice(mrp)}</span><span style=\"color:var(--green-mid);font-weight:600\">${this.formatPrice(item.price)}</span><span style=\"font-size:.75rem;color:var(--amber);margin-left:.45rem\">${discountPercent}% off</span>` : `${this.formatPrice(item.price)}`} each</div>
                 <div class="cart-item-actions">
                   <button class="quantity-btn" onclick="App.cart.updateQuantity('${item.slug}',${item.quantity-1})" aria-label="Decrease">−</button>
                   <span style="min-width:1.75rem;text-align:center;font-weight:600">${item.quantity}</span>
@@ -862,7 +879,8 @@ class PinaBakesApp {
                 <div style="font-weight:700;color:var(--green-mid);font-family:var(--font-display);font-size:1.05rem">${this.formatPrice(item.price * item.quantity)}</div>
               </div>
             </div>
-          `).join('');
+            `;
+          }).join('');
         }
       }
 
@@ -1330,6 +1348,69 @@ class PinaBakesApp {
       const suggestions = this.elements.searchSuggest;
       if (suggestions) suggestions.classList.remove("active");
     },
+  };
+
+  // Reviews module: load static + user-submitted reviews and persist to localStorage
+  reviews = {
+    storageKey: 'pinabakes_reviews',
+    staticReviews: [
+      { name:'Priya M.',   stars:5, text:'Absolutely love the Jowar Peanut Butter cookies! Guilt-free snacking at its best.',        product:'Jowar Peanut Butter' },
+      { name:'Rajan K.',   stars:5, text:'The pistachio ones are a luxury. Sent a box to my mom and she called to reorder!',          product:'Richie-Pistachio Premium' },
+      { name:'Sneha T.',   stars:5, text:'Finally cookies that taste amazing AND are actually healthy. Perfect with chai.',            product:'Ragi Millet Classic' },
+      { name:'Amit S.',    stars:5, text:'Ordered 3 packs of the chocolate foxtail. Best impulse buy I\'ve made this year.',          product:'Foxtail True-Chocolate' },
+      { name:'Deepika R.', stars:5, text:'The lemon blueberry burst is SO refreshing. Light, zesty, and addictive!',                  product:'Lemon-Blueberry Burst' },
+      { name:'Vikram P.',  stars:5, text:'Premium quality, incredible flavors. Quinoa walnut is my go-to post-workout snack.',        product:'Quinoa-Walnut Crunch' },
+    ],
+    load: function() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(this.storageKey) || '[]');
+        this.userReviews = Array.isArray(stored) ? stored : [];
+      } catch (e) { this.userReviews = []; }
+    },
+    getAll: function() {
+      return [...this.userReviews || [], ...this.staticReviews];
+    },
+    add: function(review) {
+      if (!review || !review.name || !review.text) return false;
+      this.userReviews.unshift(review);
+      try { localStorage.setItem(this.storageKey, JSON.stringify(this.userReviews)); } catch (e) { console.warn('Could not save review', e); }
+      this.render();
+      return true;
+    },
+    render: function() {
+      const rg = document.getElementById('reviews-grid');
+      if (!rg) return;
+      const all = this.getAll();
+      rg.innerHTML = `
+        <div style="display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:1.25rem;width:100%">
+          <div style="flex:1;min-width:260px">
+            <h3 style=\"font-family:var(--font-display);font-size:1.15rem;color:var(--green-deep);margin-bottom:.6rem\">Add Your Review</h3>
+            <div style=\"display:flex;flex-direction:column;gap:.5rem\">
+              <input id=\"review-name\" class=\"form-input\" placeholder=\"Your name\" />
+              <input id=\"review-product\" class=\"form-input\" placeholder=\"Product (optional)\" />
+              <select id=\"review-stars\" class=\"form-input\"><option value=5>5 stars</option><option value=4>4 stars</option><option value=3>3 stars</option><option value=2>2 stars</option><option value=1>1 star</option></select>
+              <textarea id=\"review-text\" class=\"form-textarea\" rows=\"3\" placeholder=\"Write your feedback...\"></textarea>
+              <div style=\"display:flex;gap:.5rem\"><button class=\"btn btn-primary\" id=\"submit-review\">Submit Review</button><span id=\"review-msg\" style=\"align-self:center;color:var(--text-muted);font-size:.9rem\"></span></div>
+            </div>
+          </div>
+          <div style=\"flex:2;min-width:320px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem\">${all.map((r,i)=>`<div class=\"review-card\"><div class=\"review-header\"><div class=\"review-avatar\" style=\"background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--green-deep);\">${(r.name||'U')[0]}</div><div><div class=\"review-name\">${r.name}</div><div class=\"review-stars\">${'★'.repeat(r.stars||5)}</div></div></div><p class=\"review-text\">${r.text}</p><span class=\"review-product\">${r.product? '— '+r.product : ''}</span></div>`).join('')}</div>
+        </div>
+      `;
+      // wire submit
+      setTimeout(()=>{
+        const btn = document.getElementById('submit-review');
+        if (btn) btn.onclick = () => {
+          const name = (document.getElementById('review-name')?.value||'').trim() || 'Anonymous';
+          const product = (document.getElementById('review-product')?.value||'').trim();
+          const stars = parseInt(document.getElementById('review-stars')?.value||5,10);
+          const text = (document.getElementById('review-text')?.value||'').trim();
+          if (!text) { document.getElementById('review-msg').textContent = 'Please write a short review'; return; }
+          this.add({ name, product, stars, text });
+          document.getElementById('review-msg').textContent = 'Thanks for your feedback!';
+          setTimeout(()=>{ document.getElementById('review-msg').textContent=''; document.getElementById('review-text').value=''; }, 1800);
+        };
+      },50);
+    }
   };
 
   formatPrice(price) {

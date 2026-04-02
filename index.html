@@ -1750,5 +1750,114 @@
     </div>
   </section>
 
+<!-- Cute cookie character: eyes follow cursor -->
+<div id="cookie-character" aria-hidden="true" title="Cute PiNa cookie">
+  <div class="cookie-body">
+    <div class="cookie-chip chip-1"></div>
+    <div class="cookie-chip chip-2"></div>
+    <div class="cookie-chip chip-3"></div>
+    <div class="cookie-eyes">
+      <div class="eye left"><div class="pupil"></div></div>
+      <div class="eye right"><div class="pupil"></div></div>
+    </div>
+    <div class="cookie-smile"></div>
+  </div>
+</div>
+
+<style>
+  /* Cookie character styles */
+  #cookie-character { position: fixed; left: 18px; bottom: 96px; z-index: 150; pointer-events: none; }
+  .cookie-body {
+    width: 96px; height: 96px; border-radius: 50%; background: linear-gradient(135deg,#f6d9b6 0%, #f0b77a 100%);
+    box-shadow: 0 8px 18px rgba(30,20,10,.12); position: relative; display:flex; align-items:center; justify-content:center;
+    transform-origin: center; transition: transform .36s var(--ease-out);
+  }
+  @media (max-width:480px){ #cookie-character{ left: 12px; bottom: 130px;} .cookie-body{ width:72px; height:72px; }}
+  .cookie-chip { position: absolute; background: #6b4226; border-radius: 50%; opacity: .95; }
+  .chip-1{ width:12px; height:12px; left:18px; top:22px; }
+  .chip-2{ width:10px; height:10px; right:20px; top:28px; }
+  .chip-3{ width:8px; height:8px; left:28px; bottom:22px; }
+  .cookie-eyes{ position:absolute; top:30%; left:50%; transform:translateX(-50%); display:flex; gap:12px; }
+  .eye{ width:18px; height:18px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow: inset 0 -1px 0 rgba(0,0,0,.06); }
+  .eye .pupil{ width:8px; height:8px; background:#1c1612; border-radius:50%; transform:translate(0,0); transition: transform .08s linear; }
+  .cookie-smile{ position:absolute; bottom:18px; left:50%; transform:translateX(-50%); width:44px; height:18px; border-bottom:3px solid rgba(28,22,18,.14); border-radius:0 0 40px 40px; }
+
+  /* subtle bob animation */
+  @media (prefers-reduced-motion: no-preference) {
+    .cookie-body { animation: cookie-bob 4.5s ease-in-out infinite; }
+    @keyframes cookie-bob { 0%{ transform: translateY(0)} 50%{ transform: translateY(-6px)} 100%{ transform: translateY(0)} }
+  }
+
+  /* hide on very small screens if needed */
+  @media (max-width:340px){ #cookie-character{ display:none } }
+</style>
+
+<script>
+  (function(){
+    const el = document.getElementById('cookie-character');
+    if(!el) return;
+
+    const eyes = Array.from(el.querySelectorAll('.eye'));
+    const pupils = eyes.map(e => e.querySelector('.pupil'));
+    const bounds = [];
+    let raf = null;
+    let target = { x: window.innerWidth/2, y: window.innerHeight/2 };
+
+    function updateBounds(){
+      eyes.forEach((eye,i)=>{
+        bounds[i] = eye.getBoundingClientRect();
+      });
+    }
+
+    function onMove(clientX, clientY){
+      target.x = clientX; target.y = clientY;
+      if(!raf) raf = requestAnimationFrame(animate);
+    }
+
+    function animate(){
+      raf = null;
+      pupils.forEach((p,i)=>{
+        const b = bounds[i];
+        if(!b) return;
+        const cx = b.left + b.width/2;
+        const cy = b.top + b.height/2;
+        const dx = target.x - cx;
+        const dy = target.y - cy;
+        const angle = Math.atan2(dy, dx);
+        const max = Math.min(8, b.width*0.35);
+        const px = Math.cos(angle) * max;
+        const py = Math.sin(angle) * max;
+        p.style.transform = `translate(${px}px, ${py}px)`;
+      });
+      // slight tilt of cookie towards cursor
+      const cb = el.querySelector('.cookie-body').getBoundingClientRect();
+      const centerX = cb.left + cb.width/2;
+      const tilt = Math.max(-8, Math.min(8, (target.x - centerX)/30));
+      el.querySelector('.cookie-body').style.transform = `rotate(${tilt}deg)`;
+    }
+
+    // Mouse
+    window.addEventListener('mousemove', (ev)=>{
+      onMove(ev.clientX, ev.clientY);
+    }, { passive: true });
+
+    // Touch support
+    window.addEventListener('touchmove', (ev)=>{
+      const t = ev.touches[0]; if(!t) return; onMove(t.clientX, t.clientY);
+    }, { passive: true });
+
+    // Recompute on resize/scroll
+    window.addEventListener('resize', updateBounds);
+    window.addEventListener('scroll', updateBounds, { passive: true });
+
+    // init
+    // Respect reduced motion
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduced) return; // don't animate
+    // Wait a tick to ensure layout done
+    setTimeout(()=>{ updateBounds(); }, 200);
+  })();
+</script>
+
 </body>
 </html>
